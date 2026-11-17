@@ -392,8 +392,9 @@ ol.steps{margin:8px 0 0;padding-left:20px;font-size:14px;line-height:1.5;color:v
       <ol class="steps"><li>No menu Compartilhar, convide cada jogador como <b>Editor</b>. O mesmo convite vale para o mapa e para as fichas.</li><li>Escolha abaixo a campanha desta mesa. Os jogadores dela entram pelo botão <b>Mapa</b>; o link acima também funciona.</li><li>Use a ferramenta Névoa para revelar o mapa durante a sessão; tokens e mudanças aparecem para eles em segundos.</li></ol>
       <label class="field" style="margin-top:10px"><span>Campanha desta mesa</span><select id="mesaCamp"></select></label>
       <p class="note" id="mesaCampNote" style="margin:4px 0 0">Os jogadores da campanha escolhida veem este mapa ao clicar em <b>Mapa</b>.</p>
-      <div id="mesaInvBox" hidden style="margin-top:10px"><label class="field" style="margin:0"><span>Convite da campanha: o jogador cria a ficha e entra nesta mesa</span></label>
-        <div class="row"><input type="text" id="mesaInv" readonly aria-label="Link de convite da campanha"><button class="btn primary" id="mesaInvCopy">Copiar convite</button></div></div>
+      <div id="mesaInvBox" hidden style="margin-top:10px"><p class="note" style="margin:0 0 6px">Cada convite cria uma única ficha nesta campanha. A lista completa fica em Fichas › campanha › Convites.</p>
+        <div class="row"><button class="btn" id="mesaInvNew">Gerar convite de jogador</button></div>
+        <div class="row" id="mesaInvRow" hidden style="margin-top:6px"><input type="text" id="mesaInv" readonly aria-label="Link do convite"><button class="btn primary" id="mesaInvCopy">Copiar</button></div></div>
       <div class="actions" style="justify-content:flex-start"><button class="btn" id="mesaNew">Gerar link novo</button></div>
     </div>
     <p class="note" id="mesaState" style="margin-top:10px"></p>
@@ -730,6 +731,22 @@ h1.view{font-family:var(--f-title);font-weight:400;font-size:32px;margin:4px 0 4
 .invrow{display:flex;gap:8px;flex-wrap:wrap}.invrow input{flex:1 1 260px;min-width:0;background:var(--panel-2);border:1px solid var(--line);border-radius:7px;padding:5px 9px;font-size:13.5px}
 .join{max-width:620px;margin:10px auto 0}.join .card h3{font-size:20px}.join .card{gap:10px}
 .lbl-join{color:var(--muted);margin:0 0 6px;font-size:14px;letter-spacing:.04em}
+a.btn{color:inherit}
+.subh{font-family:var(--f-title);font-weight:400;font-size:19px;margin:16px 0 8px}
+.invitem{display:flex;gap:8px;align-items:center;flex-wrap:wrap;background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:9px 12px;margin-bottom:8px}
+.invitem .meta{flex:1 1 240px;min-width:0;display:flex;flex-direction:column}.invitem .meta small{color:var(--muted)}
+.invitem.used{opacity:.85}
+.cnt{display:inline-grid;place-items:center;min-width:20px;height:20px;padding:0 6px;border-radius:99px;background:var(--accent);color:var(--accent-fg);font-size:12px;margin-left:4px}
+.draft{display:inline-block;font-size:11.5px;letter-spacing:.06em;text-transform:uppercase;font-weight:700;color:var(--accent);border:1px dashed var(--accent);border-radius:99px;padding:0 7px;margin-top:2px}
+.draftbar{display:flex;gap:10px;align-items:center;flex-wrap:wrap;padding:10px 18px;background:#fff6d6;color:#3a2a00;border-bottom:1px solid #e0c060;font-size:14.5px}
+.draftbar span{flex:1 1 280px}.draftbar .btn{background:#3a2a00;color:#fff6d6;border-color:#3a2a00}
+.logitem{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:10px 14px;margin-bottom:10px}
+.logitem.new{border-left:4px solid var(--accent)}
+.logitem header{display:flex;gap:10px;align-items:baseline;flex-wrap:wrap}.logitem header b{font-family:var(--f-title);font-weight:400;font-size:18px}
+.logitem ul{margin:8px 0 0;padding:0;list-style:none;display:grid;gap:3px}
+.logitem li{display:flex;gap:8px;flex-wrap:wrap;align-items:baseline;font-size:14.5px;border-bottom:1px dashed var(--line);padding:2px 0}
+.logitem .k{font-weight:700;min-width:150px}.logitem .de{color:var(--muted);text-decoration:line-through}.logitem .para{color:var(--fg)}
+.logc{margin:6px 0 0;color:var(--muted)}
 .mesabox{display:flex;gap:10px;align-items:center;flex-wrap:wrap;background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:10px 14px;margin:12px 0 0}
 .mesabox .dot{width:9px;height:9px;border-radius:50%;background:var(--ok);flex:0 0 auto}
 .mesabox .dot.off{background:var(--muted)}
@@ -757,7 +774,7 @@ h1.view{font-family:var(--f-title);font-weight:400;font-size:32px;margin:4px 0 4
 <script id="ponte">
 /* Bridge between the map and the sheets: one page, two sections, chosen by the address (#mapa, #mesa-…, #inicio, #campanha-…, #ficha-…). */
 (()=>{'use strict';
-const FICHAS=/^#(inicio|campanha-|ficha-|entrar-)/;
+const FICHAS=/^#(inicio|campanha-|ficha-|entrar-|convite-)/;
 const ss={get(k){try{return sessionStorage.getItem(k)}catch(e){return null}},set(k,v){try{sessionStorage.setItem(k,v)}catch(e){}}};
 const viewListeners=new Set(),roots=new Set([document]);
 let last=null,lastF=ss.get('mesa.lastF')||'#inicio',lastM=ss.get('mesa.lastM')||'#mapa';
@@ -3600,11 +3617,12 @@ function mesaLink(){return map&&map.mesa?ARTIFACT_URL+'#mesa-'+map.mesa.id:'';}
 function openMesa(){$('mesaModal').hidden=false;renderMesa();}
 function renderMesa(){const on=!!(map.mesa&&map.mesa.on);
   const cs=$('mesaCamp'),camps=window.Fichas?Fichas.camps():[];cs.innerHTML='';cs.appendChild(new Option(camps.length?'Nenhuma':'Crie uma campanha em Fichas',''));for(const c of camps)cs.appendChild(new Option(c.nome,c.id));
-  const cur=map.mesa&&camps.find(c=>c.mesa===map.mesa.id);cs.value=cur?cur.id:'';cs.disabled=!camps.length;$('mesaInvBox').hidden=!cur;if(cur)$('mesaInv').value=Fichas.inviteLink(cur.id);$('mesaOn').checked=on;$('mesaLinkBox').hidden=!map.mesa;$('mesaLink').value=mesaLink();$('mesaNoDb').hidden=!!db;$('mesaOn').disabled=!db;
+  const cur=map.mesa&&camps.find(c=>c.mesa===map.mesa.id);cs.value=cur?cur.id:'';cs.disabled=!camps.length;$('mesaInvBox').hidden=!cur;$('mesaOn').checked=on;$('mesaLinkBox').hidden=!map.mesa;$('mesaLink').value=mesaLink();$('mesaNoDb').hidden=!!db;$('mesaOn').disabled=!db;
   if(!on)$('mesaState').textContent=map.mesa?'Transmissão pausada. Os jogadores continuam vendo a última versão.':'A mesa ainda não foi ativada para este mapa.';}
 function wireMesa(){$('mesaBtn').onclick=openMesa;
   $('mesaOn').onchange=e=>{if(!db)return;if(!map.mesa)map.mesa={id:uid()+uid().slice(0,4),on:false};map.mesa.on=e.target.checked;changed();renderMesa();if(map.mesa.on)pushMesa();};
   $('mesaCopy').onclick=()=>{const v=mesaLink();const ta=$('mesaLink');try{navigator.clipboard.writeText(v).then(()=>toast('Link copiado.'),()=>{ta.select();toast('Selecione e copie o link.');});}catch(e){ta.select();}};
+  $('mesaInvNew').onclick=async()=>{const cur=window.Fichas&&map.mesa&&Fichas.camps().find(c=>c.mesa===map.mesa.id);if(!cur)return;const l=await Fichas.newInvite(cur.id,'pc');if(!l)return;$('mesaInv').value=l;$('mesaInvRow').hidden=false;$('mesaInv').select();};
   $('mesaInvCopy').onclick=()=>{const v=$('mesaInv').value;const ta=$('mesaInv');try{navigator.clipboard.writeText(v).then(()=>toast('Convite copiado.'),()=>{ta.select();toast('Selecione e copie o convite.');});}catch(e){ta.select();}};
   $('mesaCamp').onchange=async e=>{if(!window.Fichas||!map.mesa)return;const cid=e.target.value;const cur=Fichas.camps().find(c=>c.mesa===map.mesa.id);
     if(cur&&cur.id!==cid)await Fichas.linkMesa(cur.id,null);if(cid){if(!map.mesa.on){map.mesa.on=true;changed();pushMesa();}await Fichas.linkMesa(cid,{mesa:map.mesa.id,mapa:map.id,nome:map.name});toast('Mesa ligada à campanha.');}renderMesa();};
@@ -3867,7 +3885,7 @@ const opCarga=s=>num(s.atr.for)<=0?2:num(s.atr.for)*5;
 const opEsp=s=>(s.itens||[]).reduce((a,i)=>a+num(i.esp),0);
 
 /* ================= STORE ================= */
-const S={mode:'local',uid:'local',master:true,canWrite:null,ready:false,camps:{},pcs:{},npcs:{},notes:{},names:{},readOnlyMsg:''};
+const S={mode:'local',uid:'local',master:true,canWrite:null,convites:{},usados:{},logs:{},ready:false,camps:{},pcs:{},npcs:{},notes:{},names:{},readOnlyMsg:''};
 let db=null,user=null;const unsub={};const pending=new Map();let saveTimer=null,parentDone=false;
 const LOCAL_KEY='grimorio.v1';
 function loadLocal(){try{const d=JSON.parse(store.get(LOCAL_KEY)||'{}');S.camps=d.camps||{};S.pcs=d.pcs||{};S.npcs=d.npcs||{};S.notes=d.notes||{};}catch(e){}}
@@ -3883,29 +3901,32 @@ function subscribe(){
   const done=()=>{if(!S.ready){S.ready=true;clearTimeout(to);setStatus('Sincronizado');}notify();if(Mesa.view()==='fichas')render();};
   const err=e=>{setStatus(e&&e.code==='revoked'?'Acesso revogado':'Não foi possível sincronizar',true);};
   unsub.c=db.collection('campanhas').onSnapshot(s=>{S.camps={};for(const d of s.docs){const v=d.data();if(v)S.camps[d.id]=Object.assign({id:d.id},v);}done();},err);
-  unsub.p=db.collection('pjs').onSnapshot(s=>{for(const d of s.docs)watchPlayer(d.id);watchPlayer(S.uid);done();},err);
   watchPlayer(S.uid);
-  if(S.master){unsub.n=db.collection('npcs').onSnapshot(s=>{S.npcs={};for(const d of s.docs){const v=d.data();if(v)S.npcs[d.id]=v;}done();},err);
+  if(S.master){unsub.p=db.collection('pjs').onSnapshot(s=>{for(const d of s.docs)watchPlayer(d.id);done();},err);
+    unsub.cv=db.collection('convites').onSnapshot(s=>{S.convites={};for(const d of s.docs){const v=d.data();if(v)S.convites[d.id]=Object.assign({id:d.id},v);}done();},err);
+    unsub.us=db.collection('usados').onSnapshot(s=>{S.usados={};for(const d of s.docs){const v=d.data();if(v)S.usados[d.id]=v;}done();},err);unsub.n=db.collection('npcs').onSnapshot(s=>{S.npcs={};for(const d of s.docs){const v=d.data();if(v)S.npcs[d.id]=v;}done();},err);
     unsub.s=db.collection('segredos').onSnapshot(s=>{S.notes={};for(const d of s.docs){const v=d.data();if(v)S.notes[d.id]=v;}done();},err);}
 }
-function watchPlayer(pid){if(!pid||unsub['u'+pid])return;unsub['u'+pid]=db.collection('pjs/'+pid+'/fichas').onSnapshot(s=>{const m={};for(const d of s.docs){const v=d.data();if(v)m[d.id]=Object.assign(v,{id:d.id,owner:pid});}
-  for(const [id,v] of Object.entries(m)){const loc=S.pcs[pid]&&S.pcs[pid][id];if(loc&&pending.has(id)){m[id]=loc;}}S.pcs[pid]=m;onRemote();},()=>{});}
-function allSheets(){const out=[];for(const [pid,m] of Object.entries(S.pcs))for(const [id,v] of Object.entries(m||{}))out.push(Object.assign(v,{id,owner:pid,kind:'pc'}));for(const [id,v] of Object.entries(S.npcs))out.push(Object.assign(v,{id,kind:'npc'}));return out;}
+function watchPlayer(pid){if(!pid||unsub['u'+pid])return;
+  if(S.master&&pid!==S.uid)unsub['l'+pid]=db.collection('pjs/'+pid+'/logs').onSnapshot(s=>{const m={};for(const d of s.docs){const v=d.data();if(v)m[d.id]=Object.assign({id:d.id,pid},v);}S.logs[pid]=m;onRemote();},()=>{});
+  unsub['u'+pid]=db.collection('pjs/'+pid+'/fichas').onSnapshot(s=>{const m={};for(const d of s.docs){const v=d.data();if(v)m[d.id]=Object.assign(v,{id:d.id,owner:pid});}
+  for(const [id,v] of Object.entries(m)){const loc=S.pcs[pid]&&S.pcs[pid][id];if(loc&&pending.has(id)){m[id]=loc;}if(pid===S.uid&&!logBase[id])logBase[id]=clone(m[id]);}S.pcs[pid]=m;onRemote();},()=>{});}
+function allSheets(){const out=[];for(const [pid,m] of Object.entries(S.pcs))for(const [id,v] of Object.entries(m||{}))out.push(Object.assign(v,{id,owner:pid,kind:v.tipo==='npc'?'npc':'pc'}));for(const [id,v] of Object.entries(S.npcs))out.push(Object.assign(v,{id,kind:'npc'}));return out;}
 function findSheet(id){return allSheets().find(s=>s.id===id);}
 /* whether this viewer can create and save their own sheet (null from the platform = let the save decide) */
 function canCreate(){if(S.mode==='local'||S.master)return true;if(!S.uid)return false;return S.canWrite!==false;}
-function canEdit(sh){return S.master||(sh.kind==='pc'&&sh.owner===S.uid);}
-function queueSave(sh){sh.updatedAt=Date.now();notify();pending.set(sh.id,sh);setStatus('Alterações não salvas');clearTimeout(saveTimer);saveTimer=setTimeout(flush,700);}
+function canEdit(sh){return S.master||(!!sh.owner&&sh.owner===S.uid);}
+function queueSave(sh){sh.updatedAt=Date.now();notify();logChange(sh);pending.set(sh.id,sh);setStatus('Alterações não salvas');clearTimeout(saveTimer);saveTimer=setTimeout(flush,700);}
 let flushing=false;
 async function flush(){if(flushing){clearTimeout(saveTimer);saveTimer=setTimeout(flush,400);return;}if(!pending.size)return;flushing=true;const items=[...pending.values()];pending.clear();
   if(S.mode==='local'){saveLocal();setStatus('Salvo neste navegador');flushing=false;return;}
   setStatus('Salvando…');let fail=null;
   for(const sh of items){const data=JSON.parse(JSON.stringify(sh));delete data.id;delete data.kind;
-    try{if(sh.kind==='npc')await db.doc('npcs/'+sh.id).set(data);else{if(sh.owner===S.uid&&!parentDone){await db.doc('pjs/'+S.uid).set({ativo:Date.now()});parentDone=true;}
+    try{if(!sh.owner)await db.doc('npcs/'+sh.id).set(data);else{if(sh.owner===S.uid&&!parentDone){await db.doc('pjs/'+S.uid).set({ativo:Date.now()});parentDone=true;}
       delete data.owner;await db.doc('pjs/'+sh.owner+'/fichas/'+sh.id).set(data);}}catch(e){fail=e;}}
   flushing=false;if(fail){const code=fail&&fail.code;setStatus(code==='invalid_argument'?'Sem permissão para salvar':'Erro ao salvar',true);
     if(code==='invalid_argument'){S.readOnlyMsg='Você pode ler as fichas, mas não salvar. Peça ao mestre para te convidar como Editor no menu Compartilhar.';render();}}else setStatus('Salvo');}
-async function removeSheet(sh){if(sh.kind==='npc'){delete S.npcs[sh.id];if(db)try{await db.doc('npcs/'+sh.id).delete();}catch(e){}}else{if(S.pcs[sh.owner])delete S.pcs[sh.owner][sh.id];if(db)try{await db.doc('pjs/'+sh.owner+'/fichas/'+sh.id).delete();}catch(e){}}
+async function removeSheet(sh){if(!sh.owner){delete S.npcs[sh.id];if(db)try{await db.doc('npcs/'+sh.id).delete();}catch(e){}}else{if(S.pcs[sh.owner])delete S.pcs[sh.owner][sh.id];if(db)try{await db.doc('pjs/'+sh.owner+'/fichas/'+sh.id).delete();}catch(e){}}
   pending.delete(sh.id);if(S.mode==='local')saveLocal();}
 async function saveCamp(c){S.camps[c.id]=c;if(S.mode==='local'){saveLocal();return;}const d=Object.assign({},c);delete d.id;try{await db.doc('campanhas/'+c.id).set(d);}catch(e){setStatus('Erro ao salvar a campanha',true);}}
 async function removeCamp(c){delete S.camps[c.id];if(S.mode==='local'){saveLocal();return;}try{await db.doc('campanhas/'+c.id).delete();await db.doc('segredos/'+c.id).delete();}catch(e){}}
@@ -3937,7 +3958,7 @@ for(const b of $('#trayMode').children)b.onclick=()=>{trayMode=b.dataset.m;for(c
 for(const f of[4,6,8,10,12,20,100]){const b=document.createElement('button');b.textContent='d'+f;b.onclick=()=>rollExpr('d'+f,'1d'+f);$('#trayDice').appendChild(b);}
 
 /* ================= ROUTING ================= */
-function route(){const h=location.hash.slice(1);let m;if((m=h.match(/^entrar-([A-Za-z0-9-]+)$/)))return {v:'join',id:m[1]};if((m=h.match(/^campanha-([A-Za-z0-9-]+)$/)))return {v:'camp',id:m[1]};if((m=h.match(/^ficha-([A-Za-z0-9-]+)$/)))return {v:'ficha',id:m[1]};return {v:'home'};}
+function route(){const h=location.hash.slice(1);let m;if((m=h.match(/^entrar-([A-Za-z0-9-]+)$/)))return {v:'oldjoin',id:m[1]};if((m=h.match(/^convite-([A-Za-z0-9-]+)$/)))return {v:'invite',id:m[1]};if((m=h.match(/^campanha-([A-Za-z0-9-]+)$/)))return {v:'camp',id:m[1]};if((m=h.match(/^ficha-([A-Za-z0-9-]+)$/)))return {v:'ficha',id:m[1]};return {v:'home'};}
 Mesa.onView((v,changed)=>{if(v!=='fichas')return;if(changed)HOST.scrollTop=0;render();});
 const ui={campTab:'grupo',sheetTab:{}};
 
@@ -3945,18 +3966,19 @@ const ui={campTab:'grupo',sheetTab:{}};
 function crumbs(parts){$('#crumbs').innerHTML=parts.map((p,i)=>(i?'<span aria-hidden="true">›</span>':'')+`<a href="${p[1]}">${esc(p[0])}</a>`).join('');}
 function render(){const app=$('#app');const tb=$('.top');if(tb)HOST.style.setProperty('--toph',tb.offsetHeight+'px');$('#who').innerHTML=S.mode==='local'?'<b>Modo local</b>':S.master?'Você é o <b>mestre</b>':'Você é <b>jogador</b>';
   if(!S.ready){app.innerHTML='<p class="lead">Carregando as campanhas…</p>';return;}const r=route();
-  if(r.v==='join')return viewJoin(app,r.id);
+  if(r.v==='invite')return viewInvite(app,r.id);
+  if(r.v==='oldjoin'){crumbs([['Campanhas','#inicio']]);app.innerHTML='<div class="join"><h1 class="view">Convite</h1><div class="empty">Este link de convite é antigo e não vale mais. Cada ficha agora tem o próprio convite: peça um novo ao mestre.</div></div>';return;}
   if(r.v==='camp'&&S.camps[r.id])return viewCamp(app,S.camps[r.id]);if(r.v==='ficha'){const sh=findSheet(r.id);if(sh)return viewSheet(app,sh);app.innerHTML='<div class="empty">Ficha não encontrada. Ela pode ter sido apagada ou ainda estar carregando.</div>';crumbs([['Campanhas','#inicio']]);return;}
   viewHome(app);}
 function campCount(cid){return allSheets().filter(s=>s.camp===cid&&s.kind==='pc').length;}
-function viewHome(app){crumbs([['Campanhas','#inicio']]);const camps=Object.values(S.camps).sort((a,b)=>(b.createdAt||0)-(a.createdAt||0));
+function viewHome(app){crumbs([['Campanhas','#inicio']]);const camps=Object.values(S.camps).filter(c=>S.master||allSheets().some(s=>s.camp===c.id&&s.owner===S.uid)).sort((a,b)=>(b.createdAt||0)-(a.createdAt||0));
   const banner=S.readOnlyMsg?`<div class="banner">${esc(S.readOnlyMsg)}</div>`:'';
-  const intro=S.master?'Crie uma campanha, escolha o sistema e convide os jogadores. Cada um preenche a própria ficha; você vê e edita todas, além de NPCs e notas que só você enxerga.':'Escolha a campanha da sua mesa e crie sua ficha. O mestre vê o que você preencher.';
+  const intro=S.master?'Crie uma campanha, escolha o sistema e convide os jogadores. Cada um preenche a própria ficha; você vê e edita todas, além de NPCs e notas que só você enxerga.':'Aqui ficam as mesas onde você tem fichas. Para criar uma ficha, use o convite que o mestre te enviar.';
   app.innerHTML=`${banner}<h1 class="view">Campanhas</h1><p class="lead">${intro}</p>
     ${S.master?'<div class="row" style="margin-bottom:14px"><button class="btn primary" id="newCamp">Nova campanha</button></div>':''}
     ${camps.length?`<div class="grid-cards">${camps.map(c=>`<article class="card"><a class="cover" href="#campanha-${c.id}"><span class="badge ${c.sys}">${esc(SYS[c.sys].n)}</span><h3>${esc(c.nome)}</h3></a>
-      <div class="meta">${esc(c.desc||'Sem descrição.')}</div><div class="meta">${campCount(c.id)} ficha(s) de jogador</div><div class="row"><a class="btn small" href="#campanha-${c.id}">Abrir</a></div></article>`).join('')}</div>`
-      :`<div class="empty">${S.master?'Nenhuma campanha ainda. Comece em “Nova campanha”.':'O mestre ainda não criou nenhuma campanha.'}</div>`}
+      <div class="meta">${esc(c.desc||'Sem descrição.')}</div><div class="meta">${S.master?campCount(c.id)+' ficha(s) de jogador':'Suas fichas: '+allSheets().filter(s=>s.camp===c.id&&s.owner===S.uid).length}</div><div class="row"><a class="btn small" href="#campanha-${c.id}">Abrir</a></div></article>`).join('')}</div>`
+      :`<div class="empty">${S.master?'Nenhuma campanha ainda. Comece em “Nova campanha”.':'Você ainda não tem fichas. Abra o convite que o mestre te enviou.'}</div>`}
     ${S.mode==='cloud'&&S.master?`<h2 style="font-family:var(--f-title);font-weight:400;margin-top:30px">Como convidar os jogadores</h2><ol class="note" style="max-width:65ch;line-height:1.6"><li>No menu Compartilhar desta página, convide cada jogador pelo e-mail como <b>Editor</b>. Quem só tem acesso de leitura consegue ver as fichas, mas não salvar.</li><li>Envie o link da campanha. Cada jogador cria a própria ficha e só consegue editar as fichas dele.</li><li>No Mapa, em “Mesa dos jogadores”, escolha a campanha: os jogadores dela passam a ver o mapa ao vivo no botão <b>Mapa</b>, com a vida dos tokens seguindo as fichas.</li><li>NPCs e notas do mestre ficam guardados num espaço que só você lê.</li></ol>`:''}
     ${S.mode==='local'?'<p class="note" style="margin-top:24px">Modo local: tudo fica salvo só neste navegador. Para jogadores e mestre compartilharem as fichas, abra esta página pelo claude.ai.</p>':''}`;
   const nb=$('#newCamp');if(nb)nb.onclick=()=>campForm();}
@@ -3978,60 +4000,164 @@ function pcCard(sh,camp){const [pv,mx]=hpOf(sh),f=mx>0?clamp(pv/mx,0,1):0;const 
   else if(sh.sys==='op'){const san=num(sh.san),smx=opMax(sh,'san'),pe=num(sh.pe),pmx=opMax(sh,'pe');stats=`<div><b>${opDef(sh)}</b>Defesa</div><div><b>${pe}/${pmx}</b>PE</div><div><b>${san}/${smx}</b>SAN</div>`;}
   else stats=`<div><b>${num(sh.ca)}</b>CA</div><div><b>${sgn(dIni(sh))}</b>Iniciativa</div><div><b>${10+dSkill(sh,'percepcao')}</b>Perc. passiva</div>`;
   const quick=canEdit(sh)?`<div class="row">${[-5,-1,1,5].map(d=>`<button class="btn small" data-hp="${sh.id}" data-d="${d}" aria-label="${d>0?'Curar':'Dano'} ${Math.abs(d)}">${d>0?'+':'−'}${Math.abs(d)}</button>`).join('')}<a class="btn small" href="#ficha-${sh.id}" style="margin-left:auto">Abrir ficha</a></div>`:`<div class="row"><a class="btn small" href="#ficha-${sh.id}">Ver ficha</a></div>`;
-  return `<article class="card pc"><div class="hd"><span class="av" style="background:${esc(sh.cor||'#555')}">${esc(ini)}</span><div><h3>${esc(sh.nome||'Sem nome')}</h3><div class="meta">${esc(subOf(sh))}${owner?' · '+esc(owner):''}</div></div></div>
+  return `<article class="card pc"><div class="hd"><span class="av" style="background:${esc(sh.cor||'#555')}">${esc(ini)}</span><div><h3>${esc(sh.nome||'Sem nome')}</h3>${sh.criacao==='rascunho'?'<span class="draft">Em criação</span>':''}<div class="meta">${esc(subOf(sh))}${owner?' · '+esc(owner):''}</div></div></div>
     <div><div class="row" style="justify-content:space-between;font-size:13px"><span>${sh.sys==='op'?'PV':sh.sys==='etmos'?'Ferimentos restantes':'Pontos de vida'}</span><b class="num">${pv} / ${mx}${sh.pvTemp?` (+${sh.pvTemp})`:''}</b></div><div class="bar"><i style="width:${f*100}%;background:${barColor(f)}"></i></div></div>
     <div class="stats">${stats}</div>${(sh.cond||[]).length?`<div class="chips">${sh.cond.map(c=>`<span class="chip">${esc(c)}</span>`).join('')}</div>`:''}${quick}</article>`;}
-function viewCamp(app,c){lastCamp=c.id;try{sessionStorage.setItem('mesa.camp',c.id);}catch(e){}crumbs([['Campanhas','#inicio'],[c.nome,'#campanha-'+c.id]]);const sheets=allSheets().filter(s=>s.camp===c.id);const pcs=sheets.filter(s=>s.kind==='pc'),npcs=sheets.filter(s=>s.kind==='npc');
-  resolveNames(pcs.map(s=>s.owner).filter(o=>o!==S.uid)).then(()=>{if(pcs.some(s=>s.owner!==S.uid&&!S.names.__done)){S.names.__done=1;if(route().v==='camp')render();}});
-  const tabs=S.master?[['grupo','Grupo'],['npcs','NPCs'],['notas','Notas do mestre']]:[['grupo','Grupo']];if(!tabs.some(t=>t[0]===ui.campTab))ui.campTab='grupo';
-  const mine=pcs.filter(s=>s.owner===S.uid);const banner=S.readOnlyMsg?`<div class="banner">${esc(S.readOnlyMsg)}</div>`:'';
+function viewCamp(app,c){lastCamp=c.id;try{sessionStorage.setItem('mesa.camp',c.id);}catch(e){}crumbs([['Campanhas','#inicio'],[c.nome,'#campanha-'+c.id]]);
+  const sheets=allSheets().filter(s=>s.camp===c.id&&(S.master||s.owner===S.uid));const pcs=sheets.filter(s=>s.kind==='pc'),npcs=sheets.filter(s=>s.kind==='npc');
+  resolveNames([...new Set(sheets.map(s=>s.owner).filter(o=>o&&o!==S.uid))]).then(()=>{if(!S.names.__done&&sheets.some(s=>s.owner&&s.owner!==S.uid)){S.names.__done=1;if(route().v==='camp')render();}});
+  const nLog=S.master?campLogs(c.id).filter(l=>(l.fim||0)>seenLogs(c.id)).length:0;
+  const tabs=S.master?[['grupo','Grupo'],['npcs','NPCs'],['convites','Convites'],['registro','Registro'+(nLog?` <span class="cnt">${nLog}</span>`:'')],['notas','Notas do mestre']]:[['grupo','Minhas fichas']];if(!tabs.some(t=>t[0]===ui.campTab))ui.campTab='grupo';
+  const banner=S.readOnlyMsg?`<div class="banner">${esc(S.readOnlyMsg)}</div>`:'';
   let body='';
-  if(ui.campTab==='grupo')body=`<div class="row" style="margin-bottom:12px"><button class="btn primary" id="newPc">${S.master&&S.mode==='cloud'?'Nova ficha (sua)':'Criar minha ficha'}</button>${mine.length&&!S.master?`<span class="note">Você tem ${mine.length} ficha(s) aqui.</span>`:''}</div>
-    ${pcs.length?`<div class="grid-cards">${pcs.map(s=>pcCard(s,c)).join('')}</div>`:'<div class="empty">Nenhum personagem ainda. Cada jogador cria a própria ficha aqui.</div>'}`;
-  else if(ui.campTab==='npcs')body=`<div class="row" style="margin-bottom:12px"><button class="btn primary" id="newNpc">Novo NPC</button><span class="note">Só você vê os NPCs.</span></div>${npcs.length?`<div class="grid-cards">${npcs.map(s=>pcCard(s,c)).join('')}</div>`:'<div class="empty">Nenhum NPC ainda.</div>'}`;
+  if(ui.campTab==='grupo')body=S.master?`<div class="row" style="margin-bottom:12px"><button class="btn primary" id="newPc">Nova ficha (sua)</button><button class="btn" data-newinv="pc">Convidar um jogador</button></div>
+      ${pcs.length?`<div class="grid-cards">${pcs.map(s=>pcCard(s,c)).join('')}</div>`:'<div class="empty">Nenhum personagem ainda. Gere um convite para cada jogador na aba Convites.</div>'}`
+    :`${pcs.length?`<div class="grid-cards">${pcs.map(s=>pcCard(s,c)).join('')}</div>`:'<div class="empty">Você ainda não tem fichas nesta mesa.</div>'}<p class="note" style="margin-top:12px">Para criar outra ficha, peça um novo convite ao mestre.</p>`;
+  else if(ui.campTab==='npcs')body=`<div class="row" style="margin-bottom:12px"><button class="btn primary" id="newNpc">Novo NPC</button><button class="btn" data-newinv="npc">Convite para criar um NPC</button><span class="note">NPCs que você cria só você vê; os criados por convite também ficam visíveis para quem os criou.</span></div>${npcs.length?`<div class="grid-cards">${npcs.map(s=>pcCard(s,c)).join('')}</div>`:'<div class="empty">Nenhum NPC ainda.</div>'}`;
+  else if(ui.campTab==='convites')body=invitesView(c);
+  else if(ui.campTab==='registro'){body=logsView(c);setSeenLogs(c.id);}
   else body=`<label class="field"><span>Anotações que só você lê: ganchos, segredos, cronologia da campanha.</span><textarea id="mNotes" rows="16" style="min-height:320px">${esc((S.notes[c.id]||{}).texto||'')}</textarea></label>`;
   app.innerHTML=`${banner}<span class="badge ${c.sys}">${esc(SYS[c.sys].n)}</span><h1 class="view">${esc(c.nome)}</h1>${c.desc?`<p class="lead">${esc(c.desc)}</p>`:''}
-    <div class="row">${S.master?'<button class="btn small" id="editCamp">Editar campanha</button>':''}${S.master?'':'<button class="btn small" id="copyCamp">Copiar link da campanha</button>'}</div>${S.master?inviteBox(c):''}
+    ${S.master?'<div class="row"><button class="btn small" id="editCamp">Editar campanha</button></div>':''}
     ${mesaBox(c)}
     <div class="tabs" role="tablist">${tabs.map(t=>`<button role="tab" data-t="${t[0]}" aria-selected="${ui.campTab===t[0]}">${t[1]}</button>`).join('')}</div>${body}`;
   for(const b of app.querySelectorAll('.tabs button'))b.onclick=()=>{ui.campTab=b.dataset.t;render();};
   const om=$('#openMesa');if(om)om.onclick=()=>openCampMap(c);
-  const e=$('#editCamp');if(e)e.onclick=()=>campForm(c);const cc=$('#copyCamp');if(cc)cc.onclick=()=>copyText(APP_URL+'#campanha-'+c.id);const ic=$('#invCopy');if(ic)ic.onclick=()=>copyText(inviteLink(c.id));const ip=$('#invPrev');if(ip)ip.onclick=()=>{location.hash='entrar-'+c.id;};
+  const e=$('#editCamp');if(e)e.onclick=()=>campForm(c);
   const np=$('#newPc');if(np)np.onclick=()=>createSheet(c,'pc');const nn=$('#newNpc');if(nn)nn.onclick=()=>createSheet(c,'npc');
+  for(const b of app.querySelectorAll('[data-newinv]'))b.onclick=()=>inviteForm(c,b.dataset.newinv);
+  bindInvites(app,c);bindLogs(app,c);
   const mn=$('#mNotes');if(mn)mn.oninput=()=>{setStatus('Alterações não salvas');saveNote(c.id,mn.value);};
   for(const b of app.querySelectorAll('[data-hp]'))b.onclick=()=>{const sh=findSheet(b.dataset.hp);if(!sh||!canEdit(sh))return;const [pv,mx]=hpOf(sh);setHpVal(sh,pv+num(b.dataset.d));queueSave(sh);render();};}
-function createSheet(c,kind,nome){if(kind==='pc'&&!canCreate()){toast('Você ainda não pode criar fichas aqui. Peça ao mestre para te convidar como Editor.');return;}const sh=c.sys==='op'?newOp():c.sys==='etmos'?newEtmos():newDnd();sh.id=uid();sh.camp=c.id;sh.kind=kind;sh.createdAt=Date.now();if(nome)sh.nome=nome;
-  if(kind==='npc'){S.npcs[sh.id]=sh;sh.nome='Novo NPC';}else{sh.owner=S.uid;(S.pcs[S.uid]=S.pcs[S.uid]||{})[sh.id]=sh;}queueSave(sh);location.hash='ficha-'+sh.id;}
+/* master: own sheets and private NPCs. Player: only through an invite (inv = {id, tipo}). */
+function createSheet(c,kind,nome,inv){if(!S.master&&!inv){toast('Para criar uma ficha, use um convite do mestre.');return null;}if(inv&&!canCreate()){toast('Você ainda não pode criar fichas aqui. Peça ao mestre para te convidar como Editor.');return null;}
+  const sh=c.sys==='op'?newOp():c.sys==='etmos'?newEtmos():newDnd();sh.id=uid();sh.camp=c.id;sh.kind=kind;sh.createdAt=Date.now();if(nome)sh.nome=nome;
+  if(inv){sh.owner=S.uid;sh.tipo=kind;sh.convite=inv.id;sh.criacao='rascunho';(S.pcs[S.uid]=S.pcs[S.uid]||{})[sh.id]=sh;}
+  else if(kind==='npc'){S.npcs[sh.id]=sh;sh.nome=nome||'Novo NPC';}else{sh.owner=S.uid;(S.pcs[S.uid]=S.pcs[S.uid]||{})[sh.id]=sh;}
+  logBase[sh.id]=clone(sh);queueSave(sh);location.hash='ficha-'+sh.id;return sh;}
 async function copyText(t){try{await navigator.clipboard.writeText(t);toast('Link copiado.');}catch(e){openModal(`<h2>Copie o link</h2><input class="field" style="padding:8px" value="${esc(t)}" readonly id="cpy"><div class="row" style="justify-content:flex-end"><button class="btn" data-close>Fechar</button></div>`);setTimeout(()=>$('#cpy').select(),30);}}
 function openModal(html){$('#modalBox').innerHTML=html;$('#modal').hidden=false;for(const b of $('#modalBox').querySelectorAll('[data-close]'))b.onclick=closeModal;const f=$('#modalBox').querySelector('input,textarea');if(f)setTimeout(()=>f.focus(),30);}
 function closeModal(){$('#modal').hidden=true;}
 $('#modal').addEventListener('click',e=>{if(e.target.id==='modal')closeModal();});window.addEventListener('keydown',e=>{if(e.key==='Escape'&&Mesa.view()==='fichas')closeModal();});
 function confirmBox(msg,ok){openModal(`<h2>Tem certeza?</h2><p>${esc(msg)}</p><div class="row" style="justify-content:flex-end"><button class="btn" data-close>Cancelar</button><button class="btn primary" id="cfOk" style="background:var(--bad);border-color:var(--bad)">Apagar</button></div>`);$('#cfOk').onclick=()=>{closeModal();ok();};}
 
-/* ================= INVITE LINK ================= */
-const inviteLink=cid=>APP_URL+'#entrar-'+cid;
-function inviteBox(c){return `<section class="invite"><div><b>Convite para os jogadores</b><p class="note">Quem abrir este link cai direto nesta mesa e cria a ficha em ${esc(SYS[c.sys].n)}.</p></div>
-  <div class="invrow"><input readonly value="${esc(inviteLink(c.id))}" aria-label="Link de convite" onclick="this.select()"><button class="btn small primary" id="invCopy">Copiar convite</button><button class="btn small" id="invPrev">Ver como jogador</button></div>
-  <ol class="note"><li>No menu <b>Compartilhar</b> desta página, convide cada jogador pelo e-mail como <b>Editor</b>. Sem esse convite o link não abre para ele.</li><li>Envie o link acima. Ele abre a tela de boas-vindas desta mesa.</li></ol></section>`;}
-function viewJoin(app,cid){const c=S.camps[cid];crumbs([['Campanhas','#inicio']].concat(c?[[c.nome,'#campanha-'+c.id],['Convite','#entrar-'+c.id]]:[]));
-  if(!c){app.innerHTML=`<div class="join"><h1 class="view">Convite para uma mesa</h1><div class="empty">${S.mode==='local'?'Este convite precisa ser aberto pelo claude.ai, na conta que o mestre convidou.':'Não encontrei esta mesa. Confira se o mestre te convidou pelo e-mail no menu Compartilhar e se o link está completo.'}</div></div>`;return;}
-  lastCamp=c.id;try{sessionStorage.setItem('mesa.camp',c.id);}catch(e){}
-  const mine=allSheets().filter(s=>s.camp===c.id&&s.kind==='pc'&&s.owner===S.uid);const can=canCreate();
-  const why=S.mode==='local'?'Você está no modo local: a ficha fica só neste navegador e o mestre não a verá. Abra o convite pelo claude.ai.'
-    :!S.uid?'Esta página não conseguiu identificar sua conta. Abra o link logado no claude.ai, com o e-mail que o mestre convidou.'
-    :S.canWrite===false?'Você pode ver esta mesa, mas ainda não pode criar fichas. Peça ao mestre para te convidar como Editor no menu Compartilhar.':'';
-  const ph={dnd:'Ex.: Thorin Escudo-de-Carvalho',op:'Ex.: Arthur Cervero',etmos:'Ex.: Lina Vasconcelos'}[c.sys]||'Nome do personagem';
-  app.innerHTML=`<div class="join">${S.master?'<div class="banner">Prévia: é assim que os jogadores veem o convite. Fichas criadas aqui ficam em seu nome.</div>':''}
-    <p class="lbl-join">Você foi convidado para a mesa</p><span class="badge ${c.sys}">${esc(SYS[c.sys].n)}</span><h1 class="view">${esc(c.nome)}</h1>${c.desc?`<p class="lead">${esc(c.desc)}</p>`:''}
+/* ================= INVITES (one link = one sheet) ================= */
+const inviteLink=id=>APP_URL+'#convite-'+id;
+const tok=()=>{const a=new Uint8Array(12);crypto.getRandomValues(a);return [...a].map(b=>'abcdefghijkmnopqrstuvwxyz23456789'[b%33]).join('');};
+async function newInvite(cid,tipo,para){const id=tok();const v={camp:cid,tipo,para:para||'',criadoEm:Date.now()};
+  if(S.mode==='local'){toast('Convites precisam da página aberta pelo claude.ai.');return null;}
+  try{await db.doc('convites/'+id).set(v);S.convites[id]=Object.assign({id},v);return id;}catch(e){toast('Não foi possível criar o convite agora.');return null;}}
+function inviteForm(c,tipo){openModal(`<h2>${tipo==='npc'?'Convite para criar um NPC':'Convite para um jogador'}</h2>
+  <p class="note">O link vale para uma única ficha. ${tipo==='npc'?'Quem usar cria um NPC desta campanha; ele e você veem a ficha.':'O jogador cria um personagem e só enxerga as fichas dele.'}</p>
+  <label class="field"><span>Para quem (opcional, só para você se lembrar)</span><input id="invPara" placeholder="Ex.: Ana"></label>
+  <div class="row" style="justify-content:flex-end"><button class="btn" data-close>Cancelar</button><button class="btn primary" id="invOk">Gerar link</button></div>`);
+  $('#invOk').onclick=async()=>{const id=await newInvite(c.id,tipo,$('#invPara').value.trim());if(!id)return;
+    openModal(`<h2>Link pronto</h2><p class="note">Envie para ${esc(S.convites[id].para||'a pessoa')}. Ele funciona uma vez; para outra ficha, gere outro.</p>
+      <div class="invrow"><input readonly value="${esc(inviteLink(id))}" id="invNew" aria-label="Link do convite"><button class="btn primary" id="invNewCopy">Copiar</button></div>
+      <p class="note">A pessoa também precisa estar convidada como <b>Editor</b> no menu Compartilhar desta página.</p>
+      <div class="row" style="justify-content:flex-end"><button class="btn" data-close>Fechar</button></div>`);
+    $('#invNewCopy').onclick=()=>copyText(inviteLink(id));setTimeout(()=>{const i=$('#invNew');if(i)i.select();},40);
+    ui.campTab='convites';render();};}
+function invitesView(c){const list=Object.values(S.convites).filter(v=>v.camp===c.id).sort((a,b)=>(b.criadoEm||0)-(a.criadoEm||0));
+  const row=v=>{const u=S.usados[v.id];const sh=u&&findSheet(u.ficha);const who=u?(u.uid===S.uid?'você':S.names[u.uid]||'jogador'):'';
+    return `<div class="invitem${u?' used':''}"><div class="meta"><b>${v.tipo==='npc'?'NPC':'Jogador'}${v.para?' · para '+esc(v.para):''}</b>
+      <small>${u?`Usado por ${esc(who)} em ${new Date(u.em||0).toLocaleString('pt-BR',{dateStyle:'short',timeStyle:'short'})}${sh?` · ficha “${esc(sh.nome||'sem nome')}”`:''}`:`Aguardando · criado em ${new Date(v.criadoEm||0).toLocaleString('pt-BR',{dateStyle:'short',timeStyle:'short'})}`}</small></div>
+      ${u?(sh?`<a class="btn small" href="#ficha-${sh.id}">Abrir ficha</a>`:''):`<button class="btn small primary" data-invcopy="${v.id}">Copiar link</button><button class="btn small" data-invprev="${v.id}">Ver como jogador</button>`}
+      <button class="btn small danger" data-invdel="${v.id}">${u?'Remover':'Cancelar'}</button></div>`;};
+  const pend=list.filter(v=>!S.usados[v.id]),used=list.filter(v=>S.usados[v.id]);
+  resolveNames([...new Set(used.map(v=>S.usados[v.id].uid).filter(x=>x&&x!==S.uid))]).then(()=>{if(!S.names.__inv&&used.length){S.names.__inv=1;if(ui.campTab==='convites')render();}});
+  return `<div class="row" style="margin-bottom:12px"><button class="btn primary" data-newinv="pc">Novo convite de jogador</button><button class="btn" data-newinv="npc">Novo convite de NPC</button></div>
+    <p class="note" style="margin:0 0 12px">Cada link cria uma única ficha. Antes de enviar, convide a pessoa como <b>Editor</b> no menu Compartilhar desta página.</p>
+    <h3 class="subh">Aguardando (${pend.length})</h3>${pend.length?pend.map(row).join(''):'<div class="empty">Nenhum convite pendente.</div>'}
+    ${used.length?`<h3 class="subh">Usados (${used.length})</h3>${used.map(row).join('')}`:''}`;}
+function bindInvites(app,c){
+  for(const b of app.querySelectorAll('[data-invcopy]'))b.onclick=()=>copyText(inviteLink(b.dataset.invcopy));
+  for(const b of app.querySelectorAll('[data-invprev]'))b.onclick=()=>{location.hash='convite-'+b.dataset.invprev;};
+  for(const b of app.querySelectorAll('[data-invdel]'))b.onclick=()=>{const id=b.dataset.invdel;const used=!!S.usados[id];
+    confirmBox(used?'Remover este convite da lista? A ficha criada continua existindo.':'Cancelar este convite? O link deixa de funcionar.',async()=>{delete S.convites[id];render();try{await db.doc('convites/'+id).delete();}catch(e){toast('Não foi possível cancelar agora.');}});};}
+/* the page a player lands on */
+const invCache={};
+async function loadInvite(id){const st=invCache[id]={state:'loading'};
+  try{const [a,b]=await Promise.all([db.doc('convites/'+id).get(),db.doc('usados/'+id).get()]);st.conv=a.exists?a.data():null;st.uso=b.exists?b.data():null;st.state=st.conv?'ok':'missing';}
+  catch(e){st.state='error';}
+  if(route().v==='invite'&&Mesa.view()==='fichas')render();}
+function viewInvite(app,id){crumbs([['Convite','#convite-'+id]]);
+  if(S.mode==='local'){app.innerHTML=`<div class="join"><h1 class="view">Convite</h1><div class="empty">Este convite precisa ser aberto pelo claude.ai, logado na conta que o mestre convidou.</div></div>`;return;}
+  const st=invCache[id];if(!st){loadInvite(id);app.innerHTML='<p class="lead">Abrindo o convite…</p>';return;}
+  if(st.state==='loading'){app.innerHTML='<p class="lead">Abrindo o convite…</p>';return;}
+  const box=(t,msg,extra)=>`<div class="join"><h1 class="view">${t}</h1><div class="empty">${msg}</div>${extra||''}</div>`;
+  if(st.state==='error'){app.innerHTML=box('Convite','Não consegui ler este convite. Confira se o mestre te convidou como Editor no menu Compartilhar e tente de novo.');return;}
+  if(st.state==='missing'){app.innerHTML=box('Convite','Este convite não existe ou foi cancelado pelo mestre. Peça um novo.');return;}
+  const v=st.conv,c=S.camps[v.camp];if(!c){app.innerHTML=box('Convite','A campanha deste convite não foi encontrada.');return;}
+  if(st.uso){const mine=st.uso.uid===S.uid;const sh=mine&&findSheet(st.uso.ficha);
+    app.innerHTML=box(esc(c.nome),mine?'Você já usou este convite.':'Este convite já foi usado. Para criar uma ficha, peça um novo convite ao mestre.',sh?`<div class="row" style="justify-content:center;margin-top:12px"><a class="btn primary" href="#ficha-${sh.id}">Abrir minha ficha</a></div>`:'');return;}
+  const can=canCreate()&&!S.master;const npc=v.tipo==='npc';
+  const why=!S.uid?'Esta página não conseguiu identificar sua conta. Abra o link logado no claude.ai, com o e-mail que o mestre convidou.':S.canWrite===false?'Você pode abrir esta mesa, mas ainda não pode criar fichas. Peça ao mestre para te convidar como Editor no menu Compartilhar.':'';
+  const ph=npc?'Ex.: Velho Corvo, o taberneiro':({dnd:'Ex.: Thorin Escudo-de-Carvalho',op:'Ex.: Arthur Cervero',etmos:'Ex.: Lina Vasconcelos'}[c.sys]||'Nome');
+  app.innerHTML=`<div class="join">${S.master?'<div class="banner">Prévia: é assim que a pessoa vê este convite. Você não pode usá-lo pela sua conta.</div>':''}
+    <p class="lbl-join">${npc?'O mestre pediu que você crie um NPC para a mesa':'Você foi convidado para a mesa'}</p><span class="badge ${c.sys}">${esc(SYS[c.sys].n)}</span><h1 class="view">${esc(c.nome)}</h1>${c.desc?`<p class="lead">${esc(c.desc)}</p>`:''}
     ${why?`<div class="banner">${esc(why)}</div>`:''}
-    ${mine.length?`<div class="card"><h3>Suas fichas nesta mesa</h3>${mine.map(s=>`<div class="row" style="justify-content:space-between"><span>${esc(s.nome||'Sem nome')}</span><a class="btn small primary" href="#ficha-${s.id}">Abrir minha ficha</a></div>`).join('')}</div>`:''}
-    <form class="card" id="joinForm" style="margin-top:12px"><h3>${mine.length?'Criar outra ficha':'Criar minha ficha'}</h3>
-      <label class="field"><span>Nome do personagem</span><input id="joinNome" placeholder="${esc(ph)}" autocomplete="off" ${can?'':'disabled'}></label>
-      <div class="row"><button class="btn primary" type="submit" ${can?'':'disabled'}>Criar e preencher a ficha</button>${c.mesa?'<button class="btn" type="button" id="joinMap">Ver o mapa ao vivo</button>':''}</div>
-      <p class="note">O mestre vê o que você preencher. Só você e o mestre podem editar a sua ficha.</p></form></div>`;
-  $('#joinForm').onsubmit=e=>{e.preventDefault();const n=$('#joinNome').value.trim();if(!n){$('#joinNome').focus();return;}createSheet(c,'pc',n);};
-  const jm=$('#joinMap');if(jm)jm.onclick=()=>openCampMap(c);
-  if(can&&!mine.length)setTimeout(()=>{const i=$('#joinNome');if(i)i.focus();},50);}
+    <form class="card" id="joinForm"><h3>${npc?'Criar o NPC':'Criar minha ficha'}</h3>
+      <label class="field"><span>${npc?'Nome do NPC':'Nome do personagem'}</span><input id="joinNome" placeholder="${esc(ph)}" autocomplete="off" ${can?'':'disabled'}></label>
+      <div class="row"><button class="btn primary" type="submit" ${can?'':'disabled'}>Criar e preencher</button></div>
+      <p class="note">Este convite vale para uma única ficha. Depois de preencher, clique em <b>Concluir criação</b>; a partir daí o mestre acompanha as alterações.</p></form></div>`;
+  $('#joinForm').onsubmit=async e=>{e.preventDefault();if(!can)return;const n=$('#joinNome').value.trim();if(!n){$('#joinNome').focus();return;}
+    const fresh=await Promise.all([db.doc('usados/'+id).get(),db.doc('convites/'+id).get()]).catch(()=>null);
+    if(fresh&&(fresh[0].exists||!fresh[1].exists)){st.uso=fresh[0].exists?fresh[0].data():null;if(!fresh[1].exists)st.state='missing';render();return;}
+    const sh=createSheet(c,v.tipo==='npc'?'npc':'pc',n,{id});if(!sh)return;
+    st.uso={uid:S.uid,ficha:sh.id,em:Date.now()};try{await db.doc('usados/'+id).set(st.uso);}catch(e){}};
+  if(can)setTimeout(()=>{const i=$('#joinNome');if(i)i.focus();},50);}
+
+/* ================= PLAYER CHANGE LOG ================= */
+/* A player's edits after "Concluir criação" go to pjs/<player>/logs, which only the master reads.
+   Edits close together form one entry, keeping each field's first old value and latest new value. */
+const clone=o=>JSON.parse(JSON.stringify(o));
+const logBase={},logSess={};
+const LOG_SKIP=new Set(['updatedAt','_mx','id','owner','kind','criacao','criadaEm','convite','tipo','camp','createdAt','ultimas']);
+function flatLog(o,pre,out){for(const [k,v] of Object.entries(o||{})){if(!pre&&LOG_SKIP.has(k))continue;const p=pre?pre+'.'+k:k;
+    if(Array.isArray(v)&&v.every(x=>x==null||typeof x!=='object'))out[p]=v.join(', ');else if(v&&typeof v==='object')flatLog(v,p,out);else out[p]=v;}return out;}
+const fmtV=v=>v===true?'sim':v===false?'não':v==null||v===''?'—':String(v).length>90?String(v).slice(0,88)+'…':String(v);
+const LBL={nome:'Nome',jogador:'Jogador',classe:'Classe',subclasse:'Subclasse',nivel:'Nível',especie:'Espécie',antecedente:'Antecedente',alinhamento:'Alinhamento',xp:'XP',cor:'Cor',
+  inspiracao:'Inspiração',ca:'CA',iniB:'Bônus de iniciativa',desloc:'Deslocamento',pvMax:'PV máximo',pv:'PV',pvTemp:'PV temporários',dv:'Dados de vida',dvUsados:'Dados de vida usados',conjAtr:'Atributo de conjuração',
+  tracos:'Características e talentos',profs:'Proficiências e idiomas',personalidade:'Personalidade',ideais:'Ideais',vinculos:'Vínculos',defeitos:'Defeitos',aparencia:'Aparência',historia:'História',notas:'Notas',cond:'Condições',
+  origem:'Origem',trilha:'Trilha',nex:'NEX',patente:'Patente',pp:'Pontos de prestígio',afinidade:'Afinidade',pvAj:'Ajuste de PV',peAj:'Ajuste de PE',sanAj:'Ajuste de SAN',defB:'Bônus de defesa',resist:'Resistências',pe:'PE',san:'SAN',historico:'Histórico',objetivo:'Objetivo',
+  ano:'Ano escolar',idade:'Idade',empenho:'Dados de empenho',fadiga:'Fadiga',ferimentos:'Ferimentos',estresse:'Estresse',complex:'Complexidade máxima',origens:'Origens',praticas:'Habilidades práticas',teoricas:'Habilidades teóricas',inventario:'Inventário',basico:'Básico',pontos:'Pontos de importância',futuro:'Futuro',
+  morte:'Testes contra a morte',moedas:'Moedas',itens:'Item',ataques:'Ataque',magias:'Magia',rituais:'Ritual',habilidades:'Habilidade',palavras:'Palavra guardada',slots:'Espaços de magia',valores:'Valores',marcos:'Marcos'};
+const SUB={s:'sucessos',f:'falhas',fis:'físicos',emo:'emocionais',men:'mentais',a:'lado A',b:'lado B',g:'grau',b2:'bônus',nome:'nome',qtd:'quantidade',peso:'peso',bonus:'bônus',dano:'dano',nivel:'nível',circ:'círculo',custo:'custo',elem:'elemento',esp:'espaços',cat:'categoria',desc:'descrição',nota:'anotação',tot:'total',usados:'usados',per:'perícia',crit:'crítico',alc:'alcance',tipo:'tipo'};
+function labelFor(sh,path){const sys=SYS[sh.sys]||DND;const ps=path.split('.');const [a,b,c]=ps;
+  if(a==='atr'){const at=(sys.atrs||[]).find(x=>x[0]===b);return at?at[1]:b==='corpo'?'Corpo':b==='alma'?'Alma':b==='mente'?'Mente':path;}
+  if(a==='per'){const sk=(sys.skills||[]).find(x=>x[0]===b);const n=sk?sk[1]:b;return sh.sys==='op'?`${n} (${c==='g'?'grau':'outros bônus'})`:`${n} (proficiência)`;}
+  if(a==='salv'){const at=DND.atrs.find(x=>x[0]===b);return 'Salvaguarda de '+(at?at[1]:b);}
+  if(a==='parts')return 'Partícula '+etSil(b);
+  if(a==='moedas')return 'Moedas ('+String(b).toUpperCase()+')';
+  if(/^\d+$/.test(b||''))return `${LBL[a]||a} ${num(b)+1}${c?' · '+(SUB[c]||c):''}`;
+  return (LBL[a]||a)+(b?' · '+(SUB[b]||b):'');}
+function shouldLog(sh){return S.mode==='cloud'&&!S.master&&sh.owner===S.uid&&sh.criacao!=='rascunho';}
+function logChange(sh){if(!shouldLog(sh)){logBase[sh.id]=clone(sh);return;}
+  const before=logBase[sh.id];logBase[sh.id]=clone(sh);if(!before)return;
+  const A=flatLog(before,'',{}),B=flatLog(sh,'',{});const now=Date.now();
+  let ss=logSess[sh.id];if(!ss||now-ss.last>3*60000)ss=logSess[sh.id]={id:uid(),inicio:now,last:now,ch:new Map()};ss.last=now;
+  for(const k of new Set([...Object.keys(A),...Object.keys(B)])){if(A[k]===B[k])continue;const e=ss.ch.get(k);if(e){e.para=fmtV(B[k]);if(e.para===e.de)ss.ch.delete(k);}else ss.ch.set(k,{k:labelFor(sh,k),de:fmtV(A[k]),para:fmtV(B[k])});}
+  const ub=(before.ultimas||[])[0],ua=(sh.ultimas||[])[0];if(ua&&(!ub||ua.t!==ub.t))ss.ch.set('conj:'+ua.t,{k:'Palavra conjurada',de:'',para:etWord(ua.seq)});
+  if(!ss.ch.size)return;clearTimeout(ss.timer);ss.timer=setTimeout(()=>writeSess(sh,ss),1500);}
+async function writeSess(sh,ss){const list=[...ss.ch.values()];const doc={ficha:sh.id,nome:sh.nome||'',camp:sh.camp,inicio:ss.inicio,fim:ss.last,mudancas:list.slice(0,80),extra:Math.max(0,list.length-80)};
+  try{await db.doc('pjs/'+S.uid+'/logs/'+ss.id).set(doc);}catch(e){}}
+async function writeLogNow(sh,mudancas,tipo){if(S.mode!=='cloud'||S.master||sh.owner!==S.uid)return;const t=Date.now();
+  try{await db.doc('pjs/'+S.uid+'/logs/'+uid()).set({ficha:sh.id,nome:sh.nome||'',camp:sh.camp,inicio:t,fim:t,tipo:tipo||'',mudancas});}catch(e){}}
+window.addEventListener('pagehide',()=>{for(const id in logSess){const ss=logSess[id];if(ss.timer){clearTimeout(ss.timer);const sh=findSheet(id);if(sh)writeSess(sh,ss);}}});
+function campLogs(cid){const out=[];for(const m of Object.values(S.logs))for(const l of Object.values(m||{}))if(l.camp===cid)out.push(l);return out.sort((a,b)=>(b.fim||0)-(a.fim||0));}
+const seenLogs=cid=>num(store.get('mesa.logvisto.'+cid));
+const setSeenLogs=cid=>store.set('mesa.logvisto.'+cid,String(Date.now()));
+function logsView(c){const all=campLogs(c.id);const f=ui.logF&&ui.logF[c.id]||'';const list=f?all.filter(l=>l.ficha===f):all;const seen=seenLogs(c.id);
+  resolveNames([...new Set(all.map(l=>l.pid))]).then(()=>{if(!S.names.__log&&all.length){S.names.__log=1;if(ui.campTab==='registro')render();}});
+  const fichas=[...new Map(all.map(l=>[l.ficha,(findSheet(l.ficha)||{}).nome||l.nome])).entries()];
+  const t=x=>new Date(x||0).toLocaleString('pt-BR',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'});
+  return `<div class="row" style="margin-bottom:12px"><label class="field" style="flex-direction:row;align-items:center;gap:8px"><span>Ficha</span><select id="logF"><option value="">Todas</option>${fichas.map(([id,n])=>`<option value="${esc(id)}" ${f===id?'selected':''}>${esc(n||'sem nome')}</option>`).join('')}</select></label>
+    <span class="note">Alterações que os jogadores fizeram nas próprias fichas depois de concluir a criação. Só você vê.</span></div>
+    ${list.length?list.map(l=>{const sh=findSheet(l.ficha);return `<article class="logitem${(l.fim||0)>seen?' new':''}"><header><b>${esc((sh&&sh.nome)||l.nome||'Ficha')}</b><span class="note">por ${esc(S.names[l.pid]||'jogador')} · ${t(l.inicio)}${l.fim&&l.fim-l.inicio>60000?' – '+new Date(l.fim).toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'}):''}</span>${sh?`<a class="btn small" href="#ficha-${sh.id}" style="margin-left:auto">Abrir ficha</a>`:''}</header>
+      ${l.tipo==='criada'?'<p class="logc">Concluiu a criação da ficha.</p>':`<ul>${(l.mudancas||[]).map(m=>`<li><span class="k">${esc(m.k)}</span>${m.de!==''&&m.de!=null?`<span class="de">${esc(m.de)}</span><span aria-hidden="true">→</span>`:''}<span class="para">${esc(m.para)}</span></li>`).join('')}${l.extra?`<li class="note">e mais ${l.extra} alterações</li>`:''}</ul>`}</article>`;}).join('')
+      :'<div class="empty">Nenhuma alteração registrada ainda.</div>'}`;}
+function bindLogs(app,c){const s=app.querySelector('#logF');if(s)s.onchange=()=>{(ui.logF=ui.logF||{})[c.id]=s.value;render();};}
 
 /* ================= LINK WITH THE MAP ================= */
 let lastCamp=null;try{lastCamp=sessionStorage.getItem('mesa.camp');}catch(e){}
@@ -4054,15 +4180,16 @@ window.Fichas={
   async linkMesa(cid,info){for(const c of Object.values(S.camps)){if(c.id!==cid&&c.mesa&&info&&c.mesa===info.mesa){delete c.mesa;delete c.mapa;delete c.mesaNome;await saveCamp(c);}}
     const c=S.camps[cid];if(!c)return;if(info){c.mesa=info.mesa;c.mapa=info.mapa;c.mesaNome=info.nome;}else{delete c.mesa;delete c.mapa;delete c.mesaNome;}await saveCamp(c);notify();},
   open(id){Mesa.go('fichas','#ficha-'+id);},
-  inviteLink
+  inviteLink,
+  async newInvite(cid,tipo){const id=await newInvite(cid,tipo||'pc','');return id?inviteLink(id):null;}
 };
 
 /* ================= SHEET VIEW ================= */
 const F=(k,label,o={})=>`<label class="${o.cls||''}" style="display:flex;flex-direction:column;gap:2px;min-width:0"><span class="lbl">${label}</span>${o.sel?`<select data-k="${k}">${o.sel.map(v=>Array.isArray(v)?`<option value="${esc(v[0])}">${esc(v[1])}</option>`:`<option>${esc(v)}</option>`).join('')}</select>`:`<input data-k="${k}"${o.n?` type="number" data-t="n"${o.min!=null?` min="${o.min}"`:''}${o.max!=null?` max="${o.max}"`:''}`:''} placeholder="${esc(o.ph||'')}">`}</label>`;
 function viewSheet(app,sh){const camp=S.camps[sh.camp];crumbs([['Campanhas','#inicio']].concat(camp?[[camp.nome,'#campanha-'+camp.id]]:[]).concat([[sh.nome||'Ficha','#ficha-'+sh.id]]));
-  const ro=!canEdit(sh);const tab=ui.sheetTab[sh.id]||(sh.sys==='etmos'?'personagem':'principal');const sc=HOST.scrollTop;
+  const ro=!canEdit(sh);if(!S.master&&sh.owner!==S.uid){app.innerHTML='<div class="empty">Esta ficha não é sua.</div>';crumbs([['Campanhas','#inicio']]);return;}const tab=ui.sheetTab[sh.id]||(sh.sys==='etmos'?'personagem':'principal');const sc=HOST.scrollTop;
   const body=sh.sys==='op'?opSheet(sh,tab):sh.sys==='etmos'?etSheet(sh,tab):dndSheet(sh,tab);
-  app.innerHTML=`${S.readOnlyMsg?`<div class="banner">${esc(S.readOnlyMsg)}</div>`:''}<div id="sheetRoot" class="sheet ${sh.sys}">${ro?'<div class="ro-note">Somente leitura: esta ficha é de outro jogador.</div>':''}<fieldset ${ro?'disabled':''}>${body}</fieldset>
+  app.innerHTML=`${S.readOnlyMsg?`<div class="banner">${esc(S.readOnlyMsg)}</div>`:''}<div id="sheetRoot" class="sheet ${sh.sys}">${sh.criacao==='rascunho'?(sh.owner===S.uid&&!S.master?`<div class="draftbar"><span><b>Ficha em criação.</b> Preencha com calma. Quando terminar, conclua: a partir daí o mestre acompanha cada alteração no registro.</span><button type="button" class="btn small" id="shDone">Concluir criação</button></div>`:'<div class="draftbar"><span><b>Em criação.</b> O jogador ainda não concluiu esta ficha.</span></div>'):''}${ro?'<div class="ro-note">Somente leitura: esta ficha é de outro jogador.</div>':''}<fieldset ${ro?'disabled':''}>${body}</fieldset>
     <div class="tools"><span class="note" style="margin-right:auto;color:var(--sm)">${sh.kind==='npc'?'NPC · visível só para o mestre':''}</span>${window.Atlas&&Atlas.hasToken(sh.id)?'<button class="btn small" id="shMap">Mostrar no mapa</button>':''}<button class="btn small" id="shLink">Copiar link da ficha</button>${canEdit(sh)?'<button class="btn small danger" id="shDel">Apagar ficha</button>':''}</div></div>`;
   HOST.scrollTop=sc;bindSheet($('#sheetRoot'),sh);}
 function bindSheet(root,sh){
@@ -4081,6 +4208,7 @@ function bindSheet(root,sh){
   for(const el of root.querySelectorAll('[data-roll]'))el.addEventListener('click',e=>{if(e.target.closest('input,select,button:not([data-roll])'))return;doRoll(sh,el.dataset.roll);});
   for(const el of root.querySelectorAll('[data-roll]'))el.addEventListener('keydown',e=>{if((e.key==='Enter'||e.key===' ')&&e.target===el){e.preventDefault();doRoll(sh,el.dataset.roll);}});
   for(const b of root.querySelectorAll('[data-cast]'))b.onclick=()=>{const r=sh.rituais[num(b.dataset.cast)];const c=num(r.custo);if(num(sh.pe)<c){toast('PE insuficiente para conjurar.');return;}sh.pe=num(sh.pe)-c;queueSave(sh);toast(`${r.nome||'Ritual'} conjurado: −${c} PE.`);render();};
+  const dn=$('#shDone');if(dn)dn.onclick=()=>{sh.criacao='pronta';sh.criadaEm=Date.now();logBase[sh.id]=clone(sh);queueSave(sh);writeLogNow(sh,[{k:'Ficha concluída',para:sh.nome||''}],'criada');toast('Ficha concluída. O mestre foi avisado.');render();};
   $('#shLink').onclick=()=>copyText(APP_URL+'#ficha-'+sh.id);const sm=$('#shMap');if(sm)sm.onclick=()=>Atlas.showToken(sh.id);const d=$('#shDel');if(d)d.onclick=()=>confirmBox(`Apagar a ficha “${sh.nome||'sem nome'}”? Isso não pode ser desfeito.`,async()=>{const cid=sh.camp;await removeSheet(sh);location.hash=cid?'campanha-'+cid:'inicio';render();});
   if(sh.sys==='etmos')bindEtmos(root,sh);
   calc(root,sh);}
