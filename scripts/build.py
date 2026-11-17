@@ -34,7 +34,11 @@ print("mesa-do-mestre.html e index.html gerados")
 # versão para publicar no claude.ai, com os símbolos (gerados por scripts/etmos_simbolos.py, fora do git)
 gpath = root / "etmos-simbolos.json"
 if gpath.exists():
-    glifos = "<script>window.ETMOS_GLIFOS=" + gpath.read_text(encoding="utf-8").strip() + ";</script>\n"
+    import json
+    dados = json.loads(gpath.read_text(encoding="utf-8"))
+    # dado, não código: um símbolo por linha, para nenhuma linha ficar gigante
+    linhas = ",\n".join(json.dumps(k) + ":" + json.dumps(v) for k, v in dados.items())
+    glifos = '<script type="application/json" id="etmosGlifos">{\n' + linhas + '\n}</script>\n'
     (root / "mesa-com-simbolos.html").write_text(montar(glifos), encoding="utf-8")
     print("mesa-com-simbolos.html gerado (fora do git)")
 else:

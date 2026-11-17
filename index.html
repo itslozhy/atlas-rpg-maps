@@ -3851,8 +3851,12 @@ function etWord(seq){const w=seq.map(id=>id.toLowerCase()).join('');return w.cha
 const etFad=s=>{let st=ETMOS.fadiga[0];for(const f of ETMOS.fadiga)if(num(s.fadiga)>=f[0])st=f;return st[1];};
 const etLimF=s=>4+Math.floor(num(s.atr&&s.atr.corpo)/2);
 const etLimE=s=>4+num(s.atr&&s.atr.alma);
-const GLIFOS=window.ETMOS_GLIFOS||{};
-const glyph=(id,cls)=>GLIFOS[id]?`<svg class="${cls||'gl'}" viewBox="0 0 200 200" aria-hidden="true"><path d="${GLIFOS[id]}"/></svg>`:`<span class="${cls||'gl'} gl-txt" aria-hidden="true">${esc(etSil(id))}</span>`;
+/* symbols come as data (a JSON block next to the page), read on first use */
+let GLIFOS=null;
+function glifos(){if(GLIFOS&&Object.keys(GLIFOS).length)return GLIFOS;GLIFOS={};
+  try{const el=document.getElementById('etmosGlifos');if(el)GLIFOS=JSON.parse(el.textContent);}catch(e){console.error('símbolos do Etmos ilegíveis',e);}
+  if(!Object.keys(GLIFOS).length&&window.ETMOS_GLIFOS)GLIFOS=window.ETMOS_GLIFOS;return GLIFOS;}
+const glyph=(id,cls)=>glifos()[id]?`<svg class="${cls||'gl'}" viewBox="0 0 200 200" aria-hidden="true"><path d="${glifos()[id]}"/></svg>`:`<span class="${cls||'gl'} gl-txt" aria-hidden="true">${esc(etSil(id))}</span>`;
 const SYS={dnd:DND,op:OP,etmos:ETMOS};
 const COLORS=['#7b1e1e','#2f5a7a','#3f6a3a','#8a5a1a','#5a3f7a','#1f6a6a','#8a2f5a','#4a4a52'];
 
@@ -4264,7 +4268,7 @@ function etSheet(sh,tab){
     const known=Object.keys(sh.parts||{}).filter(k=>sh.parts[k]).length;
     const col=g=>`<div class="box"><h4>${ETMOS.grupos.find(x=>x[0]===g)[1]}</h4><div class="eparts">${ETMOS.parts[g].map(([id,n,nv])=>`<label class="epart">${glyph(id)}<input type="checkbox" data-k="parts.${id}" data-re="1"><span><b>${esc(etSil(id))}</b> ${esc(n)}${nv?` <small>${nv}º nível</small>`:''}</span></label>`).join('')}</div></div>`;
     const saved=(sh.palavras||[]).map((w,i)=>`<div class="esaved"><div class="glrow">${w.seq.map(id=>glyph(id,'gls')).join('')}</div><div class="esw"><b>${esc(etWord(w.seq))}</b><input data-k="palavras.${i}.nota" placeholder="Para que serve" aria-label="Anotação da palavra"></div><button type="button" class="btn small" data-et-use="${i}">Usar no combate</button><button type="button" class="x" data-del="palavras|${i}" aria-label="Apagar palavra">×</button></div>`).join('');
-    b=`<p class="note" style="margin:0 0 10px">Marque as partículas que o personagem conhece (${known} de ${Object.keys(ET_ALL).length}). Só elas aparecem no combate.</p>
+    b=`${Object.keys(glifos()).length?'':'<p class="banner" style="color:#2b1830">Os símbolos das partículas não carregaram nesta página; as sílabas aparecem no lugar deles.</p>'}<p class="note" style="margin:0 0 10px">Marque as partículas que o personagem conhece (${known} de ${Object.keys(ET_ALL).length}). Só elas aparecem no combate.</p>
       <div class="egrim">${col('func')}${col('obj')}${col('car')}${col('comp')}</div>
       <div class="box" style="margin-top:12px"><h4>Palavras guardadas</h4>${saved||'<p class="note">Nenhuma ainda. Monte uma palavra no Combate e use “Guardar no grimório”.</p>'}</div>`;}
   else b=`<div class="grid2"><div class="box"><h4>Básico</h4><textarea data-k="basico" aria-label="Básico"></textarea></div><div class="box"><h4>Pontos de importância</h4><textarea data-k="pontos" aria-label="Pontos de importância"></textarea></div>
