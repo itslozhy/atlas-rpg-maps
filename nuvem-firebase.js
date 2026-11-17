@@ -10,7 +10,13 @@ const HOSTS=['itslozhy.github.io'];
 const forced=/[?&]firebase=1\b/.test(location.search);
 if(window.claude||(!HOSTS.includes(location.hostname)&&!forced))return;
 
-const state={ready:null,user:null,mestre:null,fs:null,F:null,A:null,auth:null};
+const state={ready:null,user:null,space:null,spaces:[],fs:null,F:null,A:null,auth:null};
+/* every master has a space of their own: mestres/<uid>/... holds their campaigns, NPCs, invites, players' sheets.
+   Account-level data (maps, profile, list of tables joined) stays outside it. */
+const SHARED=/^(data\/users\/|perfis\/|usuarios\/)/;
+const P=path=>SHARED.test(path)?path:'mestres/'+state.space+'/'+path;
+window.MESA_URL=location.origin+location.pathname;
+const lsGet=k=>{try{return localStorage.getItem(k);}catch(e){return null;}};const lsSet=(k,v)=>{try{localStorage.setItem(k,v);}catch(e){}};
 const css=`#nvGate{position:fixed;inset:0;z-index:100;display:grid;place-items:center;background:rgba(18,16,20,.72);padding:16px;font-family:"Alegreya Sans",system-ui,sans-serif}
 #nvGate .box{background:#fbfaf6;color:#1e1c19;border-radius:14px;max-width:440px;width:100%;padding:22px 22px 18px;box-shadow:0 12px 40px rgba(0,0,0,.4)}
 #nvGate h2{margin:0 0 6px;font-family:"IM Fell English SC",Georgia,serif;font-weight:400;font-size:26px}
@@ -18,6 +24,7 @@ const css=`#nvGate{position:fixed;inset:0;z-index:100;display:grid;place-items:c
 #nvGate button{font:inherit;border-radius:8px;padding:8px 14px;cursor:pointer;border:1px solid #c9c1b2;background:#f1eee6;color:#1e1c19}
 #nvGate button.p{background:#6e2a24;border-color:#6e2a24;color:#fff}#nvGate .err{color:#a3302a;font-size:14px}
 #nvChip{position:fixed;left:max(10px,env(safe-area-inset-left,0px));bottom:calc(10px + env(safe-area-inset-bottom,0px));z-index:60;font:13px "Alegreya Sans",system-ui,sans-serif;background:rgba(251,250,246,.95);color:#1e1c19;border:1px solid #d6d0c3;border-radius:99px;padding:3px 4px 3px 10px;display:flex;gap:6px;align-items:center;box-shadow:0 4px 14px rgba(0,0,0,.15)}
+#nvChip select{font:inherit;border:1px solid #d6d0c3;border-radius:99px;background:#fff;padding:1px 4px;max-width:190px}#nvChip .nvsp{color:#686256}
 #nvChip button{font:inherit;border:0;background:#f1eee6;border-radius:99px;padding:2px 8px;cursor:pointer}
 @media (max-width:820px){#nvChip{bottom:auto;top:calc(8px + env(safe-area-inset-top,0px));left:auto;right:max(10px,env(safe-area-inset-right,0px))}}`;
 function gate(html){let g=document.getElementById('nvGate');if(!html){if(g)g.remove();return null;}
@@ -34,27 +41,28 @@ const err=e=>{const x=new Error(e&&e.message||'erro');x.code=e&&e.code==='permis
 function makeDb(){const {F,fs}=state;
   const docSnap=s=>({exists:s.exists(),id:s.id,data:()=>s.exists()?dec(s.data()):undefined});
   const colSnap=q=>({docs:q.docs.map(d=>({id:d.id,data:()=>dec(d.data())})),size:q.size,empty:q.empty});
-  const docApi=path=>{const ref=F.doc(fs,path);return {
+  const docApi=path=>{const ref=F.doc(fs,P(path));return {
     async get(){try{return docSnap(await F.getDoc(ref));}catch(e){throw err(e);}},
     async set(d){try{await F.setDoc(ref,enc(d));}catch(e){throw err(e);}},
     async update(d){try{const cur=await F.getDoc(ref);await F.setDoc(ref,enc(Object.assign({},cur.exists()?dec(cur.data()):{},d)));}catch(e){throw err(e);}},
     async delete(){try{await F.deleteDoc(ref);}catch(e){throw err(e);}},
     onSnapshot(cb,onErr){return F.onSnapshot(ref,s=>cb(docSnap(s)),e=>onErr&&onErr(err(e)));}};};
-  const colApi=path=>{const ref=F.collection(fs,path);return {
+  const colApi=path=>{const ref=F.collection(fs,P(path));return {
     doc:id=>docApi(path+'/'+id),
     async get(){try{return colSnap(await F.getDocs(ref));}catch(e){throw err(e);}},
     onSnapshot(cb,onErr){return F.onSnapshot(ref,s=>cb(colSnap(s)),e=>onErr&&onErr(err(e)));}};};
   return Object.freeze({collection:colApi,doc:docApi,
     /* joining a table with an invite: the rules let a signed-in person become a member only with an unused invite */
-    async entrar(convite){const u=state.user;if(!u)throw err({code:'permission-denied'});
-      try{const ja=await F.getDoc(F.doc(fs,'membros/'+u.uid));if(ja.exists())return;await F.setDoc(F.doc(fs,'membros/'+u.uid),enc({convite,nome:u.displayName||'',em:Date.now()}));}catch(e){throw err(e);}}});}
+    async entrar(convite){const u=state.user;if(!u)throw err({code:'permission-denied'});if(state.space===u.uid)return;
+      try{const ref=F.doc(fs,P('membros/'+u.uid));const ja=await F.getDoc(ref);if(!ja.exists())await F.setDoc(ref,enc({convite,nome:u.displayName||'',em:Date.now()}));
+        await F.setDoc(F.doc(fs,'usuarios/'+u.uid+'/espacos/'+state.space),enc({em:Date.now()}));if(!state.spaces.includes(state.space))state.spaces.push(state.space);lsSet('mesa.espaco.'+u.uid,state.space);chip();}catch(e){throw err(e);}}});}
 function makeUser(){const u=state.user;return Object.freeze({
   id:async()=>u?u.uid:null,
-  isOwner:async()=>!!(u&&state.mestre&&u.uid===state.mestre),
-  canEdit:async()=>!!(u&&state.mestre&&u.uid===state.mestre),
+  isOwner:async()=>!!(u&&state.space===u.uid),
+  canEdit:async()=>!!(u&&state.space===u.uid),
   can:async()=>null,
   me:async()=>({id:u?u.uid:null,name:u?u.displayName||'':'',email:null}),
-  async profiles(ids){const out={};await Promise.all(ids.map(async id=>{try{const s=await state.F.getDoc(state.F.doc(state.fs,'perfis/'+id));out[id]={id,name:s.exists()?(dec(s.data())||{}).nome||'':''};}catch(e){out[id]={id,name:''};}}));return out;}});}
+  async profiles(ids){const out={};await Promise.all(ids.map(async id=>{try{const s=await state.F.getDoc(state.F.doc(state.fs,'perfis/'+id));/*shared*/out[id]={id,name:s.exists()?(dec(s.data())||{}).nome||'':''};}catch(e){out[id]={id,name:''};}}));return out;}});}
 
 async function boot(){
   gate('<h2>Mesa do Mestre</h2><p>Conectando…</p>');
@@ -77,16 +85,18 @@ function askLogin(msg){return new Promise(res=>{
   document.getElementById('nvLocal').onclick=()=>{gate(null);res(false);};});}
 async function afterLogin(user){state.user=user;const {F,fs}=state;
   try{await F.setDoc(F.doc(fs,'perfis/'+user.uid),enc({nome:user.displayName||'',em:Date.now()}));}catch(e){}
-  let m=null;try{const s=await F.getDoc(F.doc(fs,'config/mestre'));m=s.exists()?(dec(s.data())||{}).uid:null;}catch(e){}
-  if(!m){m=await new Promise(res=>{gate(`<h2>Quem é o mestre?</h2><p>Esta mesa ainda não tem mestre registrado. A primeira conta registrada fica como mestre para sempre: ela vê e edita tudo.</p>
-      <p>Você está entrando como <b>${esc(user.displayName||user.email||'esta conta')}</b>.</p>
-      <div class="row"><button class="p" id="nvMe">Sou o mestre</button><button id="nvNo">Sou jogador</button></div><p class="err" id="nvErr"></p>`);
-    document.getElementById('nvMe').onclick=async()=>{try{await F.setDoc(F.doc(fs,'config/mestre'),enc({uid:user.uid,em:Date.now()}));res(user.uid);}
-      catch(e){document.getElementById('nvErr').textContent='Não consegui registrar. Confira se as regras do arquivo firestore.rules foram publicadas no Firebase.';}};
-    document.getElementById('nvNo').onclick=()=>res(null);});}
-  state.mestre=m;gate(null);chip();return true;}
-function chip(){const u=state.user;if(!u)return;let c=document.getElementById('nvChip');if(!c){c=document.createElement('div');c.id='nvChip';document.body.appendChild(c);}
-  c.innerHTML=`<span>${esc((u.displayName||u.email||'Conta').split(' ')[0])}${state.mestre===u.uid?' · mestre':''}</span><button type="button" id="nvOut">Sair</button>`;
+  try{const q=await F.getDocs(F.collection(fs,'usuarios/'+user.uid+'/espacos'));state.spaces=q.docs.map(d=>d.id);}catch(e){state.spaces=[];}
+  /* which master's tables to show: the one in an invite link, the last one used, a table already joined, or your own */
+  const inv=(location.hash.match(/^#convite-([A-Za-z0-9_-]+)~/)||[])[1];const last=lsGet('mesa.espaco.'+user.uid);
+  state.space=inv||(last&&(last===user.uid||state.spaces.includes(last))?last:null)||state.spaces[0]||user.uid;
+  if(!inv)lsSet('mesa.espaco.'+user.uid,state.space);
+  window.MESA_ESPACO=state.space;gate(null);chip();return true;}
+async function chip(){const u=state.user;if(!u)return;let c=document.getElementById('nvChip');if(!c){c=document.createElement('div');c.id='nvChip';document.body.appendChild(c);}
+  const all=[u.uid].concat(state.spaces.filter(x=>x!==u.uid));if(state.space&&!all.includes(state.space))all.push(state.space);
+  const names={};await Promise.all(all.filter(x=>x!==u.uid).map(async id=>{try{const s=await state.F.getDoc(state.F.doc(state.fs,'perfis/'+id));names[id]=s.exists()?(dec(s.data())||{}).nome:'';}catch(e){}}));
+  const label=id=>id===u.uid?'Minhas campanhas (mestre)':'Mesas de '+((names[id]||'outro mestre').split(' ')[0]);
+  c.innerHTML=`<span>${esc((u.displayName||u.email||'Conta').split(' ')[0])}</span>${all.length>1?`<select id="nvSpace" aria-label="De quem são as mesas">${all.map(id=>`<option value="${esc(id)}" ${id===state.space?'selected':''}>${esc(label(id))}</option>`).join('')}</select>`:`<span class="nvsp">${esc(label(state.space))}</span>`}<button type="button" id="nvOut">Sair</button>`;
+  const sel=document.getElementById('nvSpace');if(sel)sel.onchange=()=>{lsSet('mesa.espaco.'+u.uid,sel.value);location.hash='inicio';location.reload();};
   document.getElementById('nvOut').onclick=async()=>{await state.A.signOut(state.auth);location.reload();};}
 
 state.ready=new Promise(res=>{const go=()=>boot().then(res,()=>res(false));if(document.body)go();else document.addEventListener('DOMContentLoaded',go);});

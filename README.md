@@ -5,7 +5,7 @@
 
 **[Versão com mesa ao vivo e fichas compartilhadas](https://claude.ai/artifact/1wUYbQ513Syib6KfoBeN8k)** · no claude.ai, só para quem o mestre convidar.
 
-<sub>Última atualização: 17/11/2026 às 14:12 (horário de Brasília). O GitHub Pages publica a versão nova poucos minutos depois de cada envio.</sub>
+<sub>Última atualização: 17/11/2026 às 14:33 (horário de Brasília). O GitHub Pages publica a versão nova poucos minutos depois de cada envio.</sub>
 <!-- LINKS:FIM -->
 
 Mapas e fichas de RPG de mesa numa página só. O botão **Mapa | Fichas** no topo troca de seção sem sair da página, e as duas partes conversam entre si.
@@ -46,7 +46,7 @@ Configuração no console do Firebase (uma vez):
 3. **Authentication › Método de login:** ativar o Google.
 4. **Authentication › Configurações › Domínios autorizados:** adicionar `itslozhy.github.io`.
 
-Depois, o mestre abre a página, entra com a conta Google e escolhe "Sou o mestre". A primeira conta registrada fica como mestre para sempre. Os jogadores entram pelos convites gerados na aba Convites da campanha: só quem usou um convite vira membro e enxerga a mesa.
+Cada conta é mestre do próprio espaço: suas campanhas, NPCs, diário, bestiário, convites e mesas ficam em `mestres/<conta>/` e nenhum outro mestre os vê. Os jogadores entram pelos convites gerados na aba Convites da campanha: quem usa um convite vira membro só do espaço daquele mestre, enxerga as próprias fichas e a mesa ao vivo. Quem joga com mais de um mestre troca de mesa pelo seletor no canto da tela.
 
 ## Arquivos
 

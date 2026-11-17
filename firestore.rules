@@ -1,72 +1,72 @@
 rules_version = '2';
 // Regras da Mesa do Mestre no Firebase. Cole este arquivo inteiro em
 // Firebase console › Firestore Database › Regras e clique em Publicar.
-// Mestre: a conta registrada em config/mestre (a primeira que se registrar).
-// Membro: quem entrou por um convite do mestre (membros/<uid>).
+//
+// Cada conta é mestre do próprio espaço: mestres/<uid da conta>/...
+// Ali ficam as campanhas, NPCs, notas, diário, bestiário, convites, mesas ao vivo
+// e as pastas dos jogadores. Outro mestre não lê nem escreve nada disso.
+// Jogador: quem entrou com um convite daquele mestre (mestres/<mestre>/membros/<uid>).
 service cloud.firestore {
   match /databases/{database}/documents {
     function signedIn() { return request.auth != null; }
     function me() { return request.auth.uid; }
-    function mestreDoc() { return /databases/$(database)/documents/config/mestre; }
-    function isMestre() { return signedIn() && exists(mestreDoc()) && get(mestreDoc()).data.uid == me(); }
-    function isMembro() { return signedIn() && (isMestre() || exists(/databases/$(database)/documents/membros/$(me()))); }
 
-    // Quem é o mestre: a primeira conta que se registra; depois disso não muda.
-    match /config/mestre {
-      allow read: if signedIn();
-      allow create: if signedIn() && request.resource.data.uid == me();
-      allow update, delete: if false;
-    }
-    // Nome de cada conta, para o mestre ver quem é quem.
+    // Dados da própria conta: mapas e modelos do Atlas, e a lista de mesas em que joga.
+    match /data/users/{uid}/{rest=**} { allow read, write: if signedIn() && me() == uid; }
+    match /usuarios/{uid}/{rest=**}   { allow read, write: if signedIn() && me() == uid; }
+    // Nome de cada conta, para mestre e jogadores verem quem é quem.
     match /perfis/{uid} {
       allow read: if signedIn();
       allow write: if signedIn() && me() == uid;
     }
-    // Entrar na mesa: só com um convite que existe e ainda não foi usado.
-    match /membros/{uid} {
-      allow read: if signedIn() && (me() == uid || isMestre());
-      allow create: if signedIn() && me() == uid
-        && request.resource.data.convite is string
-        && exists(/databases/$(database)/documents/convites/$(request.resource.data.convite))
-        && !exists(/databases/$(database)/documents/usados/$(request.resource.data.convite));
-      allow update, delete: if isMestre();
-    }
-    // Convites: quem tem o link lê aquele convite; só o mestre lista e cria.
-    match /convites/{id} {
-      allow get: if signedIn();
-      allow list, write: if isMestre();
-    }
-    // Convite usado: uma vez só, por um membro, em nome de si mesmo.
-    match /usados/{id} {
-      allow get: if signedIn();
-      allow list: if isMestre();
-      allow create: if isMembro() && request.resource.data.uid == me()
-        && exists(/databases/$(database)/documents/convites/$(id));
-      allow update, delete: if isMestre();
-    }
-    // O que todos os membros leem e só o mestre escreve.
-    match /campanhas/{id} { allow read: if isMembro(); allow write: if isMestre(); }
-    match /mesas/{id}     { allow read: if isMembro(); allow write: if isMestre(); }
-    match /resumos/{id}   { allow read: if isMembro(); allow write: if isMestre(); }
-    match /documentos/{id} { allow read: if isMembro(); allow write: if isMestre(); }
-    // Só o mestre.
-    match /npcs/{id}      { allow read, write: if isMestre(); }
-    match /segredos/{id}  { allow read, write: if isMestre(); }
-    match /diario/{id}    { allow read, write: if isMestre(); }
-    match /bestiario/{id} { allow read, write: if isMestre(); }
-    // Pasta de cada jogador (fichas, registro, rolagens, documentos pessoais):
-    // o dono e o mestre leem; o dono escreve se for membro; o mestre escreve sempre.
-    match /pjs/{uid} {
-      allow read: if signedIn() && (me() == uid || isMestre());
-      allow write: if isMestre() || (signedIn() && me() == uid && isMembro());
-      match /{rest=**} {
-        allow read: if signedIn() && (me() == uid || isMestre());
-        allow write: if isMestre() || (signedIn() && me() == uid && isMembro());
+
+    match /mestres/{m} {
+      function dono() { return signedIn() && me() == m; }
+      function membro() { return dono() || (signedIn() && exists(/databases/$(database)/documents/mestres/$(m)/membros/$(me()))); }
+      function conviteExiste(c) { return exists(/databases/$(database)/documents/mestres/$(m)/convites/$(c)); }
+      function conviteUsado(c) { return exists(/databases/$(database)/documents/mestres/$(m)/usados/$(c)); }
+
+      // Entrar na mesa deste mestre: só com um convite dele que existe e ainda não foi usado.
+      match /membros/{uid} {
+        allow read: if dono() || (signedIn() && me() == uid);
+        allow create: if signedIn() && me() == uid && !dono()
+          && request.resource.data.convite is string
+          && conviteExiste(request.resource.data.convite)
+          && !conviteUsado(request.resource.data.convite);
+        allow update, delete: if dono();
       }
-    }
-    // Mapas e modelos de cada conta: só a própria conta.
-    match /data/users/{uid}/{rest=**} {
-      allow read, write: if signedIn() && me() == uid;
+      // Convites: quem tem o link lê aquele convite; só o mestre lista e cria.
+      match /convites/{id} {
+        allow get: if signedIn();
+        allow list, write: if dono();
+      }
+      // Convite usado: uma vez só, por um membro, em nome de si mesmo.
+      match /usados/{id} {
+        allow get: if signedIn();
+        allow list: if dono();
+        allow create: if membro() && request.resource.data.uid == me() && conviteExiste(id);
+        allow update, delete: if dono();
+      }
+      // O que os jogadores deste mestre leem e só ele escreve.
+      match /campanhas/{id}  { allow read: if membro(); allow write: if dono(); }
+      match /mesas/{id}      { allow read: if membro(); allow write: if dono(); }
+      match /resumos/{id}    { allow read: if membro(); allow write: if dono(); }
+      match /documentos/{id} { allow read: if membro(); allow write: if dono(); }
+      // Só o mestre.
+      match /npcs/{id}       { allow read, write: if dono(); }
+      match /segredos/{id}   { allow read, write: if dono(); }
+      match /diario/{id}     { allow read, write: if dono(); }
+      match /bestiario/{id}  { allow read, write: if dono(); }
+      // Pasta de cada jogador (fichas, registro, rolagens, documentos pessoais):
+      // o jogador e o mestre leem; o jogador escreve se for membro; o mestre escreve sempre.
+      match /pjs/{uid} {
+        allow read: if dono() || (signedIn() && me() == uid);
+        allow write: if dono() || (signedIn() && me() == uid && membro());
+        match /{rest=**} {
+          allow read: if dono() || (signedIn() && me() == uid);
+          allow write: if dono() || (signedIn() && me() == uid && membro());
+        }
+      }
     }
   }
 }

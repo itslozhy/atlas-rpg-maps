@@ -414,7 +414,8 @@ queueMicrotask(apply);
 
 <script>
 (()=>{'use strict';
-const APP_URL='https://claude.ai/artifact/1wUYbQ513Syib6KfoBeN8k';
+/* links point to where the page runs: claude.ai, or the GitHub Pages copy (set by nuvem-firebase.js) */
+const APP_URL=window.MESA_URL||'https://claude.ai/artifact/1wUYbQ513Syib6KfoBeN8k';
 /* the sheets live in a shadow root so their styles never mix with the map's */
 const HOST=document.getElementById('fichas');const R=HOST.attachShadow({mode:'open'});R.appendChild(document.getElementById('fichasTpl').content.cloneNode(true));
 const Mesa=window.Mesa;Mesa.wire(R);
@@ -594,7 +595,7 @@ for(const b of $('#trayMode').children)b.onclick=()=>{trayMode=b.dataset.m;for(c
 for(const f of[4,6,8,10,12,20,100]){const b=document.createElement('button');b.textContent='d'+f;b.onclick=()=>rollExpr('d'+f,'1d'+f);$('#trayDice').appendChild(b);}
 
 /* ================= ROUTING ================= */
-function route(){const h=location.hash.slice(1);let m;if((m=h.match(/^entrar-([A-Za-z0-9-]+)$/)))return {v:'oldjoin',id:m[1]};if((m=h.match(/^convite-([A-Za-z0-9-]+)$/)))return {v:'invite',id:m[1]};if((m=h.match(/^campanha-([A-Za-z0-9-]+)$/)))return {v:'camp',id:m[1]};if((m=h.match(/^ficha-([A-Za-z0-9-]+)$/)))return {v:'ficha',id:m[1]};return {v:'home'};}
+function route(){const h=location.hash.slice(1);let m;if((m=h.match(/^entrar-([A-Za-z0-9-]+)$/)))return {v:'oldjoin',id:m[1]};if((m=h.match(/^convite-(?:[A-Za-z0-9_-]+~)?([A-Za-z0-9-]+)$/)))return {v:'invite',id:m[1]};if((m=h.match(/^campanha-([A-Za-z0-9-]+)$/)))return {v:'camp',id:m[1]};if((m=h.match(/^ficha-([A-Za-z0-9-]+)$/)))return {v:'ficha',id:m[1]};return {v:'home'};}
 Mesa.onView((v,changed)=>{if(v!=='fichas')return;if(changed)HOST.scrollTop=0;render();});
 const ui={campTab:'grupo',sheetTab:{}};
 
@@ -818,7 +819,7 @@ function partForm(c,old){const p=old?clone(old):{id:'X'+tok().slice(0,10),sil:''
     c.particulas=(c.particulas||[]).filter(q=>q.id!==p.id).concat([p]);closeModal();await saveCamp(c);toast(old?'Partícula atualizada.':'Partícula criada.');render();};}
 
 /* ================= INVITES (one link = one sheet) ================= */
-const inviteLink=id=>APP_URL+'#convite-'+id;
+const inviteLink=id=>APP_URL+'#convite-'+(window.MESA_ESPACO?window.MESA_ESPACO+'~':'')+id;
 const tok=()=>{const a=new Uint8Array(12);crypto.getRandomValues(a);return [...a].map(b=>'abcdefghijkmnopqrstuvwxyz23456789'[b%33]).join('');};
 async function newInvite(cid,tipo,para){const id=tok();const cc=S.camps[cid]||{};const v={camp:cid,tipo,para:para||'',criadoEm:Date.now(),campNome:cc.nome||'',sys:cc.sys||'dnd',desc:cc.desc||''};
   if(S.mode==='local'){toast('Convites precisam da página aberta pelo claude.ai.');return null;}

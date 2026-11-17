@@ -3237,7 +3237,7 @@ function scheduleMesa(){if(playerMode||!map||!map.mesa||!map.mesa.on||!db)return
 async function pushMesa(){if(!map||!map.mesa||!map.mesa.on||!db)return;const data=playerSafe(map);const json=JSON.stringify(data);if(json.length>250000){$('mesaState').textContent='O mapa ficou grande demais para transmitir.';return;}
   try{await db.doc('mesas/'+map.mesa.id).set({map:data,updatedAt:Date.now()});$('mesaState').textContent='Transmitindo. Última atualização às '+new Date().toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'})+'.';}
   catch(e){$('mesaState').textContent='Não foi possível atualizar a mesa agora.';}}
-function mesaLink(){return map&&map.mesa?ARTIFACT_URL+'#mesa-'+map.mesa.id:'';}
+function mesaLink(){return map&&map.mesa?(window.MESA_URL||ARTIFACT_URL)+'#mesa-'+map.mesa.id:'';}
 function openMesa(){$('mesaModal').hidden=false;renderMesa();}
 function renderMesa(){const on=!!(map.mesa&&map.mesa.on);
   const cs=$('mesaCamp'),camps=window.Fichas?Fichas.camps():[];cs.innerHTML='';cs.appendChild(new Option(camps.length?'Nenhuma':'Crie uma campanha em Fichas',''));for(const c of camps)cs.appendChild(new Option(c.nome,c.id));
