@@ -2191,6 +2191,13 @@ function arrowHead(ctx,pts,size,col){const sp=samplePath(pts);if(sp.length<2)ret
   ctx.lineTo(a[0]+Math.cos(ang+2.5)*size,a[1]+Math.sin(ang+2.5)*size);ctx.lineTo(a[0]+Math.cos(ang-2.5)*size,a[1]+Math.sin(ang-2.5)*size);ctx.closePath();ctx.fill();ctx.restore();}
 function alongPath(pts,every,fn){const sp=samplePath(pts);let acc=0;for(let i=1;i<sp.length;i++){const d=Math.hypot(sp[i][0]-sp[i-1][0],sp[i][1]-sp[i-1][1]);acc+=d;
   if(acc>=every){acc=0;const ang=Math.atan2(sp[i][1]-sp[i-1][1],sp[i][0]-sp[i-1][0]);fn(sp[i][0],sp[i][1],ang);}}}
+/* rivers and canals: all banks first, then all water, so confluences read as one body */
+const WATERWAYS=new Set(['rio','canal']);
+function drawRiver(ctx,o,P,pass){const w=o.w,all=pass==null;ctx.save();ctx.lineCap='round';ctx.lineJoin='round';
+  if(o.type==='canal'){const sp=samplePath(o.pts);if(all||pass===0){ctx.strokeStyle=P.ink;ctx.lineWidth=w*1.4+2;strokePoly(ctx,sp);}if(all||pass===1){ctx.strokeStyle=P.river;ctx.lineWidth=w*1.4;strokePoly(ctx,sp);}ctx.restore();return;}
+  const sp=samplePath(o.pts),n=sp.length;for(let ps=0;ps<2;ps++){if(!all&&ps!==pass)continue;ctx.strokeStyle=ps?P.river:P.water;
+    for(let i=1;i<n;i++){const f=i/(n-1);ctx.lineWidth=(w*(.35+.65*f))+(ps?0:Math.max(1.2,w*.35));ctx.beginPath();ctx.moveTo(sp[i-1][0],sp[i-1][1]);ctx.lineTo(sp[i][0],sp[i][1]);ctx.stroke();}}
+  ctx.restore();}
 function drawLine(ctx,o,P){
   const w=o.w, pts=o.pts; if(!pts||pts.length<2)return;
   if(o.type&&/^w3?_/.test(o.type))return drawWall(ctx,o,P);
@@ -2198,10 +2205,7 @@ function drawLine(ctx,o,P){
   ctx.save();ctx.lineCap='round';ctx.lineJoin='round';
   const path=()=>{ctx.beginPath();smoothPath(ctx,pts);};
   switch(o.type){
-    case 'rio':{const sp=samplePath(pts);const n=sp.length;
-      for(let pass=0;pass<2;pass++){ctx.strokeStyle=pass?P.river:P.water;
-        for(let i=1;i<n;i++){const f=i/(n-1);ctx.lineWidth=(w*(.35+.65*f))+(pass?0:Math.max(1.2,w*.35));ctx.beginPath();ctx.moveTo(sp[i-1][0],sp[i-1][1]);ctx.lineTo(sp[i][0],sp[i][1]);ctx.stroke();}}
-      break;}
+    case 'rio':ctx.restore();drawRiver(ctx,o,P);return;
     case 'estrada': path();ctx.strokeStyle=P.halo;ctx.lineWidth=w+2;ctx.stroke();ctx.strokeStyle=P.road;ctx.lineWidth=w*.7;ctx.setLineDash([w*2.2,w*1.2]);ctx.stroke();break;
     case 'trilha': path();ctx.strokeStyle=P.ink;ctx.lineWidth=Math.max(1.5,w*.5);ctx.setLineDash([.1,w*1.6]);ctx.stroke();break;
     case 'fronteira': path();ctx.strokeStyle=P.borderSoft;ctx.lineWidth=w*3;ctx.stroke();
@@ -2213,7 +2217,7 @@ function drawLine(ctx,o,P){
     case 'cerca': path();ctx.strokeStyle=P.road;ctx.lineWidth=Math.max(1,w*.35);ctx.stroke();ctx.setLineDash([.1,w*1.5]);ctx.lineWidth=w*.9;ctx.stroke();break;
     case 'ferrovia': path();ctx.strokeStyle=P.ink;ctx.lineWidth=w+2;ctx.stroke();ctx.strokeStyle=P.paper;ctx.lineWidth=w;ctx.stroke();
       ctx.strokeStyle=P.ink;ctx.setLineDash([w*2.4,w*2.4]);ctx.stroke();break;
-    case 'canal': path();ctx.strokeStyle=P.ink;ctx.lineWidth=w*1.4+2;ctx.stroke();ctx.strokeStyle=P.river;ctx.lineWidth=w*1.4;ctx.stroke();break;
+    case 'canal':ctx.restore();drawRiver(ctx,o,P);return;
     case 'telegrafo': path();ctx.strokeStyle=P.ink;ctx.lineWidth=Math.max(.8,w*.25);ctx.stroke();ctx.lineWidth=Math.max(1,w*.35);
       alongPath(pts,w*7,(x,y,a)=>{const nx=Math.cos(a+Math.PI/2)*w,ny=Math.sin(a+Math.PI/2)*w;ctx.beginPath();ctx.moveTo(x-nx,y-ny);ctx.lineTo(x+nx,y+ny);ctx.stroke();});break;
     case 'rota_aerea': path();ctx.strokeStyle=P.brass;ctx.lineWidth=Math.max(1.4,w*.45);ctx.setLineDash([w*.3,w*1.3]);ctx.stroke();arrowHead(ctx,pts,w*2.2,P.brass);break;
@@ -2297,7 +2301,8 @@ function drawMap(ctx,opts){
   if(vig){const g=ctx.createRadialGradient(W/2,H/2,Math.min(W,H)*.35,W/2,H/2,Math.max(W,H)*.75);g.addColorStop(0,'rgba(0,0,0,0)');g.addColorStop(1,vig);ctx.fillStyle=g;ctx.fillRect(0,0,W,H);}
   if(map.layers.grid&&opts.grid&&map.grid.type!=='none')drawGrid(ctx,map.grid,opts.bounds||[0,0,W,H],opts.gridLW||1);
   const vis=o=>!(opts.player&&o.secret);
-  const w3=[],sts=[];if(map.layers.lines){for(const o of map.objects)if(o.kind==='line'&&vis(o)){if(WALLS3[o.type]&&o.pts.length>1)w3.push(o);else if(NEWST.has(o.type)&&o.pts.length>1)sts.push(o);else drawLine(ctx,o,P);}
+  const w3=[],sts=[];if(map.layers.lines){const rest=[],rivs=[];for(const o of map.objects)if(o.kind==='line'&&vis(o)){if(WALLS3[o.type]&&o.pts.length>1)w3.push(o);else if(NEWST.has(o.type)&&o.pts.length>1)sts.push(o);else if(WATERWAYS.has(o.type)&&o.pts.length>1)rivs.push(o);else rest.push(o);}
+    for(let ps=0;ps<2;ps++)for(const o of rivs)drawRiver(ctx,o,P,ps);for(const o of rest)drawLine(ctx,o,P);
     sts.sort((a,b)=>ST_RANK[a.type]-ST_RANK[b.type]);const dp=map.doorPaths!==false&&map.layers.icons,pl=!!opts.player;
     if(dp){drawDoorPaths(ctx,P,pl,0,false);drawDoorPaths(ctx,P,pl,0,true);}for(const o of sts)drawStreet(ctx,o,P,0);
     if(dp)drawDoorPaths(ctx,P,pl,1,false);for(const o of sts)if(o.type==='rua_terra')drawStreet(ctx,o,P,1);
@@ -2482,7 +2487,7 @@ function drawStreet(ctx,o,P,pass){const w=o.w,sp=samplePath(o.pts),all=pass==nul
   if(all||pass===1){ctx.strokeStyle=streetPattern(ctx,ST_KIND[o.type]);ctx.lineWidth=o.type==='rua_pedra'?w*2-1:o.type==='rua_terra'?w*2:w*2.1;strokePoly(ctx,sp);}
   ctx.restore();}
 function nearestOnPath(sp,p){let best=null,bd=Infinity;for(let i=1;i<sp.length;i++){const a=sp[i-1],b=sp[i],dx=b[0]-a[0],dy=b[1]-a[1],l=dx*dx+dy*dy;let t=l?((p[0]-a[0])*dx+(p[1]-a[1])*dy)/l:0;t=clamp(t,0,1);const q=[a[0]+t*dx,a[1]+t*dy],d=Math.hypot(p[0]-q[0],p[1]-q[1]);if(d<bd){bd=d;best=q;}}return best?{q:best,d:bd}:null;}
-function snapStreetEnds(nl){if(!PATHLIKE.has(nl.type))return 0;let n=0;const others=map.objects.filter(o=>o!==nl&&o.kind==='line'&&PATHLIKE.has(o.type)).map(o=>({o,sp:samplePath(o.pts)}));
+function snapStreetEnds(nl){const grp=PATHLIKE.has(nl.type)?PATHLIKE:WATERWAYS.has(nl.type)?WATERWAYS:null;if(!grp)return 0;let n=0;const others=map.objects.filter(o=>o!==nl&&o.kind==='line'&&grp.has(o.type)).map(o=>({o,sp:samplePath(o.pts)}));
   for(const idx of[0,nl.pts.length-1]){const p=nl.pts[idx];let best=null;for(const it of others){const r=nearestOnPath(it.sp,p);if(!r)continue;const tol=Math.max(14,(it.o.w+nl.w)*2.2);if(r.d<tol&&(!best||r.d<best.d))best=r;}
     if(best&&best.d>.5){nl.pts[idx]=[Math.round(best.q[0]*10)/10,Math.round(best.q[1]*10)/10];n++;}}return n;}
 let geomVer=0,urbCat=null,linkCache={key:'',list:[]},fdCache={key:'',list:[]};
@@ -2768,7 +2773,7 @@ function endPointer(e){
   if(!drag)return;const d=drag;drag=null;cv.style.cursor='';
   if(d.type==='brush'){flushTerrain();if(!dirtyEver())0;changed();}
   if(d.type==='line'&&preview){let pts=rdp(preview.pts,1.4/view.z+.6).map(q=>[Math.round(q[0]*10)/10,Math.round(q[1]*10)/10]);
-    if(pts.length>=2&&Math.hypot(pts[0][0]-pts[pts.length-1][0],pts[0][1]-pts[pts.length-1][1])+pts.length>6){pushHistory();const nl={id:uid(),kind:'line',type:preview.type,w:preview.w,pts};map.objects.push(nl);const sn=snapStreetEnds(nl);changed();if(sn)toast(sn>1?'As duas pontas foram ligadas a caminhos próximos.':'A ponta foi ligada ao caminho mais próximo.');if(ui.streetFill&&STREETS.has(nl.type)){const n=fillStreet(nl,[-1,1]);if(n)toast(`${n} construções colocadas ao longo da rua.`);}}
+    if(pts.length>=2&&Math.hypot(pts[0][0]-pts[pts.length-1][0],pts[0][1]-pts[pts.length-1][1])+pts.length>6){pushHistory();const nl={id:uid(),kind:'line',type:preview.type,w:preview.w,pts};map.objects.push(nl);const sn=snapStreetEnds(nl);changed();if(sn)toast(WATERWAYS.has(nl.type)?(sn>1?'As duas pontas foram ligadas a rios próximos.':'A ponta foi ligada ao rio mais próximo.'):(sn>1?'As duas pontas foram ligadas a caminhos próximos.':'A ponta foi ligada ao caminho mais próximo.'));if(ui.streetFill&&STREETS.has(nl.type)){const n=fillStreet(nl,[-1,1]);if(n)toast(`${n} construções colocadas ao longo da rua.`);}}
     preview=null;requestDraw();}
   if(false)0;
   if(d.type==='move'&&d.moved){atmDirty=true;changed();refreshPanel();}
