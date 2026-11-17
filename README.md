@@ -12,7 +12,8 @@ Mapas e fichas de RPG de mesa numa página só. O botão **Mapa | Fichas** no to
 
 ## Grimório do Mestre (fichas)
 
-- **Sistemas:** D&D 5e (tema pergaminho) e Ordem Paranormal (tema dossiê).
+- **Sistemas:** D&D 5e (tema pergaminho), Ordem Paranormal (tema dossiê) e Etmos (caderno lavanda).
+- **Etmos no combate:** o jogador vê os símbolos das partículas que conhece, separados em funções, objetos, características e complementos, escolhe a ordem e confirma; a página mostra a palavra montada e os símbolos em sequência.
 - **Acesso:** cada jogador edita só as próprias fichas; o mestre vê e edita todas, e tem NPCs e notas que só ele lê.
 - **Cálculos automáticos:** modificadores, perícias, salvaguardas, CD e ataque de magia (D&D); PV, PE e SAN por classe e NEX, defesa e carga (Ordem Paranormal).
 - **Dados:** clique em atributos, perícias e ataques para rolar; vantagem e desvantagem no D&D; regra de dados por atributo na Ordem.
@@ -28,6 +29,9 @@ Mapas e fichas de RPG de mesa numa página só. O botão **Mapa | Fichas** no to
 | `mesa-do-mestre.html` | Página montada, publicada como artefato no claude.ai. |
 | `index.html` | A mesma página completa, para abrir direto no navegador. |
 | `scripts/build.py` | Monta `mesa-do-mestre.html` e `index.html` a partir dos dois arquivos-fonte. |
+| `scripts/etmos_simbolos.py` | Baixa o PDF de partículas do Etmos e vetoriza os símbolos em `etmos-simbolos.json`. |
+
+Os símbolos do Etmos são arte do Balde Galáctico e não ficam no repositório. Rode `python3 scripts/etmos_simbolos.py` e depois o build: ele gera `mesa-com-simbolos.html` (fora do git) para publicar. Sem o arquivo de símbolos, a ficha mostra as sílabas no lugar deles.
 
 ## Como usar
 

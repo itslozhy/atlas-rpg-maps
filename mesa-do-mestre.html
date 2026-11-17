@@ -451,8 +451,8 @@ h1.view{font-family:var(--f-title);font-weight:400;font-size:32px;margin:4px 0 4
 .card a.cover{color:inherit;text-decoration:none}
 .badge{display:inline-flex;align-items:center;gap:5px;font-size:12px;letter-spacing:.06em;text-transform:uppercase;font-weight:700;padding:2px 8px;border-radius:99px;border:1px solid currentColor;width:max-content}
 .badge.dnd{color:#8e3a1f}.badge.op{color:#b0122f}
-@media (prefers-color-scheme:dark){:host(:not([data-theme="light"])) .badge.dnd{color:#e6a07f}:host(:not([data-theme="light"])) .badge.op{color:#f07087}}
-:host([data-theme="dark"]) .badge.dnd{color:#e6a07f}:host([data-theme="dark"]) .badge.op{color:#f07087}
+@media (prefers-color-scheme:dark){:host(:not([data-theme="light"])) .badge.dnd{color:#e6a07f}:host(:not([data-theme="light"])) .badge.op{color:#f07087}:host(:not([data-theme="light"])) .badge.etmos{color:#c9a4e0}}
+:host([data-theme="dark"]) .badge.dnd{color:#e6a07f}:host([data-theme="dark"]) .badge.op{color:#f07087}:host([data-theme="dark"]) .badge.etmos{color:#c9a4e0}
 .empty{border:1px dashed var(--line);border-radius:12px;padding:22px;color:var(--muted);text-align:center;background:var(--panel)}
 .field{display:flex;flex-direction:column;gap:4px;font-size:14px}
 .field>span{color:var(--muted);font-size:13px}
@@ -504,7 +504,7 @@ h1.view{font-family:var(--f-title);font-weight:400;font-size:32px;margin:4px 0 4
 .seg button[aria-pressed="true"]{border-color:var(--accent);background:var(--accent-soft)}
 
 /* ============ SHEETS (each system commits to its own look, in both host themes) ============ */
-.sheet{border-radius:16px;overflow:hidden;box-shadow:var(--shadow)}
+.sheet{border-radius:16px;overflow:hidden;overflow:clip;box-shadow:var(--shadow)}
 .sheet fieldset{border:0;margin:0;padding:0;min-width:0}
 .sheet input,.sheet select,.sheet textarea{background:transparent;border:0;border-bottom:1px solid var(--sl);border-radius:0;padding:3px 2px;color:var(--sf);width:100%;min-width:0}
 .sheet textarea{border:1px solid var(--sl);border-radius:6px;padding:7px 9px;min-height:110px;resize:vertical;line-height:1.45}
@@ -615,6 +615,108 @@ h1.view{font-family:var(--f-title);font-weight:400;font-size:32px;margin:4px 0 4
 @media (max-width:700px){.sheet.op .ritual .rd{grid-template-columns:repeat(2,minmax(0,1fr))}}
 .sheet.op .ritual textarea{min-height:60px}
 .sheet.op .tag{font-family:"IBM Plex Mono",monospace;font-size:11px;color:var(--sm);border:1px solid var(--sl);border-radius:4px;padding:0 4px}
+
+/* ---- Etmos: lavender school notebook, plum ink, particle cards ---- */
+.sheet.etmos{--sbg:#e5e0f0;--sp:#eeeaf6;--sp2:#d9d2ea;--sf:#2b1830;--sm:#6b5875;--sa:#4a2350;--sab:#f4effa;--sl:#b6abc9;--sl2:#cdc4dc;--sh:#f7f4fc;
+  background:var(--sbg);color:var(--sf);font-family:"EB Garamond",Georgia,serif;font-size:16px;
+  background-image:radial-gradient(ellipse at 0% 0%,rgba(255,255,255,.55),transparent 55%),radial-gradient(ellipse at 100% 100%,rgba(74,35,80,.12),transparent 50%)}
+.sheet.etmos .box{background:rgba(255,255,255,.35)}
+.sheet.etmos .box>h4,.sheet.etmos .lbl,.sheet.etmos .stabs button{font-family:"IM Fell English SC",Georgia,serif;letter-spacing:.06em}
+.sheet.etmos .box>h4{font-size:15px;text-transform:none;font-weight:400}
+.sheet.etmos .ehead{padding:18px 20px 14px;border-bottom:2px solid var(--sa);display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,2fr) auto;gap:16px;align-items:end}
+.sheet.etmos .ename input{font-family:"IM Fell English SC",Georgia,serif;font-size:30px;color:var(--sa);border-bottom:2px solid var(--sa)}
+.sheet.etmos .emeta{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:8px 12px}
+.sheet.etmos .elogo{font-family:"IM Fell English SC",Georgia,serif;font-size:30px;letter-spacing:.32em;color:var(--sa);text-align:right;line-height:1}
+.sheet.etmos .elogo small{display:block;font-size:11px;letter-spacing:.4em;margin-top:2px}
+@media (max-width:980px){.sheet.etmos .ehead{grid-template-columns:minmax(0,1fr)}.sheet.etmos .emeta{grid-template-columns:repeat(2,minmax(0,1fr))}.sheet.etmos .elogo{display:none}}
+.sheet.etmos .emain{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.sheet.etmos .emain .wide{grid-column:1/-1}
+@media (max-width:700px){.sheet.etmos .emain{grid-template-columns:minmax(0,1fr)}}
+.sheet.etmos .erow{display:flex;align-items:center;gap:10px;padding:3px 0}
+.sheet.etmos .erow .n,.sheet.etmos .emarcos .n{min-width:64px;font-size:17px}
+.sheet.etmos .epips{display:flex;gap:4px;flex-wrap:wrap}
+.sheet.etmos .epip{width:24px;height:24px;border-radius:3px;border:1px solid var(--sl);background:var(--sh);cursor:pointer;padding:0;color:var(--sa);font-weight:700}
+.sheet.etmos .epip.on{background:var(--sa);border-color:var(--sa);color:var(--sab)}
+.sheet.etmos .ftrack{display:grid;grid-template-columns:28px repeat(10,minmax(0,1fr));gap:4px;align-items:center;max-width:420px}
+.sheet.etmos .box .ftrack:not(:has(.plus)){grid-template-columns:28px repeat(6,minmax(0,1fr));max-width:260px}
+.sheet.etmos .ftrack .epip{width:100%;max-width:30px}
+.sheet.etmos .f0{width:26px;height:26px;border-radius:50%;border:1.5px solid var(--sa);background:transparent;color:var(--sa);font-family:"IM Fell English SC",Georgia,serif;cursor:pointer;padding:0;font-size:15px}
+.sheet.etmos .f0.on{background:var(--sa);color:var(--sab)}
+.sheet.etmos .fscale{display:grid;grid-template-columns:28px repeat(10,minmax(0,1fr));gap:4px;max-width:420px;font-size:12.5px;color:var(--sm);margin-top:3px}
+.sheet.etmos .fscale span{border-top:1.5px solid var(--sl);padding-top:1px;text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sheet.etmos .fscale span:first-child{border:0;text-align:left;overflow:visible}
+.sheet.etmos .fnow{margin:8px 0 6px;font-size:15px}
+.sheet.etmos .ecount{display:flex;align-items:center;gap:8px;font-size:22px}
+.sheet.etmos .ecount .sep{color:var(--sm)}
+.sheet.etmos .note{color:var(--sm);font-size:13.5px;margin:4px 0 0}
+.sheet.etmos .emarcos{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+.sheet.etmos .emarcos>div{display:flex;flex-direction:column;gap:5px}
+@media (max-width:640px){.sheet.etmos .emarcos{grid-template-columns:minmax(0,1fr)}}
+.sheet.etmos .evals{display:grid;grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);gap:10px;align-items:center;margin:8px 0;font-size:20px;color:var(--sm)}
+.sheet.etmos .gl{width:34px;height:34px;fill:currentColor;flex:0 0 auto;display:block}
+.sheet.etmos .gls{width:26px;height:26px;fill:currentColor;flex:0 0 auto}
+.sheet.etmos .gl-txt{display:grid;place-items:center;border:1px solid currentColor;border-radius:50%;font-size:11px;font-weight:700}
+.sheet.etmos .egrim{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
+@media (max-width:1100px){.sheet.etmos .egrim{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:640px){.sheet.etmos .egrim{grid-template-columns:minmax(0,1fr)}}
+.sheet.etmos .eparts{display:flex;flex-direction:column;gap:2px}
+.sheet.etmos .epart{display:grid;grid-template-columns:30px auto minmax(0,1fr);gap:8px;align-items:center;padding:3px 4px;border-radius:6px;cursor:pointer;color:var(--sa)}
+.sheet.etmos .epart .gl{width:30px;height:30px;opacity:.35}
+.sheet.etmos .epart:has(input:checked) .gl{opacity:1}
+.sheet.etmos .epart:hover{background:var(--sh)}
+.sheet.etmos .epart input{width:auto;accent-color:#4a2350}
+.sheet.etmos .epart span{color:var(--sf);font-size:15px;line-height:1.2}
+.sheet.etmos .epart small{color:var(--sm);font-size:12px}
+.sheet.etmos .esaved{display:grid;grid-template-columns:auto minmax(0,1fr) auto auto;gap:10px;align-items:center;padding:6px 0;border-bottom:1px solid var(--sl2)}
+@media (max-width:640px){.sheet.etmos .esaved{grid-template-columns:minmax(0,1fr) auto}.sheet.etmos .esaved .glrow{grid-column:1/-1}}
+.sheet.etmos .esw b{font-family:"IM Fell English SC",Georgia,serif;font-size:19px;color:var(--sa)}
+.sheet.etmos .glrow{display:flex;gap:2px;color:var(--sa);flex-wrap:wrap}
+.sheet.etmos .estatus{display:flex;gap:8px 18px;flex-wrap:wrap;font-size:15px;color:var(--sm);margin-bottom:12px}
+.sheet.etmos .estatus b{color:var(--sf)}
+.sheet.etmos .eseq{position:sticky;top:calc(var(--toph,58px) + 6px);z-index:2;display:flex;gap:10px;align-items:center;flex-wrap:wrap;background:#2b1631;color:#ece3f7;border-radius:12px;padding:10px 12px;margin-bottom:14px;box-shadow:0 6px 18px rgba(43,22,49,.25)}
+.sheet.etmos .eseq-l{display:flex;gap:6px;flex-wrap:wrap;flex:1 1 260px;min-height:44px;align-items:center}
+.sheet.etmos .eseq-l .note{color:#bfb0d0;font-size:14px}
+.sheet.etmos .eseq-i{display:flex;flex-direction:column;align-items:center;gap:1px;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.18);border-radius:8px;color:#efe6fa;padding:4px 6px;cursor:pointer;font:inherit;font-size:12px}
+.sheet.etmos .eseq-i:hover{border-color:#e2c9ff;text-decoration:line-through}
+.sheet.etmos .eseq-a{display:flex;gap:8px}
+@media (max-width:640px){.sheet.etmos .eseq{flex-wrap:nowrap;padding:8px}.sheet.etmos .eseq-l{flex:1 1 0;min-width:0;overflow-x:auto;flex-wrap:nowrap}.sheet.etmos .eseq-a{flex-direction:column;gap:6px}.sheet.etmos .eseq .btn{padding:4px 10px;justify-content:center}.sheet.etmos .eseq-l .note{font-size:13px}}
+.sheet.etmos .eseq .btn{background:rgba(255,255,255,.1);border-color:rgba(255,255,255,.25);color:#f4effa}
+.sheet.etmos .eseq .btn.primary{background:#e9dcf8;color:#2b1631;border-color:#e9dcf8;font-weight:700}
+.sheet.etmos .egroup{margin-bottom:14px}
+.sheet.etmos .egroup>h4{font-family:"IM Fell English SC",Georgia,serif;font-weight:400;font-size:17px;color:var(--sa);margin:0 0 6px;border-bottom:1px solid var(--sl);padding-bottom:2px}
+.sheet.etmos .epick{display:grid;grid-template-columns:repeat(auto-fill,minmax(104px,1fr));gap:8px}
+.sheet.etmos .ech{position:relative;display:flex;flex-direction:column;align-items:center;gap:2px;padding:10px 6px 8px;border:1px solid var(--sl);border-radius:10px;cursor:pointer;color:var(--sa);font:inherit;
+  background:var(--sh) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='-50 -50 100 100'%3E%3Cpath d='M0-46L13.5 41.6-35.4-27 42.9 13.9-43.1 13.9 35.4-27-13.5 41.6Z M0-46 27 37.2-43.7-14.2 43.7-14.2-27 37.2Z' fill='none' stroke='%23b9aecb' stroke-width='.8'/%3E%3C/svg%3E") center 8px/64px no-repeat}
+.sheet.etmos .ech .gl{width:52px;height:52px;margin-bottom:2px}
+.sheet.etmos .ech b{font-family:"IM Fell English SC",Georgia,serif;font-size:18px;font-weight:400;line-height:1}
+.sheet.etmos .ech span{font-size:12.5px;color:var(--sm);text-align:center;line-height:1.15}
+.sheet.etmos .ech:hover{border-color:var(--sa);transform:translateY(-1px)}
+.sheet.etmos .ech.on{background-color:#2b1631;border-color:#2b1631;color:#efe6fa}
+.sheet.etmos .ech.on span{color:#cbbbe0}
+.sheet.etmos .ech .ord{position:absolute;top:5px;left:6px;font-style:normal;font-weight:700;font-size:12px;background:#e9dcf8;color:#2b1631;border-radius:99px;min-width:20px;height:20px;display:grid;place-items:center}
+.sheet.etmos .ecast{background:#2b1631;color:#ece3f7;border-radius:16px;padding:22px 18px 18px;text-align:center;box-shadow:0 10px 30px rgba(43,22,49,.3);
+  background-image:radial-gradient(circle at 50% 30%,rgba(205,170,255,.16),transparent 60%)}
+.sheet.etmos .ecast .lbl{color:#bfb0d0;margin:0}
+.sheet.etmos .etw{font-family:"IM Fell English SC",Georgia,serif;font-weight:400;font-size:clamp(36px,7vw,64px);letter-spacing:.06em;margin:4px 0 14px;color:#f6efff;text-shadow:0 0 22px rgba(205,170,255,.45);overflow-wrap:anywhere}
+.sheet.etmos .ecast-gl{display:flex;justify-content:center;align-items:center;gap:6px 8px;flex-wrap:wrap}
+.sheet.etmos .ecast-gl figure{margin:0;display:flex;flex-direction:column;align-items:center;gap:4px;min-width:76px;animation:etIn .45s both}
+.sheet.etmos .ecast-gl figure:nth-of-type(2){animation-delay:.08s}.sheet.etmos .ecast-gl figure:nth-of-type(3){animation-delay:.16s}.sheet.etmos .ecast-gl figure:nth-of-type(4){animation-delay:.24s}.sheet.etmos .ecast-gl figure:nth-of-type(n+5){animation-delay:.32s}
+@keyframes etIn{from{opacity:0;transform:translateY(6px) scale(.92)}to{opacity:1;transform:none}}
+@media (prefers-reduced-motion:reduce){.sheet.etmos .ecast-gl figure{animation:none}}
+.sheet.etmos .glb{width:72px;height:72px;fill:#efe3ff;filter:drop-shadow(0 0 6px rgba(205,170,255,.5))}
+.sheet.etmos .ecast-gl figcaption{display:flex;flex-direction:column;line-height:1.15}
+.sheet.etmos .ecast-gl figcaption b{font-family:"IM Fell English SC",Georgia,serif;font-weight:400;font-size:18px}
+.sheet.etmos .ecast-gl figcaption span{font-size:12.5px;color:#bfb0d0}
+.sheet.etmos .ecast-gl .plus{color:#8f7aa6;font-size:22px}
+.sheet.etmos .esyl{color:#bfb0d0;margin:12px 0 10px;letter-spacing:.04em}
+.sheet.etmos .ewarn{background:rgba(255,200,120,.12);border:1px solid rgba(255,200,120,.35);border-radius:8px;padding:8px 10px;color:#f5dfbf;font-size:14.5px}
+.sheet.etmos .ecast .btn{background:rgba(255,255,255,.1);border-color:rgba(255,255,255,.25);color:#f4effa}
+.sheet.etmos .erecent{display:flex;align-items:center;gap:10px;width:100%;background:none;border:0;border-bottom:1px solid var(--sl2);padding:6px 2px;cursor:pointer;font:inherit;color:var(--sf);text-align:left}
+.sheet.etmos .erecent b{font-family:"IM Fell English SC",Georgia,serif;font-weight:400;font-size:18px;color:var(--sa)}
+.sheet.etmos .erecent small{margin-left:auto;color:var(--sm)}
+.sheet.etmos .erecent:hover{background:var(--sh)}
+.badge.etmos{color:#5b2a63}
+.etw-mini{font-family:"IM Fell English SC",Georgia,serif;font-weight:400!important}
 /* section switch shared with the map (same look on both sides) */
 .viewsw{display:inline-flex;border:1px solid var(--line);border-radius:8px;overflow:hidden;flex:0 0 auto}
 .viewsw button{background:var(--panel-2);border:0;padding:5px 13px;cursor:pointer;font-weight:600;color:var(--muted)}
@@ -3704,12 +3806,35 @@ const OP={id:'op',n:'Ordem Paranormal',
   patentes:['Recruta','Operador','Agente especial','Oficial de operações','Agente de elite'],
   custo:{1:1,2:3,3:6,4:10},
   conds:['Abalado','Apavorado','Atordoado','Caído','Cego','Confuso','Debilitado','Desprevenido','Enlouquecendo','Enredado','Esmorecido','Exausto','Fatigado','Frustrado','Inconsciente','Lento','Machucado','Morrendo','Ofuscado','Paralisado','Pasmo','Perturbado','Sangrando','Surdo','Vulnerável']};
-const SYS={dnd:DND,op:OP};
+const ETMOS={id:'etmos',n:'Etmos',
+  grupos:[['func','Funções'],['obj','Objetos'],['car','Características'],['comp','Complementos']],
+  parts:{
+    func:[['AL','Alterar'],['AR','Aprisionar'],['IM','Atacar/Ferir'],['IR','Atrair/Repelir'],['EN','Banir'],['ET','Controlar'],['AS','Destruir'],['EM','Empoderar'],['IN','Enfraquecer'],['EV','Invocar/Criar'],['UN','Juntar/Conectar'],['ES','Marcar'],['AM','Proteger'],['AN','Restaurar'],['IL','Revelar'],['OR','Transmitir'],['IT','Transportar']],
+    obj:[['ALA','Abstrato'],['ANI','Alma'],['ALI','Animais'],['IRO','Aura'],['EVA','Cadáver'],['AYU','Clima'],['IBO','Comida'],['OMU','Construção'],['ELI','Elemento'],['EPI','Explosão'],['EXA','Inanimado'],['AZI','Informação'],['IMU','Mente/Pensamento'],['IVI','Pessoa'],['UNA','Sentido'],['INA','Tecnologia'],['ANU','Tempo'],['ERA','Terreno'],['ORA','Vegetação/Flora']],
+    car:[['DUM','Ácido'],['QUAN','Água'],['AER','Ar'],['IMPE','Armas'],['KAR','Cheiro'],['PHYS','Corpo'],['RAT','Dimensional'],['TRIZ','Elétrico'],['BHAS','Emoção'],['TEN','Escuridão'],['IG','Fogo'],['VIB','Força'],['YM','Gravidade'],['HIN','Idioma'],['ALUI','Ilusão'],['MOK','Loucura'],['LUM','Luz'],['MAG','Magia'],['TUM','Movimento'],
+      ['SAG','Munição'],['NECRO','Necrótico'],['APU','Nojento/Secreção'],['GUS','Paladar'],['ROC','Pedra'],['CAND','Radiação'],['KAN','Reflexo/Espelho'],['HEM','Sangue'],['MUL','Som'],['CYSG','Sono'],['TUNI','Tecido'],['MUN','Terra'],['AST','Velocidade'],['TOX','Veneno'],['OCUL','Visão']],
+    comp:[['MOR','Maior',1],['MIN','Menor',1],['SAN','Forma: Círculo/Redoma/Esfera',1],['SAR','Forma: Parede/Barreira/Muralha',1],['SIN','Forma: Objeto em geral',1],['AG','Adição',2],['ADA','Variação',3],['NO','Negação',3],['MUT','Derivação',3],['ITAM','Inerte',4]]},
+  /* particles written with a trailing hyphen on the sheet (they lean on the next one) */
+  hifen:{BHAS:1,ADA:1,NO:1,MUT:1},
+  fadiga:[[0,'Normal'],[1,'Cansado'],[6,'Exausto'],[9,'Esgotado']],
+  complex:['Trivial','Regular','Difícil','Difícil','Complexo','Complexo','Milagre']};
+const ET_ALL={};for(const [g] of ETMOS.grupos)for(const p of ETMOS.parts[g])ET_ALL[p[0]]={id:p[0],n:p[1],nv:p[2]||0,g};
+const etSil=id=>id.charAt(0)+id.slice(1).toLowerCase()+(ETMOS.hifen[id]?'-':'');
+function etWord(seq){const w=seq.map(id=>id.toLowerCase()).join('');return w.charAt(0).toUpperCase()+w.slice(1);}
+const etFad=s=>{let st=ETMOS.fadiga[0];for(const f of ETMOS.fadiga)if(num(s.fadiga)>=f[0])st=f;return st[1];};
+const etLimF=s=>4+Math.floor(num(s.atr&&s.atr.corpo)/2);
+const etLimE=s=>4+num(s.atr&&s.atr.alma);
+const GLIFOS=window.ETMOS_GLIFOS||{};
+const glyph=(id,cls)=>GLIFOS[id]?`<svg class="${cls||'gl'}" viewBox="0 0 200 200" aria-hidden="true"><path d="${GLIFOS[id]}"/></svg>`:`<span class="${cls||'gl'} gl-txt" aria-hidden="true">${esc(etSil(id))}</span>`;
+const SYS={dnd:DND,op:OP,etmos:ETMOS};
 const COLORS=['#7b1e1e','#2f5a7a','#3f6a3a','#8a5a1a','#5a3f7a','#1f6a6a','#8a2f5a','#4a4a52'];
 
 function newDnd(){return {sys:'dnd',nome:'',jogador:'',classe:'',subclasse:'',nivel:1,especie:'',antecedente:'',alinhamento:'',xp:0,cor:COLORS[Math.floor(Math.random()*COLORS.length)],
   atr:{for:10,des:10,con:10,int:10,sab:10,car:10},salv:{},per:{},inspiracao:false,ca:10,iniB:0,desloc:9,pvMax:10,pv:10,pvTemp:0,dv:'1d8',dvUsados:0,morte:{s:0,f:0},
   ataques:[],conjAtr:'int',slots:{},magias:[],itens:[],moedas:{pc:0,pp:0,pe:0,po:0,pl:0},cond:[],tracos:'',profs:'',personalidade:'',ideais:'',vinculos:'',defeitos:'',aparencia:'',historia:'',notas:''};}
+function newEtmos(){return {sys:'etmos',nome:'',jogador:'',ano:'',idade:'',nivel:1,empenho:'',cor:COLORS[Math.floor(Math.random()*COLORS.length)],
+  atr:{corpo:0,alma:0,mente:0},fadiga:0,ferimentos:0,estresse:0,complex:0,marcos:{fis:0,emo:0,men:0},origens:'',praticas:'',teoricas:'',inventario:'',
+  basico:'',aparencia:'',pontos:'',valores:[{a:'',b:''},{a:'',b:''}],futuro:'',parts:{},palavras:[],ultimas:[],cond:[]};}
 function newOp(){const s={sys:'op',nome:'',jogador:'',origem:'',classe:'combatente',trilha:'',nex:5,patente:'Recruta',pp:0,afinidade:'',cor:COLORS[Math.floor(Math.random()*COLORS.length)],
   atr:{agi:1,for:1,int:1,pre:1,vig:1},pvAj:0,peAj:0,sanAj:0,defB:0,desloc:9,resist:'',per:{},ataques:[],rituais:[],habilidades:[],itens:[],cond:[],aparencia:'',personalidade:'',historico:'',objetivo:'',notas:''};
   s.pv=opMax(s,'pv');s.pe=opMax(s,'pe');s.san=opMax(s,'san');s._mx={pv:s.pv,pe:s.pe,san:s.san};return s;}
@@ -3806,7 +3931,7 @@ const ui={campTab:'grupo',sheetTab:{}};
 
 /* ================= VIEWS ================= */
 function crumbs(parts){$('#crumbs').innerHTML=parts.map((p,i)=>(i?'<span aria-hidden="true">›</span>':'')+`<a href="${p[1]}">${esc(p[0])}</a>`).join('');}
-function render(){const app=$('#app');$('#who').innerHTML=S.mode==='local'?'<b>Modo local</b>':S.master?'Você é o <b>mestre</b>':'Você é <b>jogador</b>';
+function render(){const app=$('#app');const tb=$('.top');if(tb)HOST.style.setProperty('--toph',tb.offsetHeight+'px');$('#who').innerHTML=S.mode==='local'?'<b>Modo local</b>':S.master?'Você é o <b>mestre</b>':'Você é <b>jogador</b>';
   if(!S.ready){app.innerHTML='<p class="lead">Carregando as campanhas…</p>';return;}const r=route();
   if(r.v==='camp'&&S.camps[r.id])return viewCamp(app,S.camps[r.id]);if(r.v==='ficha'){const sh=findSheet(r.id);if(sh)return viewSheet(app,sh);app.innerHTML='<div class="empty">Ficha não encontrada. Ela pode ter sido apagada ou ainda estar carregando.</div>';crumbs([['Campanhas','#inicio']]);return;}
   viewHome(app);}
@@ -3824,22 +3949,24 @@ function viewHome(app){crumbs([['Campanhas','#inicio']]);const camps=Object.valu
   const nb=$('#newCamp');if(nb)nb.onclick=()=>campForm();}
 function campForm(c){const isNew=!c;c=c||{id:uid(),nome:'',sys:'dnd',desc:'',createdAt:Date.now()};let sys=c.sys;
   openModal(`<h2>${isNew?'Nova campanha':'Editar campanha'}</h2><label class="field"><span>Nome</span><input id="cNome" value="${esc(c.nome)}" placeholder="Ex.: A Maldição de Valdren"></label>
-    <div class="field"><span>Sistema</span><div class="choices" id="cSys">${Object.values(SYS).map(s=>`<button type="button" class="choice" data-s="${s.id}" aria-pressed="${s.id===sys}"><b>${esc(s.n)}</b><small>${s.id==='dnd'?'Pergaminho, atributos, magias por nível.':'Dossiê da Ordem, NEX, rituais e sanidade.'}</small></button>`).join('')}</div>
+    <div class="field"><span>Sistema</span><div class="choices" id="cSys">${Object.values(SYS).map(s=>`<button type="button" class="choice" data-s="${s.id}" aria-pressed="${s.id===sys}"><b>${esc(s.n)}</b><small>${{dnd:'Pergaminho, atributos, magias por nível.',op:'Dossiê da Ordem, NEX, rituais e sanidade.',etmos:'Grimório de partículas, fadiga e palavras mágicas.'}[s.id]}</small></button>`).join('')}</div>
     ${isNew?'':'<small class="note">Mudar o sistema não converte as fichas que já existem.</small>'}</div>
     <label class="field"><span>Descrição</span><textarea id="cDesc" rows="3">${esc(c.desc)}</textarea></label>
     <div class="row" style="justify-content:flex-end">${isNew?'':'<button class="btn danger" id="cDel">Apagar campanha</button>'}<button class="btn" data-close>Cancelar</button><button class="btn primary" id="cOk">${isNew?'Criar':'Salvar'}</button></div>`);
   for(const b of $('#cSys').children)b.onclick=()=>{sys=b.dataset.s;for(const x of $('#cSys').children)x.setAttribute('aria-pressed',String(x===b));};
   $('#cOk').onclick=async()=>{const nome=$('#cNome').value.trim();if(!nome){$('#cNome').focus();return;}c.nome=nome;c.sys=sys;c.desc=$('#cDesc').value.trim();closeModal();await saveCamp(c);location.hash='campanha-'+c.id;render();};
   const del=$('#cDel');if(del)del.onclick=()=>confirmBox(`Apagar “${c.nome}”? As fichas continuam guardadas, mas a campanha some da lista.`,async()=>{await removeCamp(c);location.hash='inicio';render();});}
-function hpOf(sh){if(sh.sys==='op'){const mx=opMax(sh,'pv');return [num(sh.pv),mx];}return [num(sh.pv),num(sh.pvMax)];}
+function hpOf(sh){if(sh.sys==='etmos'){const l=etLimF(sh);return [l-num(sh.ferimentos),l];}if(sh.sys==='op'){const mx=opMax(sh,'pv');return [num(sh.pv),mx];}return [num(sh.pv),num(sh.pvMax)];}
+function setHpVal(sh,v){const [,mx]=hpOf(sh);if(sh.sys==='etmos')sh.ferimentos=clamp(mx-v,0,mx);else sh.pv=clamp(v,-mx,mx);}
 function barColor(f){return f>.5?'#3f9a5a':f>.25?'#d4a42c':'#c0392b';}
-function subOf(sh){if(sh.sys==='op')return `${(OP.classes[sh.classe]||{n:''}).n} · NEX ${sh.nex}%${sh.trilha?' · '+sh.trilha:''}`;return `${sh.classe||'Sem classe'} ${sh.nivel||1}${sh.especie?' · '+sh.especie:''}`;}
+function subOf(sh){if(sh.sys==='etmos')return `Nível ${sh.nivel||1}${sh.ano?' · '+sh.ano+' ano':''}${sh.idade?' · '+sh.idade+' anos':''}`;if(sh.sys==='op')return `${(OP.classes[sh.classe]||{n:''}).n} · NEX ${sh.nex}%${sh.trilha?' · '+sh.trilha:''}`;return `${sh.classe||'Sem classe'} ${sh.nivel||1}${sh.especie?' · '+sh.especie:''}`;}
 function pcCard(sh,camp){const [pv,mx]=hpOf(sh),f=mx>0?clamp(pv/mx,0,1):0;const ini=(sh.nome||'?').trim().split(/\s+/).map(w=>w[0]||'').join('').slice(0,2).toUpperCase()||'?';const owner=sh.kind==='pc'&&S.mode==='cloud'?(sh.owner===S.uid?'você':S.names[sh.owner]||'jogador'):'';
-  let stats;if(sh.sys==='op'){const san=num(sh.san),smx=opMax(sh,'san'),pe=num(sh.pe),pmx=opMax(sh,'pe');stats=`<div><b>${opDef(sh)}</b>Defesa</div><div><b>${pe}/${pmx}</b>PE</div><div><b>${san}/${smx}</b>SAN</div>`;}
+  let stats;if(sh.sys==='etmos'){const ul=(sh.ultimas||[])[0];stats=`<div><b>${num(sh.atr.corpo)}·${num(sh.atr.alma)}·${num(sh.atr.mente)}</b>Corpo·Alma·Mente</div><div><b>${esc(etFad(sh))}</b>Fadiga</div><div><b>${num(sh.estresse)}/${etLimE(sh)}</b>Estresse</div>${ul?`<div style="grid-column:1/-1"><b class="etw-mini">${esc(etWord(ul.seq))}</b>Última palavra</div>`:''}`;}
+  else if(sh.sys==='op'){const san=num(sh.san),smx=opMax(sh,'san'),pe=num(sh.pe),pmx=opMax(sh,'pe');stats=`<div><b>${opDef(sh)}</b>Defesa</div><div><b>${pe}/${pmx}</b>PE</div><div><b>${san}/${smx}</b>SAN</div>`;}
   else stats=`<div><b>${num(sh.ca)}</b>CA</div><div><b>${sgn(dIni(sh))}</b>Iniciativa</div><div><b>${10+dSkill(sh,'percepcao')}</b>Perc. passiva</div>`;
   const quick=canEdit(sh)?`<div class="row">${[-5,-1,1,5].map(d=>`<button class="btn small" data-hp="${sh.id}" data-d="${d}" aria-label="${d>0?'Curar':'Dano'} ${Math.abs(d)}">${d>0?'+':'−'}${Math.abs(d)}</button>`).join('')}<a class="btn small" href="#ficha-${sh.id}" style="margin-left:auto">Abrir ficha</a></div>`:`<div class="row"><a class="btn small" href="#ficha-${sh.id}">Ver ficha</a></div>`;
   return `<article class="card pc"><div class="hd"><span class="av" style="background:${esc(sh.cor||'#555')}">${esc(ini)}</span><div><h3>${esc(sh.nome||'Sem nome')}</h3><div class="meta">${esc(subOf(sh))}${owner?' · '+esc(owner):''}</div></div></div>
-    <div><div class="row" style="justify-content:space-between;font-size:13px"><span>${sh.sys==='op'?'PV':'Pontos de vida'}</span><b class="num">${pv} / ${mx}${sh.pvTemp?` (+${sh.pvTemp})`:''}</b></div><div class="bar"><i style="width:${f*100}%;background:${barColor(f)}"></i></div></div>
+    <div><div class="row" style="justify-content:space-between;font-size:13px"><span>${sh.sys==='op'?'PV':sh.sys==='etmos'?'Ferimentos restantes':'Pontos de vida'}</span><b class="num">${pv} / ${mx}${sh.pvTemp?` (+${sh.pvTemp})`:''}</b></div><div class="bar"><i style="width:${f*100}%;background:${barColor(f)}"></i></div></div>
     <div class="stats">${stats}</div>${(sh.cond||[]).length?`<div class="chips">${sh.cond.map(c=>`<span class="chip">${esc(c)}</span>`).join('')}</div>`:''}${quick}</article>`;}
 function viewCamp(app,c){lastCamp=c.id;try{sessionStorage.setItem('mesa.camp',c.id);}catch(e){}crumbs([['Campanhas','#inicio'],[c.nome,'#campanha-'+c.id]]);const sheets=allSheets().filter(s=>s.camp===c.id);const pcs=sheets.filter(s=>s.kind==='pc'),npcs=sheets.filter(s=>s.kind==='npc');
   resolveNames(pcs.map(s=>s.owner).filter(o=>o!==S.uid)).then(()=>{if(pcs.some(s=>s.owner!==S.uid&&!S.names.__done)){S.names.__done=1;if(route().v==='camp')render();}});
@@ -3859,8 +3986,8 @@ function viewCamp(app,c){lastCamp=c.id;try{sessionStorage.setItem('mesa.camp',c.
   const e=$('#editCamp');if(e)e.onclick=()=>campForm(c);$('#copyCamp').onclick=()=>copyText(APP_URL+'#campanha-'+c.id);
   const np=$('#newPc');if(np)np.onclick=()=>createSheet(c,'pc');const nn=$('#newNpc');if(nn)nn.onclick=()=>createSheet(c,'npc');
   const mn=$('#mNotes');if(mn)mn.oninput=()=>{setStatus('Alterações não salvas');saveNote(c.id,mn.value);};
-  for(const b of app.querySelectorAll('[data-hp]'))b.onclick=()=>{const sh=findSheet(b.dataset.hp);if(!sh||!canEdit(sh))return;const [pv,mx]=hpOf(sh);sh.pv=clamp(pv+num(b.dataset.d),-mx,mx);queueSave(sh);render();};}
-function createSheet(c,kind){const sh=c.sys==='op'?newOp():newDnd();sh.id=uid();sh.camp=c.id;sh.kind=kind;sh.createdAt=Date.now();
+  for(const b of app.querySelectorAll('[data-hp]'))b.onclick=()=>{const sh=findSheet(b.dataset.hp);if(!sh||!canEdit(sh))return;const [pv,mx]=hpOf(sh);setHpVal(sh,pv+num(b.dataset.d));queueSave(sh);render();};}
+function createSheet(c,kind){const sh=c.sys==='op'?newOp():c.sys==='etmos'?newEtmos():newDnd();sh.id=uid();sh.camp=c.id;sh.kind=kind;sh.createdAt=Date.now();
   if(kind==='npc'){S.npcs[sh.id]=sh;sh.nome='Novo NPC';}else{sh.owner=S.uid;(S.pcs[S.uid]=S.pcs[S.uid]||{})[sh.id]=sh;}queueSave(sh);location.hash='ficha-'+sh.id;}
 async function copyText(t){try{await navigator.clipboard.writeText(t);toast('Link copiado.');}catch(e){openModal(`<h2>Copie o link</h2><input class="field" style="padding:8px" value="${esc(t)}" readonly id="cpy"><div class="row" style="justify-content:flex-end"><button class="btn" data-close>Fechar</button></div>`);setTimeout(()=>$('#cpy').select(),30);}}
 function openModal(html){$('#modalBox').innerHTML=html;$('#modal').hidden=false;for(const b of $('#modalBox').querySelectorAll('[data-close]'))b.onclick=closeModal;const f=$('#modalBox').querySelector('input,textarea');if(f)setTimeout(()=>f.focus(),30);}
@@ -3885,7 +4012,7 @@ window.Fichas={
   get:id=>{const sh=findSheet(id);return sh?brief(sh):null;},
   camps:()=>Object.values(S.camps).map(c=>({id:c.id,nome:c.nome,sys:c.sys,mesa:c.mesa||null,mapa:c.mapa||null})),
   onChange:f=>{listeners.add(f);return ()=>listeners.delete(f);},
-  setHp(id,pv){const sh=findSheet(id);if(!sh||!canEdit(sh))return false;const [,mx]=hpOf(sh);sh.pv=clamp(Math.round(num(pv)),-mx,mx);queueSave(sh);if(Mesa.view()==='fichas')render();return true;},
+  setHp(id,pv){const sh=findSheet(id);if(!sh||!canEdit(sh))return false;setHpVal(sh,Math.round(num(pv)));queueSave(sh);if(Mesa.view()==='fichas')render();return true;},
   async linkMesa(cid,info){for(const c of Object.values(S.camps)){if(c.id!==cid&&c.mesa&&info&&c.mesa===info.mesa){delete c.mesa;delete c.mapa;delete c.mesaNome;await saveCamp(c);}}
     const c=S.camps[cid];if(!c)return;if(info){c.mesa=info.mesa;c.mapa=info.mapa;c.mesaNome=info.nome;}else{delete c.mesa;delete c.mapa;delete c.mesaNome;}await saveCamp(c);notify();},
   open(id){Mesa.go('fichas','#ficha-'+id);}
@@ -3894,8 +4021,8 @@ window.Fichas={
 /* ================= SHEET VIEW ================= */
 const F=(k,label,o={})=>`<label class="${o.cls||''}" style="display:flex;flex-direction:column;gap:2px;min-width:0"><span class="lbl">${label}</span>${o.sel?`<select data-k="${k}">${o.sel.map(v=>Array.isArray(v)?`<option value="${esc(v[0])}">${esc(v[1])}</option>`:`<option>${esc(v)}</option>`).join('')}</select>`:`<input data-k="${k}"${o.n?` type="number" data-t="n"${o.min!=null?` min="${o.min}"`:''}${o.max!=null?` max="${o.max}"`:''}`:''} placeholder="${esc(o.ph||'')}">`}</label>`;
 function viewSheet(app,sh){const camp=S.camps[sh.camp];crumbs([['Campanhas','#inicio']].concat(camp?[[camp.nome,'#campanha-'+camp.id]]:[]).concat([[sh.nome||'Ficha','#ficha-'+sh.id]]));
-  const ro=!canEdit(sh);const tab=ui.sheetTab[sh.id]||'principal';const sc=HOST.scrollTop;
-  const body=sh.sys==='op'?opSheet(sh,tab):dndSheet(sh,tab);
+  const ro=!canEdit(sh);const tab=ui.sheetTab[sh.id]||(sh.sys==='etmos'?'personagem':'principal');const sc=HOST.scrollTop;
+  const body=sh.sys==='op'?opSheet(sh,tab):sh.sys==='etmos'?etSheet(sh,tab):dndSheet(sh,tab);
   app.innerHTML=`${S.readOnlyMsg?`<div class="banner">${esc(S.readOnlyMsg)}</div>`:''}<div id="sheetRoot" class="sheet ${sh.sys}">${ro?'<div class="ro-note">Somente leitura: esta ficha é de outro jogador.</div>':''}<fieldset ${ro?'disabled':''}>${body}</fieldset>
     <div class="tools"><span class="note" style="margin-right:auto;color:var(--sm)">${sh.kind==='npc'?'NPC · visível só para o mestre':''}</span>${window.Atlas&&Atlas.hasToken(sh.id)?'<button class="btn small" id="shMap">Mostrar no mapa</button>':''}<button class="btn small" id="shLink">Copiar link da ficha</button>${canEdit(sh)?'<button class="btn small danger" id="shDel">Apagar ficha</button>':''}</div></div>`;
   HOST.scrollTop=sc;bindSheet($('#sheetRoot'),sh);}
@@ -3908,14 +4035,15 @@ function bindSheet(root,sh){
   for(const b of root.querySelectorAll('[data-grau]'))b.onclick=()=>{const [k,i]=b.dataset.grau.split('|');const cur=num(getP(sh,k));const v=cur===num(i)?num(i)-1:num(i);setP(sh,k,Math.max(0,v));queueSave(sh);render();};
   for(const b of root.querySelectorAll('[data-add]'))b.onclick=()=>{const k=b.dataset.add;const arr=getP(sh,k)||[];arr.push(JSON.parse(b.dataset.tpl||'{}'));setP(sh,k,arr);queueSave(sh);render();};
   for(const b of root.querySelectorAll('[data-del]'))b.onclick=()=>{const [k,i]=b.dataset.del.split('|');const arr=getP(sh,k)||[];arr.splice(num(i),1);queueSave(sh);render();};
-  for(const b of root.querySelectorAll('[data-step]'))b.onclick=()=>{const k=b.dataset.step,lim=b.dataset.lim?num(getP(sh,b.dataset.lim))||(b.dataset.limf?calcVal(sh,b.dataset.limf):1e9):b.dataset.limf?calcVal(sh,b.dataset.limf):1e9;let v=num(getP(sh,k))+num(b.dataset.d);if(num(b.dataset.d)>0)v=Math.min(v,lim);setP(sh,k,v);
+  for(const b of root.querySelectorAll('[data-step]'))b.onclick=()=>{const k=b.dataset.step,lim=b.dataset.lim?num(getP(sh,b.dataset.lim))||(b.dataset.limf?calcVal(sh,b.dataset.limf):1e9):b.dataset.limf?calcVal(sh,b.dataset.limf):1e9;let v=num(getP(sh,k))+num(b.dataset.d);if(num(b.dataset.d)>0)v=Math.min(v,lim);if(b.dataset.floor!=null)v=Math.max(v,num(b.dataset.floor));setP(sh,k,v);
     const inp=root.querySelector(`[data-k="${k}"]`);if(inp)inp.value=v;calc(root,sh);queueSave(sh);};
-  for(const b of root.querySelectorAll('[data-pip]'))b.onclick=()=>{const k=b.dataset.pip,i=num(b.dataset.i);const cur=num(getP(sh,k));setP(sh,k,cur===i?i-1:i);queueSave(sh);render();};
+  for(const b of root.querySelectorAll('[data-pip]'))b.onclick=()=>{const k=b.dataset.pip,i=num(b.dataset.i);const cur=num(getP(sh,k));setP(sh,k,Math.max(0,cur===i?i-1:i));queueSave(sh);render();};
   for(const b of root.querySelectorAll('[data-cond]'))b.onclick=()=>{const c=b.dataset.cond;sh.cond=sh.cond||[];const i=sh.cond.indexOf(c);if(i>=0)sh.cond.splice(i,1);else sh.cond.push(c);b.setAttribute('aria-pressed',String(i<0));queueSave(sh);};
   for(const el of root.querySelectorAll('[data-roll]'))el.addEventListener('click',e=>{if(e.target.closest('input,select,button:not([data-roll])'))return;doRoll(sh,el.dataset.roll);});
   for(const el of root.querySelectorAll('[data-roll]'))el.addEventListener('keydown',e=>{if((e.key==='Enter'||e.key===' ')&&e.target===el){e.preventDefault();doRoll(sh,el.dataset.roll);}});
   for(const b of root.querySelectorAll('[data-cast]'))b.onclick=()=>{const r=sh.rituais[num(b.dataset.cast)];const c=num(r.custo);if(num(sh.pe)<c){toast('PE insuficiente para conjurar.');return;}sh.pe=num(sh.pe)-c;queueSave(sh);toast(`${r.nome||'Ritual'} conjurado: −${c} PE.`);render();};
   $('#shLink').onclick=()=>copyText(APP_URL+'#ficha-'+sh.id);const sm=$('#shMap');if(sm)sm.onclick=()=>Atlas.showToken(sh.id);const d=$('#shDel');if(d)d.onclick=()=>confirmBox(`Apagar a ficha “${sh.nome||'sem nome'}”? Isso não pode ser desfeito.`,async()=>{const cid=sh.camp;await removeSheet(sh);location.hash=cid?'campanha-'+cid:'inicio';render();});
+  if(sh.sys==='etmos')bindEtmos(root,sh);
   calc(root,sh);}
 /* rules that react to a field: ritual cost follows its circle, OP current values follow a raised maximum */
 function afterSet(sh,k,val,old){let m;if(sh.sys==='op'&&(m=k.match(/^rituais\.(\d+)\.circ$/))){const r=sh.rituais[num(m[1])];if(num(r.custo)===OP.custo[num(old)]||!r.custo)r.custo=OP.custo[num(val)];return true;}
@@ -3923,6 +4051,7 @@ function afterSet(sh,k,val,old){let m;if(sh.sys==='op'&&(m=k.match(/^rituais\.(\
       if(om!=null&&mx!==om)sh[s]=clamp(num(sh[s])+(mx-om),0,mx);else if(sh[s]==null||num(sh[s])>mx)sh[s]=mx;sh._mx[s]=mx;}return /^(classe|nex)$/.test(k);}
   return false;}
 function calcVal(sh,name){const [f,a]=name.split(':');
+  if(sh.sys==='etmos'){if(f==='limf')return etLimF(sh);if(f==='lime')return etLimE(sh);return 0;}
   if(sh.sys==='op'){switch(f){case 'max':return opMax(sh,a);case 'per':return opSkill(sh,a);case 'def':return opDef(sh);case 'carga':return opCarga(sh);case 'esp':return opEsp(sh);case 'lim':return opLvl(sh);}return 0;}
   switch(f){case 'mod':return dMod(sh.atr[a]);case 'save':return dSave(sh,a);case 'per':return dSkill(sh,a);case 'prof':return dProf(sh);case 'ini':return dIni(sh);case 'pp':return 10+dSkill(sh,'percepcao');case 'dc':return dDC(sh);case 'atk':return dAtk(sh);case 'peso':return dWeight(sh);case 'cap':return dCap(sh);}return 0;}
 function calc(root,sh){for(const el of root.querySelectorAll('[data-c]')){const v=calcVal(sh,el.dataset.c);el.textContent=el.dataset.fmt==='s'?sgn(v):el.dataset.fmt==='kg'?(Math.round(v*10)/10).toLocaleString('pt-BR')+' kg':v;}
@@ -3939,6 +4068,72 @@ function doRoll(sh,spec){const [f,a,b]=spec.split(':');const who=sh.nome||'Ficha
 const stabs=(sh,tab,list)=>`<nav class="stabs" role="tablist">${list.map(t=>`<button role="tab" data-t="${t[0]}" aria-selected="${tab===t[0]}">${t[1]}</button>`).join('')}</nav>`;
 const condBox=(sh,list)=>`<div class="conds">${list.map(c=>`<button type="button" data-cond="${esc(c)}" aria-pressed="${(sh.cond||[]).includes(c)}">${esc(c)}</button>`).join('')}</div>`;
 
+
+/* ---------- Etmos: the grimoire of particles ---------- */
+const etPips=(k,n,cur,lbl)=>`<span class="epips" role="group" aria-label="${esc(lbl)}">${Array.from({length:n},(_,i)=>`<button type="button" class="epip${cur>=i+1?' on':''}" data-pip="${k}" data-i="${i+1}" aria-label="${esc(lbl)} ${i+1}"></button>`).join('')}</span>`;
+const etState=id=>(ui.et=ui.et||{})[id]||(ui.et[id]={seq:[],done:false});
+function etSheet(sh,tab){
+  const head=`<header class="ehead"><div class="ename"><span class="lbl">Nome do personagem</span><input data-k="nome" placeholder="Nome" aria-label="Nome do personagem"></div>
+    <div class="emeta">${F('jogador','Nome do jogador')}${F('ano','Ano escolar',{ph:'2º'})}${F('idade','Idade',{n:1,min:0})}${F('nivel','Nível',{n:1,min:0})}${F('empenho','Dados de empenho',{ph:'3'})}</div>
+    <div class="elogo" aria-hidden="true">ETMOS<small>RPG</small></div></header>`;
+  const tabs=stabs(sh,tab,[['personagem','Personagem'],['combate','Combate'],['grimorio','Grimório'],['conceito','Conceito']]);let b='';
+  if(tab==='personagem'){
+    const fad=num(sh.fadiga),st=etFad(sh);
+    const fadRule=st==='Cansado'?'+1 Ferimento.':st==='Exausto'?'+1 Ferimento. Para magias não triviais, role 2d6 e compare com Corpo +4: até esse valor tá tranquilo; acima, a magia falha.':st==='Esgotado'?'+1 Ferimento. Para magias não triviais, role 2d6 e compare com Corpo +3: até esse valor tá tranquilo; acima, você morre.':'Sem efeitos.';
+    const track=`<div class="ftrack"><button type="button" class="f0${fad===0?' on':''}" data-pip="fadiga" data-i="0" aria-label="Normal">O</button>${Array.from({length:10},(_,i)=>`<button type="button" class="epip${fad>=i+1?' on':''}${i===9?' plus':''}" data-pip="fadiga" data-i="${i+1}" aria-label="Fadiga ${i+1}">${i===9?'+':''}</button>`).join('')}</div>
+      <div class="fscale" aria-hidden="true"><span style="grid-column:1/2">Normal</span><span style="grid-column:2/7">Cansado</span><span style="grid-column:7/10">Exausto</span><span style="grid-column:10/12">Esgotado</span></div>`;
+    const cx=num(sh.complex);
+    b=`<div class="emain">
+      <div class="box"><h4>Atributos</h4>${[['corpo','Corpo'],['alma','Alma'],['mente','Mente']].map(([k,n])=>`<div class="erow"><span class="n">${n}</span>${etPips('atr.'+k,6,num(sh.atr[k]),n)}<b class="num">${num(sh.atr[k])}</b></div>`).join('')}</div>
+      <div class="box"><h4>Estados de fadiga</h4>${track}<p class="fnow"><b>${esc(st)}.</b> ${esc(fadRule)}</p>${fad>=6?`<button type="button" class="btn small" id="etFadRoll">Rolar 2d6 contra Corpo +${fad>=9?3:4} (${num(sh.atr.corpo)+(fad>=9?3:4)})</button>`:''}</div>
+      <div class="box"><h4>Limite de ferimentos</h4><div class="ecount"><div class="stepper"><button type="button" data-step="ferimentos" data-floor="0" data-d="-1" aria-label="Menos um ferimento">−</button><input data-k="ferimentos" type="number" data-t="n" min="0" aria-label="Ferimentos" style="width:48px;text-align:center"><button type="button" data-step="ferimentos" data-d="1" data-limf="limf" aria-label="Mais um ferimento">+</button></div><span class="sep">/</span><b class="num" data-c="limf"></b></div><p class="note">4 + 1 para cada 2 pontos de Corpo.</p>
+        <h4 style="margin-top:12px">Estresse acumulado</h4><div class="ecount"><div class="stepper"><button type="button" data-step="estresse" data-floor="0" data-d="-1" aria-label="Menos um de estresse">−</button><input data-k="estresse" type="number" data-t="n" min="0" aria-label="Estresse" style="width:48px;text-align:center"><button type="button" data-step="estresse" data-d="1" data-limf="lime" aria-label="Mais um de estresse">+</button></div><span class="sep">/</span><b class="num" data-c="lime"></b></div><p class="note">Limite de estresse = 4 + Alma.</p></div>
+      <div class="box"><h4>Complexidade máxima de magia</h4><div class="ftrack"><button type="button" class="f0${cx===0?' on':''}" data-pip="complex" data-i="0" aria-label="Trivial">O</button>${Array.from({length:6},(_,i)=>`<button type="button" class="epip${cx>=i+1?' on':''}" data-pip="complex" data-i="${i+1}" aria-label="${ETMOS.complex[i+1]}"></button>`).join('')}</div><p class="fnow"><b>${ETMOS.complex[cx]}</b></p></div>
+      <div class="box wide"><h4>Marcos de crescimento</h4><div class="emarcos">${[['fis','Físicos'],['emo','Emocionais'],['men','Mentais']].map(([k,n])=>`<div><span class="n">${n}</span>${etPips('marcos.'+k,5,num(sh.marcos&&sh.marcos[k]),'Marcos '+n)}</div>`).join('')}</div></div>
+    </div>
+    <div class="grid2" style="margin-top:12px">${[['origens','Origens'],['praticas','Habilidades práticas'],['teoricas','Habilidades teóricas'],['inventario','Inventário']].map(([k,n])=>`<div class="box"><h4>${n}</h4><textarea data-k="${k}" aria-label="${n}"></textarea></div>`).join('')}</div>`;}
+  else if(tab==='combate')b=etCombat(sh);
+  else if(tab==='grimorio'){
+    const known=Object.keys(sh.parts||{}).filter(k=>sh.parts[k]).length;
+    const col=g=>`<div class="box"><h4>${ETMOS.grupos.find(x=>x[0]===g)[1]}</h4><div class="eparts">${ETMOS.parts[g].map(([id,n,nv])=>`<label class="epart">${glyph(id)}<input type="checkbox" data-k="parts.${id}" data-re="1"><span><b>${esc(etSil(id))}</b> ${esc(n)}${nv?` <small>${nv}º nível</small>`:''}</span></label>`).join('')}</div></div>`;
+    const saved=(sh.palavras||[]).map((w,i)=>`<div class="esaved"><div class="glrow">${w.seq.map(id=>glyph(id,'gls')).join('')}</div><div class="esw"><b>${esc(etWord(w.seq))}</b><input data-k="palavras.${i}.nota" placeholder="Para que serve" aria-label="Anotação da palavra"></div><button type="button" class="btn small" data-et-use="${i}">Usar no combate</button><button type="button" class="x" data-del="palavras|${i}" aria-label="Apagar palavra">×</button></div>`).join('');
+    b=`<p class="note" style="margin:0 0 10px">Marque as partículas que o personagem conhece (${known} de ${Object.keys(ET_ALL).length}). Só elas aparecem no combate.</p>
+      <div class="egrim">${col('func')}${col('obj')}${col('car')}${col('comp')}</div>
+      <div class="box" style="margin-top:12px"><h4>Palavras guardadas</h4>${saved||'<p class="note">Nenhuma ainda. Monte uma palavra no Combate e use “Guardar no grimório”.</p>'}</div>`;}
+  else b=`<div class="grid2"><div class="box"><h4>Básico</h4><textarea data-k="basico" aria-label="Básico"></textarea></div><div class="box"><h4>Pontos de importância</h4><textarea data-k="pontos" aria-label="Pontos de importância"></textarea></div>
+    <div class="box"><h4>Aparência</h4><textarea data-k="aparencia" aria-label="Aparência"></textarea></div>
+    <div class="box"><h4>Valores e comportamento</h4>${[0,1].map(i=>`<div class="evals"><input data-k="valores.${i}.a" aria-label="Valor ${i+1}"><span aria-hidden="true">⟷</span><input data-k="valores.${i}.b" aria-label="Oposto do valor ${i+1}"></div>`).join('')}</div>
+    <div class="box" style="grid-column:1/-1"><h4>Futuro</h4><textarea data-k="futuro" aria-label="Futuro"></textarea></div></div>`;
+  return head+tabs+`<div class="sbody">${b}</div>`;}
+function etCombat(sh){
+  const st=etState(sh.id),own=g=>ETMOS.parts[g].filter(p=>sh.parts&&sh.parts[p[0]]);const any=ETMOS.grupos.some(([g])=>own(g).length);
+  const status=`<div class="estatus"><span>Fadiga: <b>${esc(etFad(sh))}</b></span><span>Ferimentos: <b>${num(sh.ferimentos)}/${etLimF(sh)}</b></span><span>Estresse: <b>${num(sh.estresse)}/${etLimE(sh)}</b></span><span>Complexidade máxima: <b>${ETMOS.complex[num(sh.complex)]}</b></span></div>`;
+  if(st.done&&st.seq.length){const seq=st.seq,fad=num(sh.fadiga);
+    return status+`<section class="ecast" aria-live="polite"><p class="lbl">Palavra conjurada</p><h2 class="etw">${esc(etWord(seq))}</h2>
+      <div class="ecast-gl">${seq.map(id=>`<figure>${glyph(id,'glb')}<figcaption><b>${esc(etSil(id))}</b><span>${esc(ET_ALL[id].n)}</span></figcaption></figure>`).join('<span class="plus" aria-hidden="true">·</span>')}</div>
+      <p class="esyl">${seq.map(etSil).join(' · ')}</p>
+      ${fad>=6?`<p class="ewarn">${etFad(sh)}: se a magia não for trivial, role 2d6 contra Corpo +${fad>=9?3:4}. <button type="button" class="btn small" id="etFadRoll">Rolar 2d6</button></p>`:''}
+      <div class="row" style="justify-content:center"><button type="button" class="btn" data-et-again>Nova palavra</button><button type="button" class="btn" data-et-edit>Ajustar esta</button><button type="button" class="btn" data-et-keep>Guardar no grimório</button></div></section>`+etRecent(sh);}
+  if(!any)return status+`<div class="empty" style="background:transparent">Nenhuma partícula conhecida ainda. Marque as que o personagem conhece na aba <b>Grimório</b>.</div>`;
+  const pos=id=>st.seq.indexOf(id);
+  const groups=ETMOS.grupos.map(([g,n])=>{const l=own(g);if(!l.length)return '';return `<div class="egroup"><h4>${n}</h4><div class="epick">${l.map(([id,nm,nv])=>{const i=pos(id);return `<button type="button" class="ech${i>=0?' on':''}" data-et-pick="${id}" aria-pressed="${i>=0}" title="${esc(nm)}">${i>=0?`<i class="ord">${i+1}</i>`:''}${glyph(id)}<b>${esc(etSil(id))}</b><span>${esc(nm)}${nv?` · ${nv}º`:''}</span></button>`;}).join('')}</div></div>`;}).join('');
+  const bar=`<div class="eseq"><div class="eseq-l">${st.seq.length?st.seq.map((id,i)=>`<button type="button" class="eseq-i" data-et-un="${i}" aria-label="Tirar ${esc(etSil(id))}">${glyph(id,'gls')}<span>${esc(etSil(id))}</span></button>`).join(''):'<span class="note">Toque nos símbolos na ordem em que o personagem vai pronunciá-los.</span>'}</div>
+    <div class="eseq-a"><button type="button" class="btn" data-et-clear ${st.seq.length?'':'disabled'}>Limpar</button><button type="button" class="btn primary" data-et-ok ${st.seq.length?'':'disabled'}>Confirmar</button></div></div>`;
+  return status+bar+groups+etRecent(sh);}
+function etRecent(sh){const l=sh.ultimas||[];if(!l.length)return '';
+  return `<div class="box" style="margin-top:14px"><h4>Últimas palavras</h4>${l.map((w,i)=>`<button type="button" class="erecent" data-et-recall="${i}"><span class="glrow">${w.seq.map(id=>glyph(id,'gls')).join('')}</span><b>${esc(etWord(w.seq))}</b><small>${new Date(w.t||0).toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'})}</small></button>`).join('')}</div>`;}
+function bindEtmos(root,sh){const st=etState(sh.id);
+  const on=(sel,f)=>{for(const b of root.querySelectorAll(sel))b.onclick=()=>f(b);};
+  on('[data-et-pick]',b=>{const id=b.dataset.etPick,i=st.seq.indexOf(id);if(i>=0)st.seq.splice(i,1);else st.seq.push(id);render();});
+  on('[data-et-un]',b=>{st.seq.splice(num(b.dataset.etUn),1);render();});
+  on('[data-et-clear]',()=>{st.seq=[];render();});
+  on('[data-et-ok]',()=>{if(!st.seq.length)return;st.done=true;if(canEdit(sh)){sh.ultimas=[{seq:[...st.seq],t:Date.now()}].concat((sh.ultimas||[]).filter(w=>w.seq.join()!==st.seq.join())).slice(0,8);queueSave(sh);}render();});
+  on('[data-et-again]',()=>{st.seq=[];st.done=false;render();});
+  on('[data-et-edit]',()=>{st.done=false;render();});
+  on('[data-et-keep]',()=>{sh.palavras=sh.palavras||[];if(sh.palavras.some(w=>w.seq.join()===st.seq.join())){toast('Essa palavra já está no grimório.');return;}sh.palavras.push({seq:[...st.seq],nota:''});queueSave(sh);toast('Palavra guardada no grimório.');});
+  on('[data-et-recall]',b=>{const w=(sh.ultimas||[])[num(b.dataset.etRecall)];if(!w)return;st.seq=[...w.seq];st.done=true;render();});
+  on('[data-et-use]',b=>{const w=(sh.palavras||[])[num(b.dataset.etUse)];if(!w)return;st.seq=[...w.seq];st.done=false;ui.sheetTab[sh.id]='combate';render();});
+  on('#etFadRoll',()=>{const f=num(sh.fadiga)>=9?3:4,alvo=num(sh.atr.corpo)+f;rollExpr(`${sh.nome||'Ficha'} · 2d6 contra Corpo +${f} (até ${alvo} tá tranquilo)`,'2d6');});}
 /* ---------- D&D 5e ---------- */
 function dndSheet(sh,tab){
   const head=`<header class="dhead"><div class="dname"><span class="lbl">Nome do personagem</span><input data-k="nome" placeholder="Nome" aria-label="Nome do personagem"></div>
