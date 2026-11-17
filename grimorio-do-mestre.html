@@ -421,6 +421,9 @@ const HOST=document.getElementById('fichas');const R=HOST.attachShadow({mode:'op
 const Mesa=window.Mesa;Mesa.wire(R);
 const $=s=>R.querySelector(s);
 const uid=()=>Math.random().toString(36).slice(2,9)+Date.now().toString(36).slice(-4);
+/* values written by other people only reach CSS or image sources in these safe shapes */
+const safeColor=c=>/^#[0-9a-fA-F]{3,8}$/.test(String(c||''))?c:'#555';
+const safeImg=u=>/^data:image\/(png|jpe?g|gif|webp);base64,[A-Za-z0-9+/=]+$/.test(String(u||''))?u:'';
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const clamp=(v,a,b)=>v<a?a:v>b?b:v;
 const num=v=>{const n=parseFloat(v);return isFinite(n)?n:0;};
@@ -638,8 +641,8 @@ function pcCard(sh,camp){const [pv,mx]=hpOf(sh),f=mx>0?clamp(pv/mx,0,1):0;const 
   else if(sh.sys==='op'){const san=num(sh.san),smx=opMax(sh,'san'),pe=num(sh.pe),pmx=opMax(sh,'pe');stats=`<div><b>${opDef(sh)}</b>Defesa</div><div><b>${pe}/${pmx}</b>PE</div><div><b>${san}/${smx}</b>SAN</div>`;}
   else stats=`<div><b>${num(sh.ca)}</b>CA</div><div><b>${sgn(dIni(sh))}</b>Iniciativa</div><div><b>${10+dSkill(sh,'percepcao')}</b>Perc. passiva</div>`;
   const quick=canEdit(sh)?`<div class="row">${[-5,-1,1,5].map(d=>`<button class="btn small" data-hp="${sh.id}" data-d="${d}" aria-label="${d>0?'Curar':'Dano'} ${Math.abs(d)}">${d>0?'+':'−'}${Math.abs(d)}</button>`).join('')}<a class="btn small" href="#ficha-${sh.id}" style="margin-left:auto">Abrir ficha</a></div>`:`<div class="row"><a class="btn small" href="#ficha-${sh.id}">Ver ficha</a></div>`;
-  return `<article class="card pc"><div class="hd"><span class="av" style="background:${esc(sh.cor||'#555')}">${esc(ini)}</span><div><h3>${esc(sh.nome||'Sem nome')}</h3>${sh.criacao==='rascunho'?'<span class="draft">Em criação</span>':''}<div class="meta">${esc(subOf(sh))}${owner?' · '+esc(owner):''}</div></div></div>
-    <div><div class="row" style="justify-content:space-between;font-size:13px"><span>${sh.sys==='op'?'PV':sh.sys==='etmos'?'Ferimentos restantes':'Pontos de vida'}</span><b class="num">${pv} / ${mx}${sh.pvTemp?` (+${sh.pvTemp})`:''}</b></div><div class="bar"><i style="width:${f*100}%;background:${barColor(f)}"></i></div></div>
+  return `<article class="card pc"><div class="hd"><span class="av" style="background:${safeColor(sh.cor)}">${esc(ini)}</span><div><h3>${esc(sh.nome||'Sem nome')}</h3>${sh.criacao==='rascunho'?'<span class="draft">Em criação</span>':''}<div class="meta">${esc(subOf(sh))}${owner?' · '+esc(owner):''}</div></div></div>
+    <div><div class="row" style="justify-content:space-between;font-size:13px"><span>${sh.sys==='op'?'PV':sh.sys==='etmos'?'Ferimentos restantes':'Pontos de vida'}</span><b class="num">${pv} / ${mx}${num(sh.pvTemp)?` (+${num(sh.pvTemp)})`:''}</b></div><div class="bar"><i style="width:${f*100}%;background:${barColor(f)}"></i></div></div>
     <div class="stats">${stats}</div>${(sh.cond||[]).length?`<div class="chips">${sh.cond.map(c=>`<span class="chip">${esc(c)}</span>`).join('')}</div>`:''}${quick}</article>`;}
 function viewCamp(app,c){lastCamp=c.id;try{sessionStorage.setItem('mesa.camp',c.id);}catch(e){}crumbs([['Campanhas','#inicio'],[c.nome,'#campanha-'+c.id]]);
   const sheets=allSheets().filter(s=>s.camp===c.id&&(S.master||s.owner===S.uid));const pcs=sheets.filter(s=>s.kind==='pc'),npcs=sheets.filter(s=>s.kind==='npc');
@@ -720,7 +723,7 @@ function bindDiary(app,c){const nb=app.querySelector('#newSess');
 /* ================= DOCUMENTS FOR PLAYERS ================= */
 function campDocs(cid){const out=Object.values(S.docs).filter(d=>d.camp===cid).map(d=>Object.assign({para:'todos'},d));for(const m of Object.values(S.pdocs))for(const d of Object.values(m||{}))if(d.camp===cid)out.push(d);return out.sort((a,b)=>(b.t||0)-(a.t||0));}
 function docCard(d,master){return `<article class="doc"><header><b>${esc(d.titulo||'Documento')}</b><span class="note">${new Date(d.t||0).toLocaleString('pt-BR',{dateStyle:'short',timeStyle:'short'})}${master?' · para '+esc(d.para==='todos'?'todos':S.names[d.pid]||'jogador'):''}</span>${master?`<button class="btn small danger" data-ddel="${esc(d.pid||'')}|${esc(d.id)}" style="margin-left:auto">Apagar</button>`:''}</header>
-  ${d.img?`<button class="docimg" data-dimg="${esc(d.pid||'')}|${esc(d.id)}" aria-label="Ampliar imagem"><img src="${esc(d.img)}" alt=""></button>`:''}${d.texto?`<p class="resumo">${esc(d.texto)}</p>`:''}</article>`;}
+  ${safeImg(d.img)?`<button class="docimg" data-dimg="${esc(d.pid||'')}|${esc(d.id)}" aria-label="Ampliar imagem"><img src="${esc(safeImg(d.img))}" alt=""></button>`:''}${d.texto?`<p class="resumo">${esc(d.texto)}</p>`:''}</article>`;}
 function docsView(c){const l=campDocs(c.id);
   if(!S.master)return l.length?l.map(d=>docCard(d,false)).join(''):'<div class="empty">Nenhum documento recebido ainda.</div>';
   const players=[...new Set(allSheets().filter(s=>s.camp===c.id&&s.owner&&s.owner!==S.uid).map(s=>s.owner))];resolveNames(players);

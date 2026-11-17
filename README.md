@@ -5,7 +5,7 @@
 
 **[Versão com mesa ao vivo e fichas compartilhadas](https://claude.ai/artifact/1wUYbQ513Syib6KfoBeN8k)** · no claude.ai, só para quem o mestre convidar.
 
-<sub>Última atualização: 17/11/2026 às 14:33 (horário de Brasília). O GitHub Pages publica a versão nova poucos minutos depois de cada envio.</sub>
+<sub>Última atualização: 17/11/2026 às 17:08 (horário de Brasília). O GitHub Pages publica a versão nova poucos minutos depois de cada envio.</sub>
 <!-- LINKS:FIM -->
 
 Mapas e fichas de RPG de mesa numa página só. O botão **Mapa | Fichas** no topo troca de seção sem sair da página, e as duas partes conversam entre si.
@@ -45,6 +45,8 @@ Configuração no console do Firebase (uma vez):
 2. **Firestore › Regras:** colar o conteúdo de `firestore.rules` e publicar.
 3. **Authentication › Método de login:** ativar o Google.
 4. **Authentication › Configurações › Domínios autorizados:** adicionar `itslozhy.github.io`.
+
+No primeiro acesso, cada pessoa escolhe um nome de usuário (único no site, de 3 a 20 caracteres: a-z, 0-9, ponto e _) e um nome de exibição; dá para mudar depois clicando no nome, no canto da tela. As regras garantem no servidor que o nome de usuário não se repete, que só o dono mexe no próprio perfil e que os campos têm formato e tamanho fixos.
 
 Cada conta é mestre do próprio espaço: suas campanhas, NPCs, diário, bestiário, convites e mesas ficam em `mestres/<conta>/` e nenhum outro mestre os vê. Os jogadores entram pelos convites gerados na aba Convites da campanha: quem usa um convite vira membro só do espaço daquele mestre, enxerga as próprias fichas e a mesa ao vivo. Quem joga com mais de um mestre troca de mesa pelo seletor no canto da tela.
 
