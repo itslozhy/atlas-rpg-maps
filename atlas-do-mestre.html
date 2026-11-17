@@ -2298,8 +2298,11 @@ function drawMap(ctx,opts){
   if(map.layers.grid&&opts.grid&&map.grid.type!=='none')drawGrid(ctx,map.grid,opts.bounds||[0,0,W,H],opts.gridLW||1);
   const vis=o=>!(opts.player&&o.secret);
   const w3=[],sts=[];if(map.layers.lines){for(const o of map.objects)if(o.kind==='line'&&vis(o)){if(WALLS3[o.type]&&o.pts.length>1)w3.push(o);else if(NEWST.has(o.type)&&o.pts.length>1)sts.push(o);else drawLine(ctx,o,P);}
-    if(map.doorPaths!==false&&map.layers.icons)drawDoorPaths(ctx,P,!!opts.player);
-    for(let ps=0;ps<3;ps++)for(const o of sts)drawStreet(ctx,o,P,ps);for(const o of w3)drawWall3(ctx,o,P,'shadow');}
+    sts.sort((a,b)=>ST_RANK[a.type]-ST_RANK[b.type]);const dp=map.doorPaths!==false&&map.layers.icons,pl=!!opts.player;
+    if(dp){drawDoorPaths(ctx,P,pl,0,false);drawDoorPaths(ctx,P,pl,0,true);}for(const o of sts)drawStreet(ctx,o,P,0);
+    if(dp)drawDoorPaths(ctx,P,pl,1,false);for(const o of sts)if(o.type==='rua_terra')drawStreet(ctx,o,P,1);
+    if(dp)drawDoorPaths(ctx,P,pl,1,true);for(const o of sts)if(o.type!=='rua_terra')drawStreet(ctx,o,P,1);
+    for(const o of w3)drawWall3(ctx,o,P,'shadow');}
   const items=[];if(map.layers.icons)for(const o of map.objects)if(o.kind==='icon'&&vis(o))items.push([iconDepth(o),o,null,null]);
   if(w3.length){const tf=ctx.getTransform(),sf=Math.hypot(tf.a,tf.b)||1;for(const o of w3){const sp=wallSprite(o,P,sf);for(const pc of sp.pieces)items.push([pc[4],o,sp,pc]);}}
   if(map.view==='34'&&map.layers.icons)for(const d of frontDecor())items.push([d[0],null,null,d]);
@@ -2462,19 +2465,21 @@ function strokePoly(ctx,pts){ctx.beginPath();ctx.moveTo(pts[0][0],pts[0][1]);for
 const NEWST=new Set(['rua_pedra','rua_terra','avenida']);
 const STREETS=new Set(['rua_pedra','rua_terra','avenida','rua','estrada']);
 const PATHLIKE=new Set(['rua_pedra','rua_terra','avenida','rua','estrada','trilha']);
+const stPats={};
+/* one tiling texture per surface kind, anchored to the map: overlapping streets paint identical pixels, so they read as one piece */
+function streetPattern(ctx,kind){const key=map.style+'|'+kind;if(stPats[key])return stPats[key];const S=64,cv=document.createElement('canvas');cv.width=cv.height=S;const g=cv.getContext('2d'),si=sIdx();
+  if(kind==='terra'){const base=TERR[12].c[si];g.fillStyle=base;g.fillRect(0,0,S,S);for(let i=0;i<90;i++){const x=hash(i,1,111)*S,y=hash(i,2,111)*S,r=.6+hash(i,3,111)*1.6;g.fillStyle=hash(i,4,111)<.6?'rgba(60,40,20,.2)':'rgba(255,255,255,.14)';
+      for(const dx of[0,S,-S])for(const dy of[0,S,-S]){g.beginPath();g.ellipse(x+dx,y+dy,r*1.4,r,0,0,TAU);g.fill();}}}
+  else{const base=kind==='avenida'?(map.style==='blueprint'?'#2a5d96':map.style==='ink'?'#cfcfcb':shade(TERR[13].c[si],-.2)):shade(TERR[13].c[si],-.04);const rh=kind==='avenida'?16:8,bw=kind==='avenida'?32:16;g.fillStyle=base;g.fillRect(0,0,S,S);
+    for(let r=0;r<S/rh;r++)for(let k=-1;k<S/bw+1;k++){const x=k*bw+(r%2)*bw/2,y=r*rh,h=hash(k+(r%2?40:0),r,112);g.fillStyle=h<.5?`rgba(0,0,0,${.03+h*.08})`:`rgba(255,255,255,${(h-.5)*.12})`;g.fillRect(x,y,bw,rh);
+      for(const dx of[0,S,-S]){g.strokeStyle='rgba(0,0,0,.22)';g.lineWidth=1;g.strokeRect(x+dx+.5,y+.5,bw,rh);}}}
+  const pat=ctx.createPattern(cv,'repeat');try{pat.setTransform(new DOMMatrix().scale(.5,.5));}catch(e){}return stPats[key]=pat;}
+const ST_KIND={rua_pedra:'pedra',rua_terra:'terra',avenida:'avenida'},ST_RANK={rua_terra:0,rua_pedra:1,avenida:2};
 function drawStreet(ctx,o,P,pass){const w=o.w,sp=samplePath(o.pts),all=pass==null;ctx.save();ctx.lineCap='round';ctx.lineJoin='round';
-  if(o.type==='rua_pedra'){
-    if(all||pass===0){ctx.strokeStyle=P.ink;ctx.lineWidth=w*2+2.6;strokePoly(ctx,sp);ctx.strokeStyle=P.wall;ctx.lineWidth=w*2+1.4;strokePoly(ctx,sp);}
-    if(all||pass===1){ctx.strokeStyle=shade(TERR[13].c[sIdx()],-.04);ctx.lineWidth=w*2-1;strokePoly(ctx,sp);}
-    if(all||pass===2){ctx.lineCap='butt';ctx.strokeStyle='rgba(0,0,0,.16)';for(let k=-1;k<=1;k++){const off=offsetPoly(sp,k*w*.55);ctx.lineWidth=w*.5;ctx.setLineDash([w*.42,w*.3]);ctx.lineDashOffset=k*w*.3;strokePoly(ctx,off);}ctx.setLineDash([]);}}
-  else if(o.type==='rua_terra'){const base=TERR[12].c[sIdx()];
-    if(all||pass===0){ctx.globalAlpha=.55;ctx.strokeStyle=base;ctx.lineWidth=w*2+3;strokePoly(ctx,sp);ctx.globalAlpha=1;}
-    if(all||pass===1){ctx.strokeStyle=base;ctx.lineWidth=w*2;strokePoly(ctx,sp);}
-    if(all||pass===2){ctx.strokeStyle='rgba(70,45,20,.35)';ctx.lineWidth=.9;ctx.setLineDash([w*3,w*.8]);for(const s of[-1,1])strokePoly(ctx,offsetPoly(sp,s*w*.45));ctx.setLineDash([]);ctx.fillStyle='rgba(60,40,20,.25)';for(let i=0;i<sp.length;i+=3){const p=sp[i];ctx.fillRect(p[0]+(hash(i,1,94)-.5)*w*1.4,p[1]+(hash(i,2,94)-.5)*w*1.4,1,1);}}}
-  else{
-    if(all||pass===0){ctx.strokeStyle=P.ink;ctx.lineWidth=w*3+2.4;strokePoly(ctx,sp);ctx.strokeStyle=P.wall;ctx.lineWidth=w*3;strokePoly(ctx,sp);}
-    if(all||pass===1){ctx.strokeStyle=map.style==='blueprint'?'#2a5d96':map.style==='ink'?'#cfcfcb':'#7d7a72';ctx.lineWidth=w*2.1;strokePoly(ctx,sp);}
-    if(all||pass===2){ctx.strokeStyle='#f1ebdc';ctx.lineWidth=.9;ctx.setLineDash([w*1.2,w*1.2]);strokePoly(ctx,sp);}}
+  if(all||pass===0){if(o.type==='rua_terra'){ctx.globalAlpha=.55;ctx.strokeStyle=TERR[12].c[sIdx()];ctx.lineWidth=w*2+3;strokePoly(ctx,sp);ctx.globalAlpha=1;}
+    else if(o.type==='rua_pedra'){ctx.strokeStyle=P.ink;ctx.lineWidth=w*2+2.6;strokePoly(ctx,sp);ctx.strokeStyle=P.wall;ctx.lineWidth=w*2+1.4;strokePoly(ctx,sp);}
+    else{ctx.strokeStyle=P.ink;ctx.lineWidth=w*3+2.4;strokePoly(ctx,sp);ctx.strokeStyle=P.wall;ctx.lineWidth=w*3;strokePoly(ctx,sp);}}
+  if(all||pass===1){ctx.strokeStyle=streetPattern(ctx,ST_KIND[o.type]);ctx.lineWidth=o.type==='rua_pedra'?w*2-1:o.type==='rua_terra'?w*2:w*2.1;strokePoly(ctx,sp);}
   ctx.restore();}
 function nearestOnPath(sp,p){let best=null,bd=Infinity;for(let i=1;i<sp.length;i++){const a=sp[i-1],b=sp[i],dx=b[0]-a[0],dy=b[1]-a[1],l=dx*dx+dy*dy;let t=l?((p[0]-a[0])*dx+(p[1]-a[1])*dy)/l:0;t=clamp(t,0,1);const q=[a[0]+t*dx,a[1]+t*dy],d=Math.hypot(p[0]-q[0],p[1]-q[1]);if(d<bd){bd=d;best=q;}}return best?{q:best,d:bd}:null;}
 function snapStreetEnds(nl){if(!PATHLIKE.has(nl.type))return 0;let n=0;const others=map.objects.filter(o=>o!==nl&&o.kind==='line'&&PATHLIKE.has(o.type)).map(o=>({o,sp:samplePath(o.pts)}));
@@ -2488,11 +2493,10 @@ function doorLinks(){const key=geomVer+'|'+map.id;if(linkCache.key===key)return 
     if(!best)continue;const half=(best.st.type==='avenida'?best.st.w*1.5:best.st.w)+1;if(best.d>70+o.s*.5||best.d<half+3)continue;const top=o.type.startsWith('u_');
     list.push({o,pts:top?[d,best.q]:[d,[d[0]+(best.q[0]-d[0])*.15,d[1]+Math.min(8,Math.max(3,(best.q[1]-d[1])*.5))],best.q],w:clamp(o.s*.06,2.2,5),paved:best.st.type!=='rua_terra'&&best.st.type!=='estrada'});}
   linkCache={key,list};return list;}
-function drawDoorPaths(ctx,P,player){const list=doorLinks();if(!list.length)return;ctx.save();ctx.lineCap='round';ctx.lineJoin='round';const si=sIdx(),dirt=TERR[12].c[si],stone=shade(TERR[13].c[si],-.04);
-  const path=l=>{ctx.beginPath();ctx.moveTo(l.pts[0][0],l.pts[0][1]);if(l.pts.length===3)ctx.quadraticCurveTo(l.pts[1][0],l.pts[1][1],l.pts[2][0],l.pts[2][1]);else ctx.lineTo(l.pts[1][0],l.pts[1][1]);};
-  for(const l of list){if(player&&(l.o.secret||!fogVisible(l.o.x,l.o.y)))continue;path(l);ctx.globalAlpha=.5;ctx.strokeStyle=l.paved?P.ink:dirt;ctx.lineWidth=l.w+(l.paved?1.4:2.6);ctx.stroke();}
-  ctx.globalAlpha=1;for(const l of list){if(player&&(l.o.secret||!fogVisible(l.o.x,l.o.y)))continue;path(l);ctx.strokeStyle=l.paved?stone:dirt;ctx.lineWidth=l.w;ctx.stroke();
-    if(l.paved){ctx.strokeStyle='rgba(0,0,0,.18)';ctx.lineWidth=l.w*.5;ctx.setLineDash([l.w*.45,l.w*.4]);ctx.stroke();ctx.setLineDash([]);}}
+function drawDoorPaths(ctx,P,player,pass,paved){const list=doorLinks();if(!list.length)return;ctx.save();ctx.lineCap='round';ctx.lineJoin='round';
+  for(const l of list){if(l.paved!==paved||(player&&(l.o.secret||!fogVisible(l.o.x,l.o.y))))continue;ctx.beginPath();ctx.moveTo(l.pts[0][0],l.pts[0][1]);if(l.pts.length===3)ctx.quadraticCurveTo(l.pts[1][0],l.pts[1][1],l.pts[2][0],l.pts[2][1]);else ctx.lineTo(l.pts[1][0],l.pts[1][1]);
+    if(pass===0){if(paved){ctx.strokeStyle=P.ink;ctx.lineWidth=l.w+2;ctx.stroke();ctx.strokeStyle=P.wall;ctx.lineWidth=l.w+1;ctx.stroke();}else{ctx.globalAlpha=.55;ctx.strokeStyle=TERR[12].c[sIdx()];ctx.lineWidth=l.w+2.6;ctx.stroke();ctx.globalAlpha=1;}}
+    else{ctx.strokeStyle=streetPattern(ctx,paved?'pedra':'terra');ctx.lineWidth=l.w;ctx.stroke();}}
   ctx.restore();}
 /* painted 3/4 trees and peaks standing in front of a building are redrawn in depth order */
 function frontDecor(){const key=geomVer+'|'+map.id+'|'+map.view;if(fdCache.key===key)return fdCache.list;const list=[],seen=new Set(),W=map.W,H=map.H;
