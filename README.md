@@ -1,5 +1,13 @@
 # Mesa do Mestre
 
+<!-- LINKS:INICIO (gerado por scripts/build.py; não edite à mão) -->
+**▶ [Abrir a Mesa do Mestre](https://itslozhy.github.io/atlas-rpg-maps/)** · versão pública no GitHub Pages; tudo fica salvo no seu navegador.
+
+**[Versão com mesa ao vivo e fichas compartilhadas](https://claude.ai/artifact/1wUYbQ513Syib6KfoBeN8k)** · no claude.ai, só para quem o mestre convidar.
+
+<sub>Última atualização: 17/11/2026 às 12:58 (horário de Brasília). O GitHub Pages publica a versão nova poucos minutos depois de cada envio.</sub>
+<!-- LINKS:FIM -->
+
 Mapas e fichas de RPG de mesa numa página só. O botão **Mapa | Fichas** no topo troca de seção sem sair da página, e as duas partes conversam entre si.
 
 ## Atlas do Mestre (mapas)
@@ -30,8 +38,9 @@ Mapas e fichas de RPG de mesa numa página só. O botão **Mapa | Fichas** no to
 | `index.html` | A mesma página completa, para abrir direto no navegador. |
 | `scripts/build.py` | Monta `mesa-do-mestre.html` e `index.html` a partir dos dois arquivos-fonte. |
 | `scripts/etmos_simbolos.py` | Baixa o PDF de partículas do Etmos e vetoriza os símbolos em `etmos-simbolos.json`. |
+| `etmos-simbolos.json` | Os símbolos vetorizados, embutidos na página pelo build. |
 
-Os símbolos do Etmos são arte do Balde Galáctico e não ficam no repositório. Rode `python3 scripts/etmos_simbolos.py` e depois o build: ele gera `mesa-com-simbolos.html` (fora do git) para publicar. Sem o arquivo de símbolos, a ficha mostra as sílabas no lugar deles.
+Os símbolos das partículas do Etmos são arte do [Balde Galáctico](https://baldegalactico.com.br), vetorizados do PDF oficial de partículas por `scripts/etmos_simbolos.py` e guardados em `etmos-simbolos.json`. Todos os direitos sobre eles são do Balde Galáctico.
 
 ## Como usar
 
