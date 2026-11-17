@@ -311,6 +311,7 @@ ol.steps{margin:8px 0 0;padding-left:20px;font-size:14px;line-height:1.5;color:v
         <div class="row" style="flex-wrap:wrap"><label>Luz vinda de</label><div class="seg" id="lightDir"><button data-d="-135">Noroeste</button><button data-d="-45">Nordeste</button><button data-d="135">Sudoeste</button><button data-d="45">Sudeste</button></div></div>
         <h3 style="margin-top:14px">Hora do dia</h3>
         <div class="seg" id="timeSeg"></div>
+        <label class="check"><input type="checkbox" id="nightWin" checked> Acender as janelas das casas e castelos à noite</label>
         <h3 style="margin-top:12px">Clima</h3>
         <div class="seg" id="wxSeg"></div>
         <label class="check"><input type="checkbox" id="wxAnim" checked> Animar chuva, neve e neblina</label>
@@ -1502,6 +1503,7 @@ function groundPatch(c,type,x,y,s){const q=isQ(type);if(!q&&!type.startsWith('u_
   const col=shade(TERR[t].c[sIdx()],-.22);c.save();c.translate(x,y+(q?s*.3:0));c.scale(1,q?.4:.8);const r=s*(q?.5:.46);const g=c.createRadialGradient(0,0,r*.35,0,0,r);const rgb=col.match(/[\d.]+/g).slice(0,3).join(',');g.addColorStop(0,`rgba(${rgb},.55)`);g.addColorStop(1,`rgba(${rgb},0)`);
   c.fillStyle=g;c.beginPath();c.arc(0,0,r,0,TAU);c.fill();c.restore();}
 function drawIcon(c,type,x,y,s,P,rot,tint,onMap){
+  if(nightWindows())type=nightType(type);
   if(onMap)groundPatch(c,type,x,y,s);
   const L=lightCfg();const t=c.getTransform();const sf=Math.hypot(t.a,t.b)||1;let q=Math.pow(2,Math.ceil(Math.log2(sf*1.05)));q=Math.max(.5,Math.min(q,8,1400/(s*1.6)));
   const sp=getSprite(type,s,P,rot,tint,q,L);const half=sp.size/2;const pw=(map&&map.style==='blueprint')?L.pow*.4:L.pow;
@@ -2394,7 +2396,15 @@ const LIGHT_R={q_farol:170,q_salao_nordico:60,q_hotel:60,q_opera:60,q_delegacia:
   q_ferraria:85,q_taverna:65,q_estalagem:65,q_padaria:45,q_fortaleza_ana:95,q_castelo_sombrio:65,q_cidadela_vapor:95,q_torre_mago:85,q_igreja:35,q_prefeitura:40,q_estacao:50,q_fabrica:55,
   farol:150,torre_mago:70,acampamento:60,vulcao:90,taverna:45,q_palacio_barroco:45,q_palacio_oriental:50,q_palacio_deserto:45,q_palacio_vitoriano:50,q_castelo_pedra:45,q_castelo_conto:45,q_castelo_elfico:55};
 Object.assign(LIGHT_R,{q_poste_vela:70,q_poste_tocha:80,q_lampiao_gas:95,q_lampiao_duplo:115,q_braseiro:85,q_fogueira:110,q_lampada_tesla:120,q_quiosque:50,q_palacio_inverno:50,q_palacete:45});
-function lightRadius(o){if(o.kind!=='icon')return 0;let r=LIGHT_R[o.type];if(!r&&o.type[0]==='h'&&parseHouse(o.type).fl.includes('l'))r=45;return r?r*o.s/40:0;}
+const LIGHT_POSTS=new Set(['q_poste_vela','q_poste_tocha','q_lampiao_gas','q_lampiao_duplo','q_lampada_tesla','u_lampiao','u_tocha']);
+const nightWindows=()=>!!map&&map.time==='noite'&&map.nightWin!==false;
+const litCache=new Map();
+/* at night, houses and castles are drawn with their windows lit unless the map or the piece opts out */
+function nightType(type){if(type[0]!=='h'&&type[0]!=='k')return type;let t=litCache.get(type);if(t)return t;if(type[0]==='h'){const h=parseHouse(type);t=h.fl.includes('l')||h.fl.includes('x')?type:(h.fl+='l',houseType(h));}
+  else{const k=parseCastle(type);t=k.fl.includes('l')||k.fl.includes('x')?type:(k.fl+='l',castleType(k));}if(litCache.size>4000)litCache.clear();litCache.set(type,t);return t;}
+function lightRadius(o){if(o.kind!=='icon')return 0;let r=LIGHT_R[o.type];if(r&&LIGHT_POSTS.has(o.type))r*=.8;
+  if(!r&&(o.type[0]==='h'||o.type[0]==='k')){const fl=o.type[0]==='h'?parseHouse(o.type).fl:parseCastle(o.type).fl;if(fl.includes('l'))r=o.type[0]==='h'?45:50;else if(!fl.includes('x')&&nightWindows())r=o.type[0]==='h'?34:42;}
+  return r?r*o.s/40:0;}
 const TIMES={dia:'Dia',amanhecer:'Amanhecer',entardecer:'Entardecer',noite:'Noite'};
 const WEATHERS={limpo:'Limpo',chuva:'Chuva',neve:'Neve',neblina:'Neblina'};
 let atmDirty=true,lightmap=null;
@@ -2923,7 +2933,7 @@ function houseControls(box,h,onChange){box.innerHTML='';const prev=document.crea
   seg('Telhado','roof',QROOF_N);seg('Paredes','wall',QMAT_N);
   {const r=document.createElement('div');r.className='row';const sid='hb_shop'+Math.random().toString(36).slice(2,6);r.innerHTML=`<label for="${sid}">Comércio</label><select id="${sid}" style="flex:1;min-width:0"></select>`;const sel=r.querySelector('select');sel.add(new Option('Nenhum (moradia)',''));
     for(const [k,v] of Object.entries(SHOPS))sel.add(new Option(v.n,k));sel.value=h.shop||'';sel.onchange=()=>{h.shop=sel.value;paint();onChange(true);};box.appendChild(r);}
-  const fl=document.createElement('div');fl.className='layers';fl.style.marginTop='6px';for(const [k,n] of [['c','Chaminé'],['s','Venezianas e flores'],['b','Sacada'],['m','Lucarnas'],['p','Alpendre'],['t','Torreão'],['l','Janelas acesas'],['v','Vitrais'],['i','Hera nas paredes'],['k','Musgo no telhado']]){
+  const fl=document.createElement('div');fl.className='layers';fl.style.marginTop='6px';for(const [k,n] of [['c','Chaminé'],['s','Venezianas e flores'],['b','Sacada'],['m','Lucarnas'],['p','Alpendre'],['t','Torreão'],['l','Janelas sempre acesas'],['x','Janelas apagadas à noite'],['v','Vitrais'],['i','Hera nas paredes'],['k','Musgo no telhado']]){
     const l=document.createElement('label');l.className='check';const i=document.createElement('input');i.type='checkbox';i.checked=h.fl.includes(k);i.onchange=()=>{h.fl=i.checked?h.fl+k:h.fl.split(k).join('');paint();onChange(true);};l.append(i,document.createTextNode(' '+n));fl.appendChild(l);}box.appendChild(fl);paint();}
 let cbState={sz:2,mat:'s',tw:'c',kr:'h',rc:'r',fl:'b'};
 function castleControls(box,k,onChange){box.innerHTML='';const prev=document.createElement('canvas');prev.width=200;prev.height=180;prev.style.cssText='width:100px;height:90px;display:block;margin:6px auto 0;border-radius:6px';box.appendChild(prev);
@@ -2932,7 +2942,7 @@ function castleControls(box,k,onChange){box.innerHTML='';const prev=document.cre
   const seg=(lab,key,opts)=>{const h3=document.createElement('div');h3.className='note';h3.style.margin='8px 0 4px';h3.textContent=lab;box.appendChild(h3);const sg=document.createElement('div');sg.className='seg';
     for(const [v,n] of Object.entries(opts)){const b=document.createElement('button');b.textContent=n;b.setAttribute('aria-pressed',String(k[key]===v));b.onclick=()=>{k[key]=v;for(const x of sg.children)x.setAttribute('aria-pressed',String(x===b));paint();onChange(true);};sg.appendChild(b);}box.appendChild(sg);};
   seg('Muralhas','mat',KMAT_N);seg('Torres','tw',{c:'Com ameias',k:'Telhado cônico'});seg('Torre de menagem','kr',{h:'Quatro águas',f:'Empena',g:'Duas águas',p:'Terraço com ameias'});seg('Cor dos telhados','rc',KROOF_N);
-  const fl=document.createElement('div');fl.className='layers';fl.style.marginTop='6px';for(const [f,n] of [['m','Fosso'],['b','Estandartes'],['t','Torreões'],['i','Casas no pátio'],['w','Portão reforçado'],['l','Janelas acesas']]){
+  const fl=document.createElement('div');fl.className='layers';fl.style.marginTop='6px';for(const [f,n] of [['m','Fosso'],['b','Estandartes'],['t','Torreões'],['i','Casas no pátio'],['w','Portão reforçado'],['l','Janelas sempre acesas'],['x','Janelas apagadas à noite']]){
     const l=document.createElement('label');l.className='check';const i=document.createElement('input');i.type='checkbox';i.checked=k.fl.includes(f);i.onchange=()=>{k.fl=i.checked?k.fl+f:k.fl.split(f).join('');paint();onChange(true);};l.append(i,document.createTextNode(' '+n));fl.appendChild(l);}box.appendChild(fl);paint();}
 let urbKey='';
 function buildUrbanPanel(){
@@ -2981,7 +2991,7 @@ function refreshPanel(){
   {const ts=$('timeSeg');if(!ts.children.length)for(const [k,n] of Object.entries(TIMES)){const b=document.createElement('button');b.dataset.k=k;b.textContent=n;b.onclick=()=>{map.time=k;atmDirty=true;changed();refreshPanel();requestDraw();};ts.appendChild(b);}
    for(const b of ts.children)b.setAttribute('aria-pressed',String(b.dataset.k===(map.time||'dia')));
    const ws=$('wxSeg');if(!ws.children.length)for(const [k,n] of Object.entries(WEATHERS)){const b=document.createElement('button');b.dataset.k=k;b.textContent=n;b.onclick=()=>{map.weather=k;changed();refreshPanel();ensureWeatherAnim();requestDraw();};ws.appendChild(b);}
-   for(const b of ws.children)b.setAttribute('aria-pressed',String(b.dataset.k===(map.weather||'limpo')));$('wxAnim').checked=map.wxAnim!==false;$('streetFill').checked=ui.streetFill;$('doorPaths').checked=map.doorPaths!==false;}
+   for(const b of ws.children)b.setAttribute('aria-pressed',String(b.dataset.k===(map.weather||'limpo')));$('wxAnim').checked=map.wxAnim!==false;$('nightWin').checked=map.nightWin!==false;$('streetFill').checked=ui.streetFill;$('doorPaths').checked=map.doorPaths!==false;}
   {const pb=$('parentBtn');pb.hidden=!map.parent;if(map.parent)pb.textContent='↑ '+map.parent.name;}
   $('scaleSel').value=map.scale;if(document.activeElement!==$('mapName'))$('mapName').value=map.name;
 }
@@ -2998,6 +3008,7 @@ function wirePanel(){
   $('gridUnit').onchange=e=>{map.grid.unit=e.target.value.slice(0,8);changed();requestDraw();};
   $('showScale').onchange=e=>{map.showScale=e.target.checked;changed();requestDraw();};
   $('iconCat').onchange=e=>{ui.iconCat=e.target.value;refreshPanel();};
+  $('nightWin').onchange=e=>{map.nightWin=e.target.checked;atmDirty=true;changed();requestDraw();};
   $('wxAnim').onchange=e=>{map.wxAnim=e.target.checked;changed();ensureWeatherAnim();requestDraw();};
   $('streetFill').onchange=e=>{ui.streetFill=e.target.checked;};
   $('doorPaths').onchange=e=>{map.doorPaths=e.target.checked;changed();requestDraw();};
@@ -3245,12 +3256,12 @@ let db=null, uidUser=null, saving=false, pendingSave=false, saveTimer=null;
 function setStatus(t,err){const s=$('status');s.textContent=t;s.classList.toggle('err',!!err);}
 function rle(a){const out=[];let v=a[0],n=1;for(let i=1;i<a.length;i++){if(a[i]===v)n++;else{out.push(v,n);v=a[i];n=1;}}out.push(v,n);return out;}
 function unrle(r,len){const a=new Uint8Array(len);let k=0;for(let i=0;i<r.length;i+=2){a.fill(r[i],k,k+r[i+1]);k+=r[i+1];}return a;}
-function serialize(m){return {v:1,id:m.id,name:m.name,scale:m.scale,W:m.W,H:m.H,terrain:rle(m.terrain),objects:m.objects,grid:m.grid,showScale:m.showScale,style:m.style,smooth:m.smooth,layers:m.layers,light:m.light,doorPaths:m.doorPaths!==false,view:m.view||'34',texOn:m.texOn!==false,time:m.time||'dia',weather:m.weather||'limpo',wxAnim:m.wxAnim!==false,fogOn:!!m.fogOn,fog:m.fogOn&&m.fog?rle(m.fog):null,parent:m.parent||null,mesa:m.mesa||null,updatedAt:m.updatedAt,sample:!!m.sample};}
+function serialize(m){return {v:1,id:m.id,name:m.name,scale:m.scale,W:m.W,H:m.H,terrain:rle(m.terrain),objects:m.objects,grid:m.grid,showScale:m.showScale,style:m.style,smooth:m.smooth,layers:m.layers,light:m.light,doorPaths:m.doorPaths!==false,nightWin:m.nightWin!==false,view:m.view||'34',texOn:m.texOn!==false,time:m.time||'dia',weather:m.weather||'limpo',wxAnim:m.wxAnim!==false,fogOn:!!m.fogOn,fog:m.fogOn&&m.fog?rle(m.fog):null,parent:m.parent||null,mesa:m.mesa||null,updatedAt:m.updatedAt,sample:!!m.sample};}
 function deserialize(d){
   if(!d||!d.W||!d.H||!Array.isArray(d.terrain))throw new Error('formato inválido');
   const m={id:d.id||uid(),name:String(d.name||'Mapa'),scale:SCALES[d.scale]?d.scale:'continente',W:d.W|0,H:d.H|0,terrain:unrle(d.terrain,(d.W|0)*(d.H|0)),
     objects:Array.isArray(d.objects)?d.objects.filter(o=>o&&['line','icon','label','token'].includes(o.kind)):[],grid:Object.assign({type:'hex',size:8,dist:50,unit:'km'},d.grid||{}),
-    showScale:d.showScale!==false,style:STYLES.includes(d.style)?d.style:'parchment',smooth:d.smooth!==false,layers:Object.assign({grid:true,lines:true,icons:true,labels:true},d.layers||{}),light:Object.assign({on:true,pow:.65,dir:-135},d.light||{}),view:d.view==='top'||d.view==='34'?d.view:((d.scale==='cidade'||(Array.isArray(d.objects)&&d.objects.some(o=>o&&o.kind==='icon'&&/^(q_|h\||k\|)/.test(o.type||''))))?'34':'top'),doorPaths:d.doorPaths!==false,texOn:d.texOn!==false,time:TIMES[d.time]?d.time:'dia',weather:WEATHERS[d.weather]?d.weather:'limpo',wxAnim:d.wxAnim!==false,fogOn:!!d.fogOn,fog:Array.isArray(d.fog)?unrle(d.fog,(d.W|0)*(d.H|0)):null,parent:d.parent||null,mesa:d.mesa||null,updatedAt:d.updatedAt||Date.now(),sample:!!d.sample};
+    showScale:d.showScale!==false,style:STYLES.includes(d.style)?d.style:'parchment',smooth:d.smooth!==false,layers:Object.assign({grid:true,lines:true,icons:true,labels:true},d.layers||{}),light:Object.assign({on:true,pow:.65,dir:-135},d.light||{}),view:d.view==='top'||d.view==='34'?d.view:((d.scale==='cidade'||(Array.isArray(d.objects)&&d.objects.some(o=>o&&o.kind==='icon'&&/^(q_|h\||k\|)/.test(o.type||''))))?'34':'top'),doorPaths:d.doorPaths!==false,nightWin:d.nightWin!==false,texOn:d.texOn!==false,time:TIMES[d.time]?d.time:'dia',weather:WEATHERS[d.weather]?d.weather:'limpo',wxAnim:d.wxAnim!==false,fogOn:!!d.fogOn,fog:Array.isArray(d.fog)?unrle(d.fog,(d.W|0)*(d.H|0)):null,parent:d.parent||null,mesa:d.mesa||null,updatedAt:d.updatedAt||Date.now(),sample:!!d.sample};
   for(let i=0;i<m.terrain.length;i++)if(m.terrain[i]>=TERR.length)m.terrain[i]=2;
   return m;
 }
