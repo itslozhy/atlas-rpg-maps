@@ -1,6 +1,6 @@
-# Atlas do Mestre e Grimório do Mestre
+# Mesa do Mestre
 
-Duas ferramentas para mestres de RPG de mesa, cada uma num único arquivo HTML, sem etapa de build.
+Mapas e fichas de RPG de mesa numa página só. O botão **Mapa | Fichas** no topo troca de seção sem sair da página, e as duas partes conversam entre si.
 
 ## Atlas do Mestre (mapas)
 
@@ -16,21 +16,22 @@ Duas ferramentas para mestres de RPG de mesa, cada uma num único arquivo HTML, 
 - **Acesso:** cada jogador edita só as próprias fichas; o mestre vê e edita todas, e tem NPCs e notas que só ele lê.
 - **Cálculos automáticos:** modificadores, perícias, salvaguardas, CD e ataque de magia (D&D); PV, PE e SAN por classe e NEX, defesa e carga (Ordem Paranormal).
 - **Dados:** clique em atributos, perícias e ataques para rolar; vantagem e desvantagem no D&D; regra de dados por atributo na Ordem.
-- Cada ficha tem um link que pode ser colado no token correspondente do Atlas.
+- **Ligação com o mapa:** um token pode ser ligado a uma ficha. A vida do token segue a ficha, o dano aplicado no mapa muda a ficha, e “Mostrar no mapa” leva ao token.
+- **Mesa ao vivo:** em “Mesa dos jogadores”, o mestre escolhe a campanha. Os jogadores dela veem o mapa ao vivo ao clicar em **Mapa** e abrem a própria ficha clicando no token.
 
 ## Arquivos
 
 | Arquivo | Para que serve |
 | --- | --- |
-| `atlas-do-mestre.html` | Código-fonte do Atlas (corpo da página publicada como artefato no claude.ai). |
-| `grimorio-do-mestre.html` | Código-fonte do Grimório. |
-| `index.html` | Atlas como página completa, para abrir direto no navegador ou hospedar. |
-| `fichas.html` | Grimório como página completa. |
-| `scripts/build.py` | Regenera `index.html` e `fichas.html`. |
+| `atlas-do-mestre.html` | Código-fonte do mapa. |
+| `grimorio-do-mestre.html` | Código-fonte das fichas (estilo isolado num shadow root) e a ponte entre as duas seções. |
+| `mesa-do-mestre.html` | Página montada, publicada como artefato no claude.ai. |
+| `index.html` | A mesma página completa, para abrir direto no navegador. |
+| `scripts/build.py` | Monta `mesa-do-mestre.html` e `index.html` a partir dos dois arquivos-fonte. |
 
 ## Como usar
 
-Abra `index.html` ou `fichas.html` no navegador. Fora do claude.ai, os dados ficam salvos só no navegador; a sincronização entre mestre e jogadores, a conta na nuvem e a transmissão da mesa dependem do ambiente de artefatos do claude.ai.
+Abra `index.html` no navegador. Fora do claude.ai, os dados ficam salvos só no navegador; a sincronização entre mestre e jogadores, a conta na nuvem e a transmissão da mesa dependem do ambiente de artefatos do claude.ai.
 
 Depois de editar um arquivo-fonte:
 
