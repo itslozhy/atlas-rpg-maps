@@ -284,6 +284,8 @@ ol.steps{margin:8px 0 0;padding-left:20px;font-size:14px;line-height:1.5;color:v
         <div class="seg" id="fogModeSeg" style="margin-top:8px"><button data-m="reveal">Revelar</button><button data-m="hide">Esconder</button></div>
         <div class="row"><label for="fogBrush">Pincel</label><input type="range" id="fogBrush" min="1" max="30" value="4"><output id="fogBrushOut">4</output></div>
         <div class="actions" style="justify-content:flex-start;margin-top:6px"><button class="btn" id="fogAll">Revelar tudo</button><button class="btn" id="fogNone">Cobrir tudo</button></div>
+        <label class="check"><input type="checkbox" id="fogVis" checked> Revelar pela visão dos tokens</label>
+        <p class="note">Tokens com <b>Visão</b> (em Selecionar) abrem a névoa ao redor de si quando você os coloca ou move. O que já foi visto continua revelado.</p>
         <p class="note">Você vê a névoa translúcida; os jogadores, pela Mesa dos jogadores, veem só o que foi revelado. Ícones, rótulos e tokens debaixo da névoa não são enviados a eles.</p>
       </section>
       <section class="sec" id="secText" hidden>
@@ -747,6 +749,33 @@ a.btn{color:inherit}
 .logitem li{display:flex;gap:8px;flex-wrap:wrap;align-items:baseline;font-size:14.5px;border-bottom:1px dashed var(--line);padding:2px 0}
 .logitem .k{font-weight:700;min-width:150px}.logitem .de{color:var(--muted);text-decoration:line-through}.logitem .para{color:var(--fg)}
 .logc{margin:6px 0 0;color:var(--muted)}
+.logitem li.rev .para,.logitem li.rev .k{opacity:.55}.tag-rev{margin-left:auto;font-size:12px;color:var(--muted);border:1px solid var(--line);border-radius:99px;padding:0 7px}
+.pendbar{margin:0;padding:10px 14px;background:#eef3ff;color:#1b2440;border-bottom:1px solid #b9c7ee;font-size:14.5px}
+.pendbar ul{list-style:none;margin:6px 0 0;padding:0;display:grid;gap:4px}.pendbar li{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.pendbar .k{font-weight:700;min-width:140px}.pendbar .de{text-decoration:line-through;opacity:.7}
+.pendbar .btn{background:#fff;color:#1b2440;border-color:#b9c7ee}.pendbar .btn.primary{background:#2d4fb0;color:#fff;border-color:#2d4fb0}
+.pedcard{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:10px 12px;margin-bottom:10px}.pedcard .pendbar{border-radius:8px;border:1px solid #b9c7ee;margin-top:8px}
+.cparts{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:10px}
+.cpart{display:flex;gap:10px;align-items:center;background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:8px 12px}
+.cpart .cpgl{color:var(--accent)}.cpart .gl{width:44px;height:44px;fill:currentColor}.cpart>div{flex:1;min-width:0;display:flex;flex-direction:column}.cpart small{color:var(--muted)}
+.pform{display:grid;grid-template-columns:auto minmax(0,1fr);gap:14px}@media (max-width:560px){.pform{grid-template-columns:minmax(0,1fr)}}
+.pad-wrap{display:flex;flex-direction:column;gap:6px;align-items:flex-start}
+#pPad{width:200px;height:200px;border:1px solid var(--line);border-radius:10px;touch-action:none;cursor:crosshair;background:var(--panel-2) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='-50 -50 100 100'%3E%3Cpath d='M0-46L13.5 41.6-35.4-27 42.9 13.9-43.1 13.9 35.4-27-13.5 41.6Z M0-46 27 37.2-43.7-14.2 43.7-14.2-27 37.2Z' fill='none' stroke='%23a99cbd' stroke-width='.8'/%3E%3C/svg%3E") center/80% no-repeat}
+.pfields{display:flex;flex-direction:column;gap:8px}
+.damesa{color:#8a4fb0!important;font-weight:700}
+.sess{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:10px 14px;margin-bottom:10px}
+.sess>summary,.sess header{display:flex;gap:10px;align-items:baseline;cursor:pointer;flex-wrap:wrap}.sess>summary b,.sess header b{font-family:var(--f-title);font-weight:400;font-size:19px}
+.sess .field{margin-top:8px}.sessf{display:grid;grid-template-columns:minmax(0,1fr) 180px;gap:10px}@media (max-width:560px){.sessf{grid-template-columns:minmax(0,1fr)}}
+.sess textarea{resize:vertical}.resumo{white-space:pre-wrap;margin:8px 0 0}
+.dur{margin:6px 0;border-top:1px dashed var(--line);padding-top:6px}.dur>summary{cursor:pointer;color:var(--muted);font-size:14px}.dur h4{margin:8px 0 4px;font-size:13px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted)}
+ul.rolls{list-style:none;margin:0;padding:0;display:grid;gap:2px;font-size:14px}ul.rolls li{display:flex;gap:8px;align-items:baseline;border-bottom:1px dotted var(--line);padding:2px 0}
+ul.rolls .t{color:var(--muted);font-variant-numeric:tabular-nums}ul.rolls .w{font-weight:700}ul.rolls .l{flex:1;min-width:0}ul.rolls b{font-family:"IBM Plex Mono",monospace}ul.rolls b.crit{color:var(--ok)}ul.rolls b.fail{color:var(--bad)}
+.doc{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:10px 14px;margin-bottom:10px}.doc header{display:flex;gap:10px;align-items:baseline;flex-wrap:wrap}.doc header b{font-family:var(--f-title);font-weight:400;font-size:19px}
+.docimg{display:block;border:0;padding:0;background:none;cursor:zoom-in;margin-top:8px;max-width:100%}.docimg img{max-height:320px;border-radius:8px;border:1px solid var(--line)}
+.gen{background:var(--panel-2);border:1px solid var(--line);border-radius:10px;padding:10px 12px;display:flex;flex-direction:column;gap:2px}.gen b{font-family:var(--f-title);font-weight:400;font-size:22px}
+.gen ul{list-style:none;margin:6px 0 0;padding:0;display:grid;gap:4px}.gen li span{display:block;font-size:12px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted)}
+.bestl{display:grid;gap:6px}.bestit{display:flex;gap:10px;align-items:center;background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:6px 10px}.bestit b{flex:1;min-width:0}
+.check-line{display:flex;gap:8px;align-items:flex-start;margin:0 0 12px;font-size:14.5px}
 .mesabox{display:flex;gap:10px;align-items:center;flex-wrap:wrap;background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:10px 14px;margin:12px 0 0}
 .mesabox .dot{width:9px;height:9px;border-radius:50%;background:var(--ok);flex:0 0 auto}
 .mesabox .dot.off{background:var(--muted)}
@@ -2854,6 +2883,11 @@ function rebuildFog(){fogDirty=false;if(!map.fogOn){fogBig=null;return;}ensureFo
   b.globalCompositeOperation='source-in';const P=PAL[map.style];b.fillStyle=shade(P.paper,-.6);b.fillRect(0,0,W*S,H*S);
   b.globalCompositeOperation='source-atop';for(let i=0;i<W*H/2;i++){b.fillStyle=i%2?'rgba(0,0,0,.07)':'rgba(255,255,255,.04)';b.fillRect(hash(i,1,91)*W*S,hash(i,2,91)*H*S,1+hash(i,3,91)*2.5,1+hash(i,4,91)*2.5);}b.globalCompositeOperation='source-over';}
 function drawFog(ctx,W,H,player){if(!map.fogOn)return;if(fogDirty||!fogBig)rebuildFog();if(!fogBig)return;ctx.save();ctx.globalAlpha=player?1:.42;ctx.imageSmoothingEnabled=true;ctx.drawImage(fogBig,0,0,W,H);ctx.restore();}
+/* token vision: each token with "visao" (grid squares) clears the fog around it; explored stays revealed */
+function visionReveal(){if(!map||playerMode||!map.fogOn||map.fogVis===false)return false;let any=false;const gs=map.grid.type==='none'?3:map.grid.size;
+  for(const o of map.objects){if(o.kind!=='token'||!(o.visao>0)||o.secret)continue;if(!map.fog)ensureFog();const r=o.visao*gs,cx=o.x/CP,cy=o.y/CP;
+    for(let y=Math.max(0,Math.floor(cy-r));y<=Math.min(map.H-1,Math.ceil(cy+r));y++)for(let x=Math.max(0,Math.floor(cx-r));x<=Math.min(map.W-1,Math.ceil(cx+r));x++){const i=y*map.W+x;if(map.fog[i]!==1&&Math.hypot(x+.5-cx,y+.5-cy)<=r){map.fog[i]=1;any=true;}}}
+  if(any)fogDirty=true;return any;}
 function fogVisible(x,y){if(!map.fogOn||!map.fog)return true;const cx=clamp(Math.floor(x/CP),0,map.W-1),cy=clamp(Math.floor(y/CP),0,map.H-1);return map.fog[cy*map.W+cx]===1;}
 function fogStamp(wx,wy){const r=ui.fogBrush,cx=wx/CP,cy=wy/CP,v=ui.fogMode==='reveal'?1:0;ensureFog();for(let y=Math.floor(cy-r);y<=Math.ceil(cy+r);y++)for(let x=Math.floor(cx-r);x<=Math.ceil(cx+r);x++){
   if(x<0||y<0||x>=map.W||y>=map.H)continue;if(Math.hypot(x+.5-cx,y+.5-cy)<=r)map.fog[y*map.W+x]=v;}fogDirty=true;}
@@ -2865,6 +2899,7 @@ const TOKEN_SIZES=[[.5,'Miúdo'],[1,'Médio'],[2,'Grande'],[3,'Enorme'],[4,'Colo
 function gridPx(){return (map.grid.type==='none'?3:map.grid.size)*CP;}
 function tokenR(o){return Math.max(6,(o.size||1)*gridPx()*.46);}
 function drawToken(ctx,o,master){const r=tokenR(o),x=o.x,y=o.y,col=o.color||'#2f7fb0';ctx.save();
+  if(!playerMode&&o.visao>0&&ui.sels&&ui.sels.has(o.id)){const vr=o.visao*gridPx();ctx.save();ctx.strokeStyle='rgba(255,214,90,.9)';ctx.fillStyle='rgba(255,214,90,.08)';ctx.lineWidth=2/view.z;ctx.setLineDash([8/view.z,6/view.z]);ctx.beginPath();ctx.arc(x,y,vr,0,TAU);ctx.fill();ctx.stroke();ctx.restore();}
   ctx.fillStyle='rgba(0,0,0,.35)';ctx.beginPath();ctx.ellipse(x+r*.12,y+r*.2,r*1.02,r*.98,0,0,TAU);ctx.fill();
   const g=ctx.createRadialGradient(x-r*.35,y-r*.4,r*.1,x,y,r);g.addColorStop(0,shade(col,.35));g.addColorStop(1,shade(col,-.28));ctx.fillStyle=g;ctx.beginPath();ctx.arc(x,y,r,0,TAU);ctx.fill();
   ctx.lineWidth=Math.max(1.5,r*.13);ctx.strokeStyle='#f6f1e6';ctx.stroke();ctx.lineWidth=Math.max(.8,r*.05);ctx.strokeStyle='#1d1a16';ctx.beginPath();ctx.arc(x,y,r*1.07,0,TAU);ctx.stroke();
@@ -3425,6 +3460,7 @@ function wirePanel(){
   $('fogOn').onchange=e=>setFogOn(e.target.checked);
   for(const b of $('fogModeSeg').children)b.onclick=()=>{ui.fogMode=b.dataset.m;refreshPanel();};
   $('fogBrush').oninput=e=>{ui.fogBrush=+e.target.value;$('fogBrushOut').textContent=ui.fogBrush;requestDraw();};
+  $('fogVis').onchange=e=>{pushHistory();map.fogVis=e.target.checked;changed();requestDraw();};
   $('fogAll').onclick=()=>{pushHistory();map.fogOn=true;ensureFog();map.fog.fill(1);fogDirty=true;changed();refreshPanel();requestDraw();};
   $('fogNone').onclick=()=>{pushHistory();map.fogOn=true;ensureFog();map.fog.fill(0);fogDirty=true;changed();refreshPanel();requestDraw();};
   $('parentBtn').onclick=()=>{if(map.parent)openMapById(map.parent.id);};
@@ -3580,12 +3616,14 @@ function tokenEditor(sb,o){const r=document.createElement('div');r.className='ro
   const a=hp.querySelector('#tokHpSel'),b=hp.querySelector('#tokHpMaxSel');a.value=o.hp==null?(o.hpMax||0):o.hp;b.value=o.hpMax||0;
   const upd=()=>{pushHistory();o.hpMax=Math.max(0,+b.value||0);o.hp=clamp(+a.value||0,0,o.hpMax||9999);const fid=fichaId(o);if(fid&&window.Fichas)Fichas.setHp(fid,o.hp);changed();requestDraw();};a.onchange=upd;b.onchange=upd;
   hp.querySelector('#tokDmg').onclick=()=>{a.value=Math.max(0,(+a.value||0)-1);upd();};hp.querySelector('#tokHeal').onclick=()=>{a.value=(+a.value||0)+1;if(+b.value&&+a.value>+b.value)a.value=b.value;upd();};sb.appendChild(hp);
+  const vr=document.createElement('div');vr.className='row';vr.innerHTML='<label for="tokVis">Visão</label><input type="number" id="tokVis" min="0" max="60" style="width:4.5em;flex:0 0 auto"><span class="note" style="margin:0">quadros</span>';const vi=vr.querySelector('input');vi.value=o.visao||0;
+  vi.onchange=()=>{pushHistory();const v=Math.max(0,Math.min(60,+vi.value||0));if(v)o.visao=v;else delete o.visao;changed();requestDraw();if(v&&!map.fogOn)toast('A visão abre a névoa quando ela está ligada (ferramenta Névoa).');};sb.appendChild(vr);
   const fid=fichaId(o),F=window.Fichas,list=F?F.list():[];
   const fl=document.createElement('div');fl.className='row';fl.innerHTML='<label for="tokFicha">Ficha</label><select id="tokFicha" style="width:100%;min-width:0"></select>';const fs=fl.querySelector('select');
   fs.appendChild(new Option(list.length?'Nenhuma':'Nenhuma ficha criada ainda',''));let grp=null,gname=null;
   for(const f of list){const gn=f.campNome||'Sem campanha';if(gn!==gname){grp=document.createElement('optgroup');grp.label=gn;fs.appendChild(grp);gname=gn;}grp.appendChild(new Option(`${f.nome}${f.kind==='npc'?' (NPC)':''}`,f.id));}
   if(fid&&!list.some(f=>f.id===fid))fs.appendChild(new Option('Ficha não encontrada',fid));fs.value=fid||'';
-  fs.onchange=()=>{pushHistory();const v=fs.value;if(v){o.ficha=v;const f=F&&F.get(v);if(f){o.name=f.nome;if(f.cor)o.color=f.cor;o.hp=Math.max(0,f.pv);o.hpMax=f.pvMax;}}else delete o.ficha;changed();refreshPanel();requestDraw();};sb.appendChild(fl);
+  fs.onchange=()=>{pushHistory();const v=fs.value;if(v){o.ficha=v;const f=F&&F.get(v);if(f){o.name=f.nome;if(o.visao==null&&f.kind==='pc')o.visao=6;if(f.cor)o.color=f.cor;o.hp=Math.max(0,f.pv);o.hpMax=f.pvMax;}}else delete o.ficha;changed();refreshPanel();requestDraw();};sb.appendChild(fl);
   if(fid){const n=document.createElement('p');n.className='note';n.style.margin='4px 0 0';n.textContent='A vida deste token segue a ficha, e o dano daqui também muda a ficha.';sb.appendChild(n);
     const a=document.createElement('button');a.className='btn';a.textContent='Abrir ficha';a.style.marginTop='6px';a.onclick=()=>F&&F.open(fid);sb.appendChild(a);}}
 function buildTokenPanel(){const cs=$('tokCats');if(!cs.children.length){for(const [k,v] of Object.entries(TOKEN_CATS)){const b=document.createElement('button');b.dataset.k=k;b.textContent=v.n;b.onclick=()=>{ui.tokCat=k;ui.tokColor=v.c;refreshPanel();};cs.appendChild(b);}}
@@ -3597,7 +3635,7 @@ function buildTokenPanel(){const cs=$('tokCats');if(!cs.children.length){for(con
   const tl=$('tokList');tl.innerHTML='';const toks=map.objects.filter(o=>o.kind==='token');if(!toks.length)tl.innerHTML='<div class="empty">Nenhum token no mapa.</div>';
   for(const o of toks){const b=document.createElement('button');b.className='sw';b.style.width='100%';b.innerHTML=`<span class="c" style="background:${o.color}"></span><span class="t"></span>`;b.querySelector('.t').textContent=`${o.name||'Token'}${o.hpMax?` · ${o.hp==null?o.hpMax:o.hp}/${o.hpMax}`:''}${o.secret?' · oculto':''}`;
     b.onclick=()=>{setTool('select');setSel([o.id]);};tl.appendChild(b);}}
-function buildFogPanel(){$('fogOn').checked=!!map.fogOn;for(const b of $('fogModeSeg').children)b.setAttribute('aria-pressed',String(b.dataset.m===ui.fogMode));$('fogBrush').value=ui.fogBrush;$('fogBrushOut').textContent=ui.fogBrush;}
+function buildFogPanel(){$('fogOn').checked=!!map.fogOn;$('fogVis').checked=map.fogVis!==false;for(const b of $('fogModeSeg').children)b.setAttribute('aria-pressed',String(b.dataset.m===ui.fogMode));$('fogBrush').value=ui.fogBrush;$('fogBrushOut').textContent=ui.fogBrush;}
 function setFogOn(on){pushHistory();map.fogOn=on;if(on){ensureFog();}fogDirty=true;changed();refreshPanel();requestDraw();}
 /* tokens linked to character sheets */
 function fichaId(o){const f=o&&o.ficha;if(!f)return null;const m=String(f).match(/#ficha-([A-Za-z0-9-]+)$/);return m?m[1]:/^[A-Za-z0-9-]+$/.test(f)?f:null;}
@@ -3686,17 +3724,17 @@ let db=null, uidUser=null, saving=false, pendingSave=false, saveTimer=null;
 function setStatus(t,err){const s=$('status');s.textContent=t;s.classList.toggle('err',!!err);}
 function rle(a){const out=[];let v=a[0],n=1;for(let i=1;i<a.length;i++){if(a[i]===v)n++;else{out.push(v,n);v=a[i];n=1;}}out.push(v,n);return out;}
 function unrle(r,len){const a=new Uint8Array(len);let k=0;for(let i=0;i<r.length;i+=2){a.fill(r[i],k,k+r[i+1]);k+=r[i+1];}return a;}
-function serialize(m){return {v:1,id:m.id,name:m.name,scale:m.scale,W:m.W,H:m.H,terrain:rle(m.terrain),objects:m.objects,grid:m.grid,showScale:m.showScale,style:m.style,smooth:m.smooth,layers:m.layers,light:m.light,doorPaths:m.doorPaths!==false,nightWin:m.nightWin!==false,view:m.view||'34',texOn:m.texOn!==false,time:m.time||'dia',weather:m.weather||'limpo',wxAnim:m.wxAnim!==false,fogOn:!!m.fogOn,fog:m.fogOn&&m.fog?rle(m.fog):null,parent:m.parent||null,mesa:m.mesa||null,updatedAt:m.updatedAt,sample:!!m.sample};}
+function serialize(m){return {v:1,id:m.id,name:m.name,scale:m.scale,W:m.W,H:m.H,terrain:rle(m.terrain),objects:m.objects,grid:m.grid,showScale:m.showScale,style:m.style,smooth:m.smooth,layers:m.layers,light:m.light,doorPaths:m.doorPaths!==false,nightWin:m.nightWin!==false,view:m.view||'34',texOn:m.texOn!==false,time:m.time||'dia',weather:m.weather||'limpo',wxAnim:m.wxAnim!==false,fogOn:!!m.fogOn,fogVis:m.fogVis!==false,fog:m.fogOn&&m.fog?rle(m.fog):null,parent:m.parent||null,mesa:m.mesa||null,updatedAt:m.updatedAt,sample:!!m.sample};}
 function deserialize(d){
   if(!d||!d.W||!d.H||!Array.isArray(d.terrain))throw new Error('formato inválido');
   const m={id:d.id||uid(),name:String(d.name||'Mapa'),scale:SCALES[d.scale]?d.scale:'continente',W:d.W|0,H:d.H|0,terrain:unrle(d.terrain,(d.W|0)*(d.H|0)),
     objects:Array.isArray(d.objects)?d.objects.filter(o=>o&&['line','icon','label','token'].includes(o.kind)):[],grid:Object.assign({type:'hex',size:8,dist:50,unit:'km'},d.grid||{}),
-    showScale:d.showScale!==false,style:STYLES.includes(d.style)?d.style:'parchment',smooth:d.smooth!==false,layers:Object.assign({grid:true,lines:true,icons:true,labels:true},d.layers||{}),light:Object.assign({on:true,pow:.65,dir:-135},d.light||{}),view:d.view==='top'||d.view==='34'?d.view:((d.scale==='cidade'||(Array.isArray(d.objects)&&d.objects.some(o=>o&&o.kind==='icon'&&/^(q_|h\||k\|)/.test(o.type||''))))?'34':'top'),doorPaths:d.doorPaths!==false,nightWin:d.nightWin!==false,texOn:d.texOn!==false,time:TIMES[d.time]?d.time:'dia',weather:WEATHERS[d.weather]?d.weather:'limpo',wxAnim:d.wxAnim!==false,fogOn:!!d.fogOn,fog:Array.isArray(d.fog)?unrle(d.fog,(d.W|0)*(d.H|0)):null,parent:d.parent||null,mesa:d.mesa||null,updatedAt:d.updatedAt||Date.now(),sample:!!d.sample};
+    showScale:d.showScale!==false,style:STYLES.includes(d.style)?d.style:'parchment',smooth:d.smooth!==false,layers:Object.assign({grid:true,lines:true,icons:true,labels:true},d.layers||{}),light:Object.assign({on:true,pow:.65,dir:-135},d.light||{}),view:d.view==='top'||d.view==='34'?d.view:((d.scale==='cidade'||(Array.isArray(d.objects)&&d.objects.some(o=>o&&o.kind==='icon'&&/^(q_|h\||k\|)/.test(o.type||''))))?'34':'top'),doorPaths:d.doorPaths!==false,nightWin:d.nightWin!==false,texOn:d.texOn!==false,time:TIMES[d.time]?d.time:'dia',weather:WEATHERS[d.weather]?d.weather:'limpo',wxAnim:d.wxAnim!==false,fogOn:!!d.fogOn,fogVis:d.fogVis!==false,fog:Array.isArray(d.fog)?unrle(d.fog,(d.W|0)*(d.H|0)):null,parent:d.parent||null,mesa:d.mesa||null,updatedAt:d.updatedAt||Date.now(),sample:!!d.sample};
   for(let i=0;i<m.terrain.length;i++)if(m.terrain[i]>=TERR.length)m.terrain[i]=2;
   return m;
 }
 function loadMap(m){geomVer++;map=m;if(!m.view)m.view='34';if(!mainCat(ui.uCat)&&ui.uCat!=='all'&&ui.uCat!=='interior'){ui.uCat=m.view==='34'?'casa34':'casa';ui.uicon=m.view==='34'?'h|5|4|2|g|r|cs':'u_casa';}if(!mainWall(ui.wall)){ui.wall=m.view==='34'?'w3_pedra':'w_pedra';ui.wallW=WALLS[ui.wall].w;}urbKey='';wallKey='';thumbCache.clear();ui.sel=null;ui.sels=new Set();ruler=null;fogDirty=true;atmDirty=true;noisePat=null;$('noteCard').hidden=true;ensureWeatherAnim();setupLayers();refreshPanel();store.set('atlas.last',m.id);requestDraw();}
-function changed(skipStamp){geomVer++;if(!map||playerMode)return;if(!skipStamp)map.updatedAt=Date.now();if(map.sample){map.sample=false;}
+function changed(skipStamp){geomVer++;if(!map||playerMode)return;visionReveal();if(!skipStamp)map.updatedAt=Date.now();if(map.sample){map.sample=false;}
   atmDirty=true;setStatus('Alterações não salvas');clearTimeout(saveTimer);saveTimer=setTimeout(save,1500);scheduleMesa();}
 async function save(){
   if(!map||playerMode)return;if(saving){pendingSave=true;return;}
@@ -3928,8 +3966,15 @@ const ETMOS={id:'etmos',n:'Etmos',
   fadiga:[[0,'Normal'],[1,'Cansado'],[6,'Exausto'],[9,'Esgotado']],
   complex:['Trivial','Regular','Difícil','Difícil','Complexo','Complexo','Milagre']};
 const ET_ALL={};for(const [g] of ETMOS.grupos)for(const p of ETMOS.parts[g])ET_ALL[p[0]]={id:p[0],n:p[1],nv:p[2]||0,g};
-const etSil=id=>id.charAt(0)+id.slice(1).toLowerCase()+(ETMOS.hifen[id]?'-':'');
-function etWord(seq){const w=seq.map(id=>id.toLowerCase()).join('');return w.charAt(0).toUpperCase()+w.slice(1);}
+/* particles the master creates for a campaign (campanhas/<id>.particulas) */
+let CUSTOM={};
+function rebuildCustom(){CUSTOM={};for(const c of Object.values(S.camps))for(const p of c.particulas||[])CUSTOM[p.id]=Object.assign({camp:c.id},p);}
+const etInfo=id=>ET_ALL[id]||CUSTOM[id]||{id,n:'Partícula removida',g:'car',nv:0};
+const silRaw=id=>CUSTOM[id]?CUSTOM[id].sil:id;
+const etSil=id=>{const r=silRaw(id);return r.charAt(0).toUpperCase()+r.slice(1).toLowerCase()+((ETMOS.hifen[id]||(CUSTOM[id]&&CUSTOM[id].hifen))?'-':'');};
+function etWord(seq){const w=seq.map(id=>silRaw(id).toLowerCase()).join('');return w.charAt(0).toUpperCase()+w.slice(1);}
+/* official particles of a group plus the ones of this sheet's campaign, as [id, meaning, level, custom] */
+const partsFor=(sh,g)=>ETMOS.parts[g].map(p=>[p[0],p[1],p[2]||0,false]).concat(Object.values(CUSTOM).filter(p=>p.camp===sh.camp&&p.g===g).map(p=>[p.id,p.n,p.nv||0,true]));
 const etFad=s=>{let st=ETMOS.fadiga[0];for(const f of ETMOS.fadiga)if(num(s.fadiga)>=f[0])st=f;return st[1];};
 const etLimF=s=>4+Math.floor(num(s.atr&&s.atr.corpo)/2);
 const etLimE=s=>4+num(s.atr&&s.atr.alma);
@@ -3938,7 +3983,7 @@ let GLIFOS=null;
 function glifos(){if(GLIFOS&&Object.keys(GLIFOS).length)return GLIFOS;GLIFOS={};
   try{const el=document.getElementById('etmosGlifos');if(el)GLIFOS=JSON.parse(el.textContent);}catch(e){console.error('símbolos do Etmos ilegíveis',e);}
   if(!Object.keys(GLIFOS).length&&window.ETMOS_GLIFOS)GLIFOS=window.ETMOS_GLIFOS;return GLIFOS;}
-const glyph=(id,cls)=>glifos()[id]?`<svg class="${cls||'gl'}" viewBox="0 0 200 200" aria-hidden="true"><path d="${glifos()[id]}"/></svg>`:`<span class="${cls||'gl'} gl-txt" aria-hidden="true">${esc(etSil(id))}</span>`;
+const glyph=(id,cls)=>CUSTOM[id]?`<svg class="${cls||'gl'}" viewBox="0 0 200 200" aria-hidden="true"><path d="${esc(CUSTOM[id].d)}" fill="none" stroke="currentColor" stroke-width="12" stroke-linecap="round" stroke-linejoin="round"/></svg>`:glifos()[id]?`<svg class="${cls||'gl'}" viewBox="0 0 200 200" aria-hidden="true"><path d="${glifos()[id]}"/></svg>`:`<span class="${cls||'gl'} gl-txt" aria-hidden="true">${esc(etSil(id))}</span>`;
 const SYS={dnd:DND,op:OP,etmos:ETMOS};
 const COLORS=['#7b1e1e','#2f5a7a','#3f6a3a','#8a5a1a','#5a3f7a','#1f6a6a','#8a2f5a','#4a4a52'];
 
@@ -3971,7 +4016,7 @@ const opCarga=s=>num(s.atr.for)<=0?2:num(s.atr.for)*5;
 const opEsp=s=>(s.itens||[]).reduce((a,i)=>a+num(i.esp),0);
 
 /* ================= STORE ================= */
-const S={mode:'local',uid:'local',master:true,canWrite:null,convites:{},usados:{},logs:{},ready:false,camps:{},pcs:{},npcs:{},notes:{},names:{},readOnlyMsg:''};
+const S={mode:'local',uid:'local',master:true,canWrite:null,convites:{},usados:{},logs:{},rolls:{},diario:{},resumos:{},docs:{},pdocs:{},bestiario:{},ready:false,camps:{},pcs:{},npcs:{},notes:{},names:{},readOnlyMsg:''};
 let db=null,user=null;const unsub={};const pending=new Map();let saveTimer=null,parentDone=false;
 const LOCAL_KEY='grimorio.v1';
 function loadLocal(){try{const d=JSON.parse(store.get(LOCAL_KEY)||'{}');S.camps=d.camps||{};S.pcs=d.pcs||{};S.npcs=d.npcs||{};S.notes=d.notes||{};}catch(e){}}
@@ -3984,19 +4029,24 @@ async function initStore(){
   S.mode='local';loadLocal();S.ready=true;setStatus('Salvo neste navegador');render();}
 function subscribe(){
   setStatus('Carregando…');const to=setTimeout(()=>{if(!S.ready){setStatus('Sem resposta do servidor ainda',true);}},10000);
-  const done=()=>{if(!S.ready){S.ready=true;clearTimeout(to);setStatus('Sincronizado');}notify();if(Mesa.view()==='fichas')render();};
+  const done=()=>{if(!S.ready){S.ready=true;clearTimeout(to);setStatus('Sincronizado');}onRemote();};
   const err=e=>{setStatus(e&&e.code==='revoked'?'Acesso revogado':'Não foi possível sincronizar',true);};
   unsub.c=db.collection('campanhas').onSnapshot(s=>{S.camps={};for(const d of s.docs){const v=d.data();if(v)S.camps[d.id]=Object.assign({id:d.id},v);}done();},err);
   watchPlayer(S.uid);
-  if(S.master){unsub.p=db.collection('pjs').onSnapshot(s=>{for(const d of s.docs)watchPlayer(d.id);done();},err);
+  const coll=(name,key,f)=>{unsub[key]=db.collection(name).onSnapshot(s=>{const m={};for(const d of s.docs){const v=d.data();if(v)m[d.id]=Object.assign({id:d.id},v);}S[f]=m;done();},()=>{});};
+  coll('resumos','rs','resumos');coll('documentos','dcs','docs');
+  if(S.master){coll('diario','di','diario');coll('bestiario','be','bestiario');unsub.p=db.collection('pjs').onSnapshot(s=>{for(const d of s.docs)watchPlayer(d.id);done();},err);
     unsub.cv=db.collection('convites').onSnapshot(s=>{S.convites={};for(const d of s.docs){const v=d.data();if(v)S.convites[d.id]=Object.assign({id:d.id},v);}done();},err);
     unsub.us=db.collection('usados').onSnapshot(s=>{S.usados={};for(const d of s.docs){const v=d.data();if(v)S.usados[d.id]=v;}done();},err);unsub.n=db.collection('npcs').onSnapshot(s=>{S.npcs={};for(const d of s.docs){const v=d.data();if(v)S.npcs[d.id]=v;}done();},err);
     unsub.s=db.collection('segredos').onSnapshot(s=>{S.notes={};for(const d of s.docs){const v=d.data();if(v)S.notes[d.id]=v;}done();},err);}
 }
 function watchPlayer(pid){if(!pid||unsub['u'+pid])return;
+  if(S.master)unsub['r'+pid]=db.collection('pjs/'+pid+'/rolagens').onSnapshot(s=>{const m={};for(const d of s.docs){const v=d.data();if(v)m[d.id]=Object.assign({id:d.id,pid},v);}S.rolls[pid]=m;onRemote();},()=>{});
+  if(S.master&&pid!==S.uid)unsub['dc'+pid]=db.collection('pjs/'+pid+'/docs').onSnapshot(s=>{const m={};for(const d of s.docs){const v=d.data();if(v)m[d.id]=Object.assign({id:d.id,pid},v);}S.pdocs[pid]=m;onRemote();},()=>{});
+  if(!S.master&&pid===S.uid)unsub['dc'+pid]=db.collection('pjs/'+pid+'/docs').onSnapshot(s=>{const m={};for(const d of s.docs){const v=d.data();if(v)m[d.id]=Object.assign({id:d.id,pid},v);}S.pdocs[pid]=m;onRemote();},()=>{});
   if(S.master&&pid!==S.uid)unsub['l'+pid]=db.collection('pjs/'+pid+'/logs').onSnapshot(s=>{const m={};for(const d of s.docs){const v=d.data();if(v)m[d.id]=Object.assign({id:d.id,pid},v);}S.logs[pid]=m;onRemote();},()=>{});
   unsub['u'+pid]=db.collection('pjs/'+pid+'/fichas').onSnapshot(s=>{const m={};for(const d of s.docs){const v=d.data();if(v)m[d.id]=Object.assign(v,{id:d.id,owner:pid});}
-  for(const [id,v] of Object.entries(m)){const loc=S.pcs[pid]&&S.pcs[pid][id];if(loc&&pending.has(id)){m[id]=loc;}if(pid===S.uid&&!logBase[id])logBase[id]=clone(m[id]);}S.pcs[pid]=m;onRemote();},()=>{});}
+  for(const [id,v] of Object.entries(m)){const loc=S.pcs[pid]&&S.pcs[pid][id];if(loc&&pending.has(id)){m[id]=loc;}if(pid===S.uid&&!pending.has(id))logBase[id]=clone(m[id]);}S.pcs[pid]=m;onRemote();},()=>{});}
 function allSheets(){const out=[];for(const [pid,m] of Object.entries(S.pcs))for(const [id,v] of Object.entries(m||{}))out.push(Object.assign(v,{id,owner:pid,kind:v.tipo==='npc'?'npc':'pc'}));for(const [id,v] of Object.entries(S.npcs))out.push(Object.assign(v,{id,kind:'npc'}));return out;}
 function findSheet(id){return allSheets().find(s=>s.id===id);}
 /* whether this viewer can create and save their own sheet (null from the platform = let the save decide) */
@@ -4021,14 +4071,15 @@ async function resolveNames(ids){if(!user||!ids.length)return;const need=ids.fil
 
 /* remote change while a sheet is open: re-render only when the viewer is not typing in it */
 let staleSheet=false;
-function onRemote(){notify();if(Mesa.view()!=='fichas')return;const r=route();if(r.v==='ficha'){const root=$('#sheetRoot');if(root&&root.contains(R.activeElement)&&/INPUT|TEXTAREA|SELECT/.test(R.activeElement.tagName)){staleSheet=true;return;}}render();}
-R.addEventListener('focusout',()=>{setTimeout(()=>{if(staleSheet){const root=$('#sheetRoot');if(!root||!root.contains(R.activeElement)){staleSheet=false;render();}}},50);});
+function onRemote(){notify();if(Mesa.view()!=='fichas')return;const root=$('#app');const a=R.activeElement;if(root&&a&&root.contains(a)&&/INPUT|TEXTAREA|SELECT/.test(a.tagName)&&a.type!=='checkbox'&&a.type!=='file'){staleSheet=true;return;}render();}
+R.addEventListener('focusout',()=>{setTimeout(()=>{if(staleSheet){const a=R.activeElement;if(!a||!/INPUT|TEXTAREA|SELECT/.test(a.tagName)){staleSheet=false;render();}}},50);});
 
 /* ================= DICE ================= */
 const trayLog=[];let trayMode='n';
 function rnd(n){const a=new Uint32Array(1);crypto.getRandomValues(a);return 1+(a[0]%n);}
 let trayTimer=null;
-function pushRoll(r){trayLog.unshift(r);trayLog.length=Math.min(trayLog.length,25);const t=$('#tray');t.classList.remove('closed');renderTray(true);clearTimeout(trayTimer);if(window.innerWidth<700)trayTimer=setTimeout(()=>t.classList.add('closed'),4500);}
+let rollSheet=null;
+function pushRoll(r){saveRoll(r,rollSheet);rollSheet=null;trayLog.unshift(r);trayLog.length=Math.min(trayLog.length,25);const t=$('#tray');t.classList.remove('closed');renderTray(true);clearTimeout(trayTimer);if(window.innerWidth<700)trayTimer=setTimeout(()=>t.classList.add('closed'),4500);}
 function rollDnd(label,bonus){const a=rnd(20),b=rnd(20);let pick=a,dice=`d20: ${a}`;if(trayMode==='v'){pick=Math.max(a,b);dice=`2d20 (vantagem): ${a}, ${b}`;}else if(trayMode==='d'){pick=Math.min(a,b);dice=`2d20 (desvantagem): ${a}, ${b}`;}
   pushRoll({label,total:pick+bonus,detail:`${dice} ${bonus>=0?'+':'−'} ${Math.abs(bonus)}`,crit:pick===20,fail:pick===1});}
 function rollOp(label,dice,bonus){const n=Math.max(0,dice);const k=n<=0?2:n;const rs=[];for(let i=0;i<k;i++)rs.push(rnd(20));const pick=n<=0?Math.min(...rs):Math.max(...rs);
@@ -4050,7 +4101,7 @@ const ui={campTab:'grupo',sheetTab:{}};
 
 /* ================= VIEWS ================= */
 function crumbs(parts){$('#crumbs').innerHTML=parts.map((p,i)=>(i?'<span aria-hidden="true">›</span>':'')+`<a href="${p[1]}">${esc(p[0])}</a>`).join('');}
-function render(){const app=$('#app');const tb=$('.top');if(tb)HOST.style.setProperty('--toph',tb.offsetHeight+'px');$('#who').innerHTML=S.mode==='local'?'<b>Modo local</b>':S.master?'Você é o <b>mestre</b>':'Você é <b>jogador</b>';
+function render(){rebuildCustom();const app=$('#app');const tb=$('.top');if(tb)HOST.style.setProperty('--toph',tb.offsetHeight+'px');$('#who').innerHTML=S.mode==='local'?'<b>Modo local</b>':S.master?'Você é o <b>mestre</b>':'Você é <b>jogador</b>';
   if(!S.ready){app.innerHTML='<p class="lead">Carregando as campanhas…</p>';return;}const r=route();
   if(r.v==='invite')return viewInvite(app,r.id);
   if(r.v==='oldjoin'){crumbs([['Campanhas','#inicio']]);app.innerHTML='<div class="join"><h1 class="view">Convite</h1><div class="empty">Este link de convite é antigo e não vale mais. Cada ficha agora tem o próprio convite: peça um novo ao mestre.</div></div>';return;}
@@ -4065,9 +4116,10 @@ function viewHome(app){crumbs([['Campanhas','#inicio']]);const camps=Object.valu
     ${camps.length?`<div class="grid-cards">${camps.map(c=>`<article class="card"><a class="cover" href="#campanha-${c.id}"><span class="badge ${c.sys}">${esc(SYS[c.sys].n)}</span><h3>${esc(c.nome)}</h3></a>
       <div class="meta">${esc(c.desc||'Sem descrição.')}</div><div class="meta">${S.master?campCount(c.id)+' ficha(s) de jogador':'Suas fichas: '+allSheets().filter(s=>s.camp===c.id&&s.owner===S.uid).length}</div><div class="row"><a class="btn small" href="#campanha-${c.id}">Abrir</a></div></article>`).join('')}</div>`
       :`<div class="empty">${S.master?'Nenhuma campanha ainda. Comece em “Nova campanha”.':'Você ainda não tem fichas. Abra o convite que o mestre te enviou.'}</div>`}
-    ${S.mode==='cloud'&&S.master?`<h2 style="font-family:var(--f-title);font-weight:400;margin-top:30px">Como convidar os jogadores</h2><ol class="note" style="max-width:65ch;line-height:1.6"><li>No menu Compartilhar desta página, convide cada jogador pelo e-mail como <b>Editor</b>. Quem só tem acesso de leitura consegue ver as fichas, mas não salvar.</li><li>Envie o link da campanha. Cada jogador cria a própria ficha e só consegue editar as fichas dele.</li><li>No Mapa, em “Mesa dos jogadores”, escolha a campanha: os jogadores dela passam a ver o mapa ao vivo no botão <b>Mapa</b>, com a vida dos tokens seguindo as fichas.</li><li>NPCs e notas do mestre ficam guardados num espaço que só você lê.</li></ol>`:''}
+    ${S.mode==='cloud'&&S.master?`<h2 style="font-family:var(--f-title);font-weight:400;margin-top:30px">Como convidar os jogadores</h2><ol class="note" style="max-width:65ch;line-height:1.6"><li>No menu Compartilhar desta página, convide cada jogador pelo e-mail como <b>Editor</b>.</li><li>Na campanha, aba <b>Convites</b>, gere um link para cada ficha e envie. Cada link cria uma única ficha.</li><li>O jogador só enxerga as próprias fichas. Mudanças importantes chegam para você aprovar, e o resto fica na aba <b>Registro</b>.</li></ol>`:''}
+    ${S.master?bestHome():''}
     ${S.mode==='local'?'<p class="note" style="margin-top:24px">Modo local: tudo fica salvo só neste navegador. Para jogadores e mestre compartilharem as fichas, abra esta página pelo claude.ai.</p>':''}`;
-  const nb=$('#newCamp');if(nb)nb.onclick=()=>campForm();}
+  const nb=$('#newCamp');if(nb)nb.onclick=()=>campForm();if(S.master)bindBestHome(app);}
 function campForm(c){const isNew=!c;c=c||{id:uid(),nome:'',sys:'dnd',desc:'',createdAt:Date.now()};let sys=c.sys;
   openModal(`<h2>${isNew?'Nova campanha':'Editar campanha'}</h2><label class="field"><span>Nome</span><input id="cNome" value="${esc(c.nome)}" placeholder="Ex.: A Maldição de Valdren"></label>
     <div class="field"><span>Sistema</span><div class="choices" id="cSys">${Object.values(SYS).map(s=>`<button type="button" class="choice" data-s="${s.id}" aria-pressed="${s.id===sys}"><b>${esc(s.n)}</b><small>${{dnd:'Pergaminho, atributos, magias por nível.',op:'Dossiê da Ordem, NEX, rituais e sanidade.',etmos:'Grimório de partículas, fadiga e palavras mágicas.'}[s.id]}</small></button>`).join('')}</div>
@@ -4092,15 +4144,19 @@ function pcCard(sh,camp){const [pv,mx]=hpOf(sh),f=mx>0?clamp(pv/mx,0,1):0;const 
 function viewCamp(app,c){lastCamp=c.id;try{sessionStorage.setItem('mesa.camp',c.id);}catch(e){}crumbs([['Campanhas','#inicio'],[c.nome,'#campanha-'+c.id]]);
   const sheets=allSheets().filter(s=>s.camp===c.id&&(S.master||s.owner===S.uid));const pcs=sheets.filter(s=>s.kind==='pc'),npcs=sheets.filter(s=>s.kind==='npc');
   resolveNames([...new Set(sheets.map(s=>s.owner).filter(o=>o&&o!==S.uid))]).then(()=>{if(!S.names.__done&&sheets.some(s=>s.owner&&s.owner!==S.uid)){S.names.__done=1;if(route().v==='camp')render();}});
-  const nLog=S.master?campLogs(c.id).filter(l=>(l.fim||0)>seenLogs(c.id)).length:0;
-  const tabs=S.master?[['grupo','Grupo'],['npcs','NPCs'],['convites','Convites'],['registro','Registro'+(nLog?` <span class="cnt">${nLog}</span>`:'')],['notas','Notas do mestre']]:[['grupo','Minhas fichas']];if(!tabs.some(t=>t[0]===ui.campTab))ui.campTab='grupo';
+  const nLog=S.master?campLogs(c.id).filter(l=>(l.fim||0)>seenLogs(c.id)).length+allSheets().filter(s=>s.camp===c.id&&s.owner).reduce((a,s)=>a+Object.keys(s.pendentes||{}).length,0):0;
+  const nDoc=S.master?0:campDocs(c.id).filter(d=>(d.t||0)>num(store.get('mesa.docvisto.'+c.id))).length;
+  const tabs=S.master?[['grupo','Grupo'],['npcs','NPCs'],['diario','Diário'],['documentos','Documentos'],...(c.sys==='etmos'?[['particulas','Partículas']]:[]),['convites','Convites'],['registro','Registro'+(nLog?` <span class="cnt">${nLog}</span>`:'')],['notas','Notas do mestre']]:[['grupo','Minhas fichas'],['diario','Diário'],['documentos','Documentos'+(nDoc?` <span class="cnt">${nDoc}</span>`:'')]];if(!tabs.some(t=>t[0]===ui.campTab))ui.campTab='grupo';
   const banner=S.readOnlyMsg?`<div class="banner">${esc(S.readOnlyMsg)}</div>`:'';
   let body='';
   if(ui.campTab==='grupo')body=S.master?`<div class="row" style="margin-bottom:12px"><button class="btn primary" id="newPc">Nova ficha (sua)</button><button class="btn" data-newinv="pc">Convidar um jogador</button></div>
       ${pcs.length?`<div class="grid-cards">${pcs.map(s=>pcCard(s,c)).join('')}</div>`:'<div class="empty">Nenhum personagem ainda. Gere um convite para cada jogador na aba Convites.</div>'}`
     :`${pcs.length?`<div class="grid-cards">${pcs.map(s=>pcCard(s,c)).join('')}</div>`:'<div class="empty">Você ainda não tem fichas nesta mesa.</div>'}<p class="note" style="margin-top:12px">Para criar outra ficha, peça um novo convite ao mestre.</p>`;
-  else if(ui.campTab==='npcs')body=`<div class="row" style="margin-bottom:12px"><button class="btn primary" id="newNpc">Novo NPC</button><button class="btn" data-newinv="npc">Convite para criar um NPC</button><span class="note">NPCs que você cria só você vê; os criados por convite também ficam visíveis para quem os criou.</span></div>${npcs.length?`<div class="grid-cards">${npcs.map(s=>pcCard(s,c)).join('')}</div>`:'<div class="empty">Nenhum NPC ainda.</div>'}`;
+  else if(ui.campTab==='npcs')body=`<div class="row" style="margin-bottom:12px"><button class="btn primary" id="newNpc">Novo NPC</button><button class="btn" id="genNpc">Gerar NPC</button><button class="btn" id="fromBest">Do bestiário</button><button class="btn" data-newinv="npc">Convite para criar um NPC</button><span class="note">NPCs que você cria só você vê; os criados por convite também ficam visíveis para quem os criou.</span></div>${npcs.length?`<div class="grid-cards">${npcs.map(s=>pcCard(s,c)).join('')}</div>`:'<div class="empty">Nenhum NPC ainda.</div>'}`;
   else if(ui.campTab==='convites')body=invitesView(c);
+  else if(ui.campTab==='particulas')body=partsView(c);
+  else if(ui.campTab==='diario')body=diaryView(c);
+  else if(ui.campTab==='documentos'){body=docsView(c);if(!S.master)store.set('mesa.docvisto.'+c.id,String(Date.now()));}
   else if(ui.campTab==='registro'){body=logsView(c);setSeenLogs(c.id);}
   else body=`<label class="field"><span>Anotações que só você lê: ganchos, segredos, cronologia da campanha.</span><textarea id="mNotes" rows="16" style="min-height:320px">${esc((S.notes[c.id]||{}).texto||'')}</textarea></label>`;
   app.innerHTML=`${banner}<span class="badge ${c.sys}">${esc(SYS[c.sys].n)}</span><h1 class="view">${esc(c.nome)}</h1>${c.desc?`<p class="lead">${esc(c.desc)}</p>`:''}
@@ -4112,7 +4168,8 @@ function viewCamp(app,c){lastCamp=c.id;try{sessionStorage.setItem('mesa.camp',c.
   const e=$('#editCamp');if(e)e.onclick=()=>campForm(c);
   const np=$('#newPc');if(np)np.onclick=()=>createSheet(c,'pc');const nn=$('#newNpc');if(nn)nn.onclick=()=>createSheet(c,'npc');
   for(const b of app.querySelectorAll('[data-newinv]'))b.onclick=()=>inviteForm(c,b.dataset.newinv);
-  bindInvites(app,c);bindLogs(app,c);
+  const gn=$('#genNpc');if(gn)gn.onclick=()=>npcGenerator(c);const fb=$('#fromBest');if(fb)fb.onclick=()=>bestPicker(c);
+  bindInvites(app,c);bindLogs(app,c);bindParts(app,c);bindDiary(app,c);bindDocs(app,c);
   const mn=$('#mNotes');if(mn)mn.oninput=()=>{setStatus('Alterações não salvas');saveNote(c.id,mn.value);};
   for(const b of app.querySelectorAll('[data-hp]'))b.onclick=()=>{const sh=findSheet(b.dataset.hp);if(!sh||!canEdit(sh))return;const [pv,mx]=hpOf(sh);setHpVal(sh,pv+num(b.dataset.d));queueSave(sh);render();};}
 /* master: own sheets and private NPCs. Player: only through an invite (inv = {id, tipo}). */
@@ -4126,6 +4183,140 @@ function openModal(html){$('#modalBox').innerHTML=html;$('#modal').hidden=false;
 function closeModal(){$('#modal').hidden=true;}
 $('#modal').addEventListener('click',e=>{if(e.target.id==='modal')closeModal();});window.addEventListener('keydown',e=>{if(e.key==='Escape'&&Mesa.view()==='fichas')closeModal();});
 function confirmBox(msg,ok){openModal(`<h2>Tem certeza?</h2><p>${esc(msg)}</p><div class="row" style="justify-content:flex-end"><button class="btn" data-close>Cancelar</button><button class="btn primary" id="cfOk" style="background:var(--bad);border-color:var(--bad)">Apagar</button></div>`);$('#cfOk').onclick=()=>{closeModal();ok();};}
+
+/* ================= SESSION DIARY ================= */
+const ymd=t=>{const d=new Date(t);return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');};
+const dmy=s=>s?s.split('-').reverse().join('/'):'';
+let diaryTimers={};
+function diaryView(c){
+  if(!S.master){const l=Object.values(S.resumos).filter(r=>r.camp===c.id).sort((a,b)=>(b.data||'').localeCompare(a.data||''));
+    return l.length?l.map(r=>`<article class="sess"><header><b>${esc(r.titulo||'Sessão')}</b><span class="note">${esc(dmy(r.data))}</span></header><p class="resumo">${esc(r.resumo||'')}</p></article>`).join(''):'<div class="empty">O mestre ainda não publicou resumos de sessão.</div>';}
+  const l=Object.values(S.diario).filter(r=>r.camp===c.id).sort((a,b)=>(b.data||'').localeCompare(a.data||'')||(b.criadoEm||0)-(a.criadoEm||0));
+  const rolls=campRolls(c.id),logs=campLogs(c.id);resolveNames([...new Set(rolls.map(r=>r.pid).concat(logs.map(x=>x.pid)))]);
+  const hm=t=>new Date(t).toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});
+  const item=(d,i)=>{const rs=rolls.filter(r=>ymd(r.t)===d.data),ls=logs.filter(x=>ymd(x.fim||x.inicio)===d.data);
+    return `<details class="sess" ${i===0||ui.openSess===d.id?'open':''} data-sid="${esc(d.id)}"><summary><b>${esc(d.titulo||'Sessão')}</b><span class="note">${esc(dmy(d.data))}${d.publicado?' · resumo publicado':''}</span></summary>
+      <div class="sessf"><label class="field"><span>Título</span><input data-ds="titulo" value="${esc(d.titulo||'')}"></label><label class="field"><span>Data</span><input type="date" data-ds="data" value="${esc(d.data||'')}"></label></div>
+      <label class="field"><span>Suas notas (só você vê)</span><textarea data-ds="notas" rows="6">${esc(d.notas||'')}</textarea></label>
+      <label class="field"><span>Resumo para os jogadores</span><textarea data-ds="resumo" rows="4">${esc(d.resumo||'')}</textarea></label>
+      <label class="check-line"><input type="checkbox" data-ds="publicado" ${d.publicado?'checked':''}> Mostrar este resumo aos jogadores (aba Diário deles)</label>
+      <details class="dur"><summary>Durante esta sessão: ${rs.length} rolagem(ns), ${ls.length} alteração(ões) nas fichas</summary>
+        ${rs.length?`<h4>Rolagens</h4><ul class="rolls">${rs.map(r=>`<li><span class="t">${hm(r.t)}</span><span class="w">${esc(r.pid===S.uid?'Você':S.names[r.pid]||'Jogador')}</span><span class="l">${esc(r.label)}</span><b class="${r.crit?'crit':r.fail?'fail':''}">${esc(String(r.total))}</b></li>`).join('')}</ul>`:''}
+        ${ls.length?`<h4>Alterações nas fichas</h4><ul class="rolls">${ls.map(x=>`<li><span class="t">${hm(x.fim||x.inicio)}</span><span class="w">${esc(S.names[x.pid]||'Jogador')}</span><span class="l">${esc((findSheet(x.ficha)||{}).nome||x.nome||'Ficha')}: ${esc((x.mudancas||[]).map(m=>m.k+(m.para!=null&&m.para!==''?' → '+m.para:'')).join('; ').slice(0,220))}</span></li>`).join('')}</ul>`:''}
+        ${!rs.length&&!ls.length?'<p class="note">Nada registrado nesse dia.</p>':''}</details>
+      <div class="row" style="justify-content:flex-end"><button class="btn small danger" data-sdel="${esc(d.id)}">Apagar sessão</button></div></details>`;};
+  return `<div class="row" style="margin-bottom:12px"><button class="btn primary" id="newSess">Nova sessão</button><span class="note">Notas por sessão, com as rolagens e as alterações das fichas do dia. O resumo pode ir para os jogadores.</span></div>
+    ${l.length?l.map(item).join(''):'<div class="empty">Nenhuma sessão ainda. Comece com “Nova sessão”.</div>'}`;}
+async function saveSession(d){const data=Object.assign({},d);delete data.id;try{await db.doc('diario/'+d.id).set(data);
+    if(d.publicado)await db.doc('resumos/'+d.id).set({camp:d.camp,titulo:d.titulo||'',data:d.data||'',resumo:d.resumo||''});else await db.doc('resumos/'+d.id).delete();setStatus('Salvo');}catch(e){setStatus('Erro ao salvar o diário',true);}}
+function bindDiary(app,c){const nb=app.querySelector('#newSess');
+  if(nb)nb.onclick=async()=>{if(S.mode!=='cloud'){toast('O diário precisa da página aberta pelo claude.ai.');return;}const n=Object.values(S.diario).filter(r=>r.camp===c.id).length+1;
+    const d={id:uid(),camp:c.id,titulo:'Sessão '+n,data:ymd(Date.now()),notas:'',resumo:'',publicado:false,criadoEm:Date.now()};S.diario[d.id]=d;ui.openSess=d.id;await saveSession(d);render();};
+  for(const box of app.querySelectorAll('details.sess[data-sid]')){const d=S.diario[box.dataset.sid];if(!d)continue;box.addEventListener('toggle',()=>{if(box.open)ui.openSess=d.id;});
+    for(const el of box.querySelectorAll('[data-ds]'))el.addEventListener(el.type==='checkbox'||el.type==='date'?'change':'input',()=>{d[el.dataset.ds]=el.type==='checkbox'?el.checked:el.value;setStatus('Alterações não salvas');
+      clearTimeout(diaryTimers[d.id]);diaryTimers[d.id]=setTimeout(()=>saveSession(d),el.type==='checkbox'?0:700);if(el.type==='checkbox'||el.type==='date')setTimeout(render,50);});}
+  for(const b of app.querySelectorAll('[data-sdel]'))b.onclick=()=>confirmBox('Apagar esta sessão do diário? As rolagens e o registro continuam guardados.',async()=>{const id=b.dataset.sdel;delete S.diario[id];render();try{await db.doc('diario/'+id).delete();await db.doc('resumos/'+id).delete();}catch(e){}});}
+
+/* ================= DOCUMENTS FOR PLAYERS ================= */
+function campDocs(cid){const out=Object.values(S.docs).filter(d=>d.camp===cid).map(d=>Object.assign({para:'todos'},d));for(const m of Object.values(S.pdocs))for(const d of Object.values(m||{}))if(d.camp===cid)out.push(d);return out.sort((a,b)=>(b.t||0)-(a.t||0));}
+function docCard(d,master){return `<article class="doc"><header><b>${esc(d.titulo||'Documento')}</b><span class="note">${new Date(d.t||0).toLocaleString('pt-BR',{dateStyle:'short',timeStyle:'short'})}${master?' · para '+esc(d.para==='todos'?'todos':S.names[d.pid]||'jogador'):''}</span>${master?`<button class="btn small danger" data-ddel="${esc(d.pid||'')}|${esc(d.id)}" style="margin-left:auto">Apagar</button>`:''}</header>
+  ${d.img?`<button class="docimg" data-dimg="${esc(d.pid||'')}|${esc(d.id)}" aria-label="Ampliar imagem"><img src="${esc(d.img)}" alt=""></button>`:''}${d.texto?`<p class="resumo">${esc(d.texto)}</p>`:''}</article>`;}
+function docsView(c){const l=campDocs(c.id);
+  if(!S.master)return l.length?l.map(d=>docCard(d,false)).join(''):'<div class="empty">Nenhum documento recebido ainda.</div>';
+  const players=[...new Set(allSheets().filter(s=>s.camp===c.id&&s.owner&&s.owner!==S.uid).map(s=>s.owner))];resolveNames(players);
+  return `<form class="card" id="docForm"><h3>Enviar documento</h3>
+    <label class="field"><span>Título</span><input id="dTit" placeholder="Ex.: Carta lacrada do Barão" required></label>
+    <label class="field"><span>Texto</span><textarea id="dTxt" rows="5" placeholder="O que os jogadores leem"></textarea></label>
+    <label class="field"><span>Imagem (opcional)</span><input id="dImg" type="file" accept="image/*"></label>
+    <label class="field"><span>Para</span><select id="dPara"><option value="todos">Todos os jogadores da campanha</option>${players.map(pid=>`<option value="${esc(pid)}">${esc(S.names[pid]||'Jogador')} (${esc(allSheets().filter(s=>s.owner===pid&&s.camp===c.id).map(s=>s.nome).join(', '))})</option>`).join('')}</select></label>
+    <div class="row"><button class="btn primary" type="submit">Enviar</button><span class="note" id="dMsg"></span></div></form>
+    <h3 class="subh">Enviados</h3>${l.length?l.map(d=>docCard(d,true)).join(''):'<div class="empty">Nenhum documento enviado.</div>'}`;}
+function shrinkImage(file){return new Promise((res,rej)=>{const img=new Image();const url=URL.createObjectURL(file);img.onload=()=>{URL.revokeObjectURL(url);let w=img.naturalWidth,h=img.naturalHeight,max=1400,q=.85,out='';
+    for(let k=0;k<8;k++){const sc=Math.min(1,max/Math.max(w,h));const cv=document.createElement('canvas');cv.width=Math.round(w*sc);cv.height=Math.round(h*sc);const g=cv.getContext('2d');g.fillStyle='#fff';g.fillRect(0,0,cv.width,cv.height);g.drawImage(img,0,0,cv.width,cv.height);
+      out=cv.toDataURL('image/jpeg',q);if(out.length<280000)return res(out);max=Math.round(max*.8);q=Math.max(.5,q-.07);}rej(new Error('grande'));};img.onerror=()=>{URL.revokeObjectURL(url);rej(new Error('formato'));};img.src=url;});}
+function bindDocs(app,c){const f=app.querySelector('#docForm');
+  if(f)f.onsubmit=async e=>{e.preventDefault();if(S.mode!=='cloud'){toast('Documentos precisam da página aberta pelo claude.ai.');return;}const msg=$('#dMsg');
+    const d={camp:c.id,titulo:$('#dTit').value.trim(),texto:$('#dTxt').value.trim(),t:Date.now()};if(!d.titulo){$('#dTit').focus();return;}
+    const file=$('#dImg').files[0];if(file){msg.textContent='Preparando a imagem…';try{d.img=await shrinkImage(file);}catch(err){msg.textContent='';toast('Não consegui usar essa imagem. Tente um JPG ou PNG menor.');return;}}
+    const para=$('#dPara').value,id=uid();msg.textContent='Enviando…';
+    try{if(para==='todos')await db.doc('documentos/'+id).set(d);else{d.para=para;await db.doc('pjs/'+para+'/docs/'+id).set(d);}toast('Documento enviado.');render();}catch(err){msg.textContent='';toast('Não foi possível enviar agora.');}};
+  for(const b of app.querySelectorAll('[data-ddel]'))b.onclick=()=>confirmBox('Apagar este documento? Os jogadores deixam de vê-lo.',async()=>{const [pid,id]=b.dataset.ddel.split('|');try{if(pid){await db.doc('pjs/'+pid+'/docs/'+id).delete();delete (S.pdocs[pid]||{})[id];}else{await db.doc('documentos/'+id).delete();delete S.docs[id];}}catch(e){}render();});
+  for(const b of app.querySelectorAll('[data-dimg]'))b.onclick=()=>{const img=b.querySelector('img');openModal(`<img src="${esc(img.src)}" alt="" style="width:100%;border-radius:8px"><div class="row" style="justify-content:flex-end"><button class="btn" data-close>Fechar</button></div>`);};}
+
+/* ================= BESTIARY AND NPC GENERATOR ================= */
+const NPCGEN={
+  nomes:{dnd:['Aldric','Brienne','Corvin','Dagna','Elric','Fenna','Gorim','Hilde','Isolde','Jorund','Kaela','Lothar','Mirela','Nyx','Orsik','Petra','Quillon','Rurik','Sefa','Tamsin','Ulric','Vesna','Wendel','Ysolde','Zarek','Bram','Edda','Tobin','Maela','Cassian'],
+    dnds:['da Ponte Velha','Ferro-Negro','das Brumas','Pedra-Funda','o Manco','Martelo-Rubro','de Valdren','Sete-Ventos','Corvo-Cinzento','das Cinzas'],
+    mod:['Ana','Bruno','Carla','Diego','Elisa','Fábio','Giovana','Heitor','Isabela','João','Karina','Lucas','Marina','Nelson','Olívia','Paulo','Raquel','Sérgio','Tatiane','Vítor','Yara','Rafael','Lívia','Otávio','Bianca'],
+    mods:['Albuquerque','Barreto','Cavalcanti','Duarte','Esteves','Fontana','Guimarães','Holanda','Lacerda','Moraes','Nogueira','Pacheco','Queiroz','Ramos','Siqueira','Teixeira','Valadares']},
+  pers:['desconfiado de forasteiros','fala demais quando está nervoso','gentil, mas esconde algo','ambicioso e calculista','supersticioso','leal até o fim a quem o ajudou','ri das próprias piadas','cansado e de poucas palavras','curioso como uma criança','arrogante com quem acha inferior','medroso, mas honesto','coleciona fofocas'],
+  apar:['cicatriz atravessando a sobrancelha','roupas remendadas e limpas','anéis demais nos dedos','olhos fundos de quem não dorme','tatuagem antiga no pescoço','sempre de luvas','voz rouca e baixa','manca de uma perna','sorriso com um dente de ouro','cabelo grisalho preso em trança','óculos rachados','cheiro forte de ervas'],
+  mot:['pagar uma dívida antiga','proteger a família','vingar um amigo','ficar rico rápido','descobrir a verdade sobre um sumiço','fugir da cidade','ganhar o respeito de alguém','manter um segredo enterrado','encontrar um objeto perdido','subir de posição'],
+  seg:['deve dinheiro a gente perigosa','viu algo que não devia','trabalha para um rival dos personagens','não é quem diz ser','tem um parente envolvido com o sobrenatural','roubou o que carrega','sabe onde está a passagem escondida','está sendo chantageado'],
+  perfis:{dnd:[['Plebeu',{ca:10,pv:4,atr:{for:10,des:10,con:10,int:10,sab:10,car:10},ataques:[{nome:'Porrete',bonus:'2',dano:'1d4'}]}],['Guarda',{ca:16,pv:11,atr:{for:13,des:12,con:12,int:10,sab:11,car:10},ataques:[{nome:'Lança',bonus:'3',dano:'1d6+1'}]}],
+      ['Bandido',{ca:12,pv:11,atr:{for:11,des:12,con:12,int:10,sab:10,car:10},ataques:[{nome:'Cimitarra',bonus:'3',dano:'1d6+1'},{nome:'Besta leve',bonus:'3',dano:'1d8+1'}]}],['Veterano',{ca:17,pv:58,atr:{for:16,des:13,con:14,int:10,sab:11,car:10},ataques:[{nome:'Espada longa',bonus:'5',dano:'1d8+3'}]}],
+      ['Mago',{ca:12,pv:40,atr:{for:9,des:14,con:11,int:17,sab:12,car:11},ataques:[{nome:'Adaga',bonus:'5',dano:'1d4+2'}]}],['Cavaleiro',{ca:18,pv:52,atr:{for:16,des:11,con:14,int:11,sab:11,car:15},ataques:[{nome:'Montante',bonus:'5',dano:'2d6+3'}]}]],
+    op:[['Civil',{classe:'especialista',nex:5,atr:{agi:1,for:1,int:1,pre:1,vig:1}}],['Agente da Ordem',{classe:'combatente',nex:25,atr:{agi:2,for:2,int:1,pre:1,vig:2}}],['Cultista',{classe:'ocultista',nex:20,atr:{agi:1,for:1,int:2,pre:3,vig:1}}],['Investigador',{classe:'especialista',nex:35,atr:{agi:2,for:1,int:3,pre:2,vig:1}}],['Líder de culto',{classe:'ocultista',nex:60,atr:{agi:2,for:1,int:3,pre:4,vig:2}}]],
+    etmos:[['Estudante',{nivel:1,atr:{corpo:2,alma:2,mente:2},complex:1}],['Monitor',{nivel:3,atr:{corpo:3,alma:3,mente:3},complex:2}],['Professor',{nivel:6,atr:{corpo:2,alma:4,mente:5},complex:4}],['Guardião',{nivel:5,atr:{corpo:5,alma:3,mente:2},complex:3}]]}};
+const pick=a=>a[Math.floor(Math.random()*a.length)];
+function genNpc(sys,perfil){const P=NPCGEN.perfis[sys];const pf=P.find(x=>x[0]===perfil)||pick(P);
+  const nome=sys==='dnd'?pick(NPCGEN.nomes.dnd)+' '+pick(NPCGEN.nomes.dnds):pick(NPCGEN.nomes.mod)+' '+pick(NPCGEN.nomes.mods);
+  return {nome,perfil:pf[0],pers:pick(NPCGEN.pers),apar:pick(NPCGEN.apar),mot:pick(NPCGEN.mot),seg:pick(NPCGEN.seg),st:clone(pf[1])};}
+function npcFromGen(c,g){const sh=c.sys==='op'?newOp():c.sys==='etmos'?newEtmos():newDnd();sh.nome=g.nome;
+  if(c.sys==='dnd'){Object.assign(sh,{classe:g.perfil,ca:g.st.ca,pvMax:g.st.pv,pv:g.st.pv,atr:g.st.atr,ataques:g.st.ataques,personalidade:g.pers,aparencia:g.apar,ideais:g.mot,notas:'Segredo: '+g.seg});}
+  else if(c.sys==='op'){Object.assign(sh,{classe:g.st.classe,nex:g.st.nex,atr:g.st.atr,trilha:g.perfil,personalidade:g.pers,aparencia:g.apar,objetivo:g.mot,notas:'Segredo: '+g.seg});sh.pv=opMax(sh,'pv');sh.pe=opMax(sh,'pe');sh.san=opMax(sh,'san');sh._mx={pv:sh.pv,pe:sh.pe,san:sh.san};}
+  else Object.assign(sh,{nivel:g.st.nivel,atr:g.st.atr,complex:g.st.complex,basico:g.perfil+'. '+g.pers+'.',aparencia:g.apar,futuro:g.mot,pontos:'Segredo: '+g.seg});
+  return sh;}
+function addNpc(c,sh){sh.id=uid();sh.camp=c.id;sh.kind='npc';sh.createdAt=Date.now();delete sh.owner;delete sh.tipo;delete sh.convite;delete sh.criacao;delete sh.pendentes;S.npcs[sh.id]=sh;logBase[sh.id]=clone(sh);queueSave(sh);location.hash='ficha-'+sh.id;}
+function npcGenerator(c){let perfil='';let g=genNpc(c.sys,perfil);
+  const show=()=>{openModal(`<h2>Gerar NPC</h2><label class="field"><span>Perfil</span><select id="gPerf"><option value="">Qualquer um</option>${NPCGEN.perfis[c.sys].map(p=>`<option ${perfil===p[0]?'selected':''}>${p[0]}</option>`).join('')}</select></label>
+    <div class="gen"><b>${esc(g.nome)}</b><span class="note">${esc(g.perfil)}</span><ul><li><span>Personalidade</span>${esc(g.pers)}</li><li><span>Aparência</span>${esc(g.apar)}</li><li><span>Quer</span>${esc(g.mot)}</li><li><span>Segredo</span>${esc(g.seg)}</li></ul></div>
+    <div class="row" style="justify-content:flex-end"><button class="btn" data-close>Cancelar</button><button class="btn" id="gAgain">Gerar outro</button><button class="btn primary" id="gUse">Criar este NPC</button></div>`);
+    $('#gPerf').onchange=e=>{perfil=e.target.value;g=genNpc(c.sys,perfil);show();};$('#gAgain').onclick=()=>{g=genNpc(c.sys,perfil);show();};$('#gUse').onclick=()=>{closeModal();addNpc(c,npcFromGen(c,g));toast('NPC criado. Ajuste o que quiser na ficha.');};};show();}
+async function saveToBest(sh){if(S.mode!=='cloud'){toast('O bestiário precisa da página aberta pelo claude.ai.');return;}const f=clone(sh);for(const k of ['id','camp','kind','owner','tipo','convite','criacao','pendentes','ultimas','createdAt','updatedAt'])delete f[k];
+  const ex=Object.values(S.bestiario).find(b=>b.nome===(sh.nome||'')&&b.sys===sh.sys);const id=ex?ex.id:uid();const d={sys:sh.sys,nome:sh.nome||'NPC',ficha:f,salvoEm:Date.now()};
+  try{await db.doc('bestiario/'+id).set(d);S.bestiario[id]=Object.assign({id},d);toast(ex?'Bestiário atualizado.':'Salvo no bestiário. Use em qualquer campanha do mesmo sistema.');}catch(e){toast('Não foi possível salvar no bestiário.');}}
+function bestPicker(c){const l=Object.values(S.bestiario).filter(b=>b.sys===c.sys).sort((a,b)=>a.nome.localeCompare(b.nome,'pt-BR'));
+  openModal(`<h2>Do bestiário</h2>${l.length?`<div class="bestl">${l.map(b=>`<div class="bestit"><b>${esc(b.nome)}</b><button class="btn small primary" data-buse="${esc(b.id)}">Usar nesta campanha</button></div>`).join('')}</div>`:`<p class="note">Nenhum NPC de ${esc(SYS[c.sys].n)} no bestiário. Abra a ficha de um NPC e use “Salvar no bestiário”.</p>`}
+    <div class="row" style="justify-content:flex-end"><button class="btn" data-close>Fechar</button></div>`);
+  for(const b of R.querySelectorAll('[data-buse]'))b.onclick=()=>{const it=S.bestiario[b.dataset.buse];closeModal();addNpc(c,clone(it.ficha));toast('Cópia criada nesta campanha.');};}
+function bestHome(){const l=Object.values(S.bestiario).sort((a,b)=>a.nome.localeCompare(b.nome,'pt-BR'));
+  return `<h2 class="subh" style="margin-top:30px;font-size:24px">Bestiário</h2><p class="note">NPCs guardados para reaproveitar em qualquer campanha do mesmo sistema. Só você vê.</p>
+    ${l.length?`<div class="bestl">${l.map(b=>`<div class="bestit"><span class="badge ${b.sys}">${esc(SYS[b.sys]?SYS[b.sys].n:b.sys)}</span><b>${esc(b.nome)}</b><button class="btn small danger" data-bdel="${esc(b.id)}">Apagar</button></div>`).join('')}</div>`:'<div class="empty">Vazio. Na ficha de um NPC, use “Salvar no bestiário”.</div>'}`;}
+function bindBestHome(app){for(const b of app.querySelectorAll('[data-bdel]'))b.onclick=()=>confirmBox('Apagar este NPC do bestiário? As cópias já usadas nas campanhas continuam.',async()=>{const id=b.dataset.bdel;delete S.bestiario[id];render();try{await db.doc('bestiario/'+id).delete();}catch(e){}});}
+
+/* ================= ETMOS: PARTICLES OF THE TABLE ================= */
+function partsView(c){const l=c.particulas||[];
+  return `<div class="row" style="margin-bottom:10px"><button class="btn primary" id="newPart">Nova partícula</button><span class="note">Elas entram no grimório dos jogadores desta campanha, ao lado das oficiais.</span></div>
+    ${l.length?`<div class="cparts">${l.map(p=>`<article class="cpart"><span class="cpgl">${glyph(p.id,'gl')}</span><div><b>${esc(etSil(p.id))}</b><span>${esc(p.n)}</span><small>${esc((ETMOS.grupos.find(g=>g[0]===p.g)||['',''])[1])}${p.nv?` · ${p.nv}º nível`:''}</small></div>
+      <button class="btn small" data-pedit="${esc(p.id)}">Editar</button><button class="btn small danger" data-pdel="${esc(p.id)}">Apagar</button></article>`).join('')}</div>`:'<div class="empty">Nenhuma partícula da mesa ainda.</div>'}`;}
+function bindParts(app,c){const nb=app.querySelector('#newPart');if(nb)nb.onclick=()=>partForm(c);
+  for(const b of app.querySelectorAll('[data-pedit]'))b.onclick=()=>partForm(c,(c.particulas||[]).find(p=>p.id===b.dataset.pedit));
+  for(const b of app.querySelectorAll('[data-pdel]'))b.onclick=()=>confirmBox('Apagar esta partícula? Ela some do grimório dos jogadores; palavras antigas com ela mostram “Partícula removida”.',async()=>{c.particulas=(c.particulas||[]).filter(p=>p.id!==b.dataset.pdel);await saveCamp(c);render();});}
+function partForm(c,old){const p=old?clone(old):{id:'X'+tok().slice(0,10),sil:'',n:'',g:'func',nv:0,d:'',hifen:false};let strokes=p.strokes?clone(p.strokes):[];
+  openModal(`<h2>${old?'Editar partícula':'Nova partícula da mesa'}</h2>
+    <div class="pform"><div class="pad-wrap"><canvas id="pPad" width="400" height="400" aria-label="Área para desenhar o símbolo"></canvas><div class="row"><button type="button" class="btn small" id="pUndo">Desfazer traço</button><button type="button" class="btn small" id="pClear">Limpar</button></div><small class="note">Desenhe o símbolo com o dedo ou o mouse.</small></div>
+    <div class="pfields"><label class="field"><span>Sílaba (o que se pronuncia)</span><input id="pSil" value="${esc(p.sil)}" placeholder="Ex.: Zor" maxlength="8" autocomplete="off"></label>
+      <label class="field"><span>Significado</span><input id="pN" value="${esc(p.n)}" placeholder="Ex.: Cristal"></label>
+      <label class="field"><span>Tipo</span><select id="pG">${ETMOS.grupos.map(([g,n])=>`<option value="${g}" ${p.g===g?'selected':''}>${n}</option>`).join('')}</select></label>
+      <label class="field" id="pNvF"><span>Nível (complementos)</span><select id="pNv">${[1,2,3,4].map(n=>`<option ${num(p.nv)===n?'selected':''}>${n}</option>`).join('')}</select></label>
+      <label class="check-line"><input type="checkbox" id="pHif" ${p.hifen?'checked':''}> Escrita com hífen (se apoia na próxima)</label></div></div>
+    <p class="note" id="pErr" style="color:var(--bad)"></p>
+    <div class="row" style="justify-content:flex-end"><button class="btn" data-close>Cancelar</button><button class="btn primary" id="pOk">Salvar</button></div>`);
+  const cv=$('#pPad'),g=cv.getContext('2d');const dark=getComputedStyle(HOST).getPropertyValue('--fg');
+  const draw=()=>{g.clearRect(0,0,400,400);g.strokeStyle=dark||'#2b1830';g.lineWidth=24;g.lineCap='round';g.lineJoin='round';for(const st of strokes){g.beginPath();st.forEach(([x,y],i)=>i?g.lineTo(x*2,y*2):g.moveTo(x*2,y*2));if(st.length===1)g.lineTo(st[0][0]*2+.1,st[0][1]*2);g.stroke();}};
+  const pt=e=>{const r=cv.getBoundingClientRect();return [clamp(Math.round((e.clientX-r.left)/r.width*200),0,200),clamp(Math.round((e.clientY-r.top)/r.height*200),0,200)];};
+  let cur=null;cv.onpointerdown=e=>{e.preventDefault();cv.setPointerCapture(e.pointerId);cur=[pt(e)];strokes.push(cur);draw();};
+  cv.onpointermove=e=>{if(!cur)return;const q=pt(e),l=cur[cur.length-1];if(Math.hypot(q[0]-l[0],q[1]-l[1])>=3){cur.push(q);draw();}};
+  cv.onpointerup=cv.onpointercancel=()=>{cur=null;};
+  $('#pUndo').onclick=()=>{strokes.pop();draw();};$('#pClear').onclick=()=>{strokes=[];draw();};
+  const nvf=()=>{$('#pNvF').hidden=$('#pG').value!=='comp';};$('#pG').onchange=nvf;nvf();draw();
+  $('#pOk').onclick=async()=>{const sil=$('#pSil').value.trim(),n=$('#pN').value.trim(),err=$('#pErr');
+    if(!/^[A-Za-zÀ-ÿ]{1,8}$/.test(sil)){err.textContent='A sílaba precisa ter de 1 a 8 letras, sem espaços.';return;}
+    const up=sil.toUpperCase();if(ET_ALL[up]||(c.particulas||[]).some(q=>q.id!==p.id&&q.sil.toUpperCase()===up)){err.textContent='Já existe uma partícula com essa sílaba.';return;}
+    if(!n){err.textContent='Escreva o significado.';return;}if(!strokes.length){err.textContent='Desenhe o símbolo.';return;}
+    p.sil=sil;p.n=n;p.g=$('#pG').value;p.nv=p.g==='comp'?num($('#pNv').value):0;p.hifen=$('#pHif').checked;p.strokes=strokes;p.d=strokes.map(st=>'M'+st.map(q=>q.join(' ')).join('L')+(st.length===1?'l.1 0':'')).join('');
+    c.particulas=(c.particulas||[]).filter(q=>q.id!==p.id).concat([p]);closeModal();await saveCamp(c);toast(old?'Partícula atualizada.':'Partícula criada.');render();};}
 
 /* ================= INVITES (one link = one sheet) ================= */
 const inviteLink=id=>APP_URL+'#convite-'+id;
@@ -4199,10 +4390,11 @@ function viewInvite(app,id){crumbs([['Convite','#convite-'+id]]);
    Edits close together form one entry, keeping each field's first old value and latest new value. */
 const clone=o=>JSON.parse(JSON.stringify(o));
 const logBase={},logSess={};
-const LOG_SKIP=new Set(['updatedAt','_mx','id','owner','kind','criacao','criadaEm','convite','tipo','camp','createdAt','ultimas']);
+const LOG_SKIP=new Set(['updatedAt','_mx','id','owner','kind','criacao','criadaEm','convite','tipo','camp','createdAt','ultimas','pendentes']);
+const same=(a,b)=>JSON.stringify(a)===JSON.stringify(b);
 function flatLog(o,pre,out){for(const [k,v] of Object.entries(o||{})){if(!pre&&LOG_SKIP.has(k))continue;const p=pre?pre+'.'+k:k;
-    if(Array.isArray(v)&&v.every(x=>x==null||typeof x!=='object'))out[p]=v.join(', ');else if(v&&typeof v==='object')flatLog(v,p,out);else out[p]=v;}return out;}
-const fmtV=v=>v===true?'sim':v===false?'não':v==null||v===''?'—':String(v).length>90?String(v).slice(0,88)+'…':String(v);
+    if(Array.isArray(v)&&v.every(x=>x==null||typeof x!=='object'))out[p]=v.slice();else if(v&&typeof v==='object')flatLog(v,p,out);else out[p]=v;}return out;}
+const fmtV=v=>Array.isArray(v)?(v.length?fmtV(v.join(', ')):'—'):v===true?'sim':v===false?'não':v==null||v===''?'—':String(v).length>90?String(v).slice(0,88)+'…':String(v);
 const LBL={nome:'Nome',jogador:'Jogador',classe:'Classe',subclasse:'Subclasse',nivel:'Nível',especie:'Espécie',antecedente:'Antecedente',alinhamento:'Alinhamento',xp:'XP',cor:'Cor',
   inspiracao:'Inspiração',ca:'CA',iniB:'Bônus de iniciativa',desloc:'Deslocamento',pvMax:'PV máximo',pv:'PV',pvTemp:'PV temporários',dv:'Dados de vida',dvUsados:'Dados de vida usados',conjAtr:'Atributo de conjuração',
   tracos:'Características e talentos',profs:'Proficiências e idiomas',personalidade:'Personalidade',ideais:'Ideais',vinculos:'Vínculos',defeitos:'Defeitos',aparencia:'Aparência',historia:'História',notas:'Notas',cond:'Condições',
@@ -4218,19 +4410,48 @@ function labelFor(sh,path){const sys=SYS[sh.sys]||DND;const ps=path.split('.');c
   if(a==='moedas')return 'Moedas ('+String(b).toUpperCase()+')';
   if(/^\d+$/.test(b||''))return `${LBL[a]||a} ${num(b)+1}${c?' · '+(SUB[c]||c):''}`;
   return (LBL[a]||a)+(b?' · '+(SUB[b]||b):'');}
+/* fields a player changes only with the master's approval (campaign setting, on by default) */
+const PROT={dnd:/^(atr\.|nivel$|classe$|subclasse$|pvMax$|ca$|xp$|salv\.|per\.)/,op:/^(atr\.|nex$|classe$|trilha$|patente$|per\.|pvAj$|peAj$|sanAj$|defB$)/,etmos:/^(atr\.|nivel$|parts\.|complex$|marcos\.)/};
+function isProt(sh,k){if(S.master||S.mode!=='cloud'||sh.owner!==S.uid||sh.criacao==='rascunho')return false;const c=S.camps[sh.camp];if(c&&c.aprovacao===false)return false;return !!(PROT[sh.sys]&&PROT[sh.sys].test(k));}
+let propToast=0;
+function propose(sh,k,val){const old=getP(sh,k);sh.pendentes=sh.pendentes||{};if(same(val,old))delete sh.pendentes[k];else sh.pendentes[k]={de:old===undefined?null:old,para:val,t:Date.now()};
+  queueSave(sh);if(Date.now()-propToast>4000){propToast=Date.now();toast('Pedido enviado: o mestre precisa aprovar esta mudança.');}render();}
+/* every edit from the sheet goes through here */
+function setField(sh,k,v){if(isProt(sh,k)){propose(sh,k,v);return false;}setP(sh,k,v);return true;}
+async function decide(sh,keys,ok){const P=sh.pendentes||{};const ch=[];for(const k of keys){const p=P[k];if(!p)continue;
+    if(ok){const old=getP(sh,k);setP(sh,k,clone(p.para));afterSet(sh,k,p.para,old);}ch.push({k:labelFor(sh,k)+(ok?' (aprovado pelo mestre)':' (recusado pelo mestre)'),de:fmtV(p.de),para:fmtV(p.para)});delete P[k];}
+  if(!ch.length)return;queueSave(sh);writeLogFor(sh,ch,'aprovacao');toast(ok?'Aprovado.':'Recusado.');render();}
+function pendList(sh,master){const P=sh.pendentes||{};const ks=Object.keys(P);if(!ks.length)return '';
+  return `<div class="pendbar"><b>${master?'Pedidos de aprovação':'Aguardando aprovação do mestre'}</b><ul>${ks.map(k=>`<li><span class="k">${esc(labelFor(sh,k))}</span><span class="de">${esc(fmtV(P[k].de))}</span><span aria-hidden="true">→</span><span class="para">${esc(fmtV(P[k].para))}</span>
+    ${master?`<button type="button" class="btn small primary" data-appr="${esc(sh.id)}|${esc(k)}">Aprovar</button><button type="button" class="btn small" data-rej="${esc(sh.id)}|${esc(k)}">Recusar</button>`:`<button type="button" class="btn small" data-cancelp="${esc(k)}">Cancelar pedido</button>`}</li>`).join('')}</ul>
+    ${master&&ks.length>1?`<div class="row" style="justify-content:flex-end"><button type="button" class="btn small primary" data-apprall="${esc(sh.id)}">Aprovar tudo</button></div>`:''}</div>`;}
+function bindPend(root){
+  for(const b of root.querySelectorAll('[data-appr]'))b.onclick=()=>{const [id,k]=b.dataset.appr.split('|');const sh=findSheet(id);if(sh)decide(sh,[k],true);};
+  for(const b of root.querySelectorAll('[data-rej]'))b.onclick=()=>{const [id,k]=b.dataset.rej.split('|');const sh=findSheet(id);if(sh)decide(sh,[k],false);};
+  for(const b of root.querySelectorAll('[data-apprall]'))b.onclick=()=>{const sh=findSheet(b.dataset.apprall);if(sh)decide(sh,Object.keys(sh.pendentes||{}),true);};}
 function shouldLog(sh){return S.mode==='cloud'&&!S.master&&sh.owner===S.uid&&sh.criacao!=='rascunho';}
 function logChange(sh){if(!shouldLog(sh)){logBase[sh.id]=clone(sh);return;}
   const before=logBase[sh.id];logBase[sh.id]=clone(sh);if(!before)return;
   const A=flatLog(before,'',{}),B=flatLog(sh,'',{});const now=Date.now();
   let ss=logSess[sh.id];if(!ss||now-ss.last>3*60000)ss=logSess[sh.id]={id:uid(),inicio:now,last:now,ch:new Map()};ss.last=now;
-  for(const k of new Set([...Object.keys(A),...Object.keys(B)])){if(A[k]===B[k])continue;const e=ss.ch.get(k);if(e){e.para=fmtV(B[k]);if(e.para===e.de)ss.ch.delete(k);}else ss.ch.set(k,{k:labelFor(sh,k),de:fmtV(A[k]),para:fmtV(B[k])});}
+  for(const k of new Set([...Object.keys(A),...Object.keys(B)])){if(same(A[k],B[k]))continue;const e=ss.ch.get(k);
+    if(e){e.para=fmtV(B[k]);e.pv=B[k]===undefined?null:B[k];if(same(e.pv,e.dv))ss.ch.delete(k);}
+    else ss.ch.set(k,{k:labelFor(sh,k),de:fmtV(A[k]),para:fmtV(B[k]),p:k,dv:A[k]===undefined?null:A[k],pv:B[k]===undefined?null:B[k]});}
+  const PA=before.pendentes||{},PB=sh.pendentes||{};
+  for(const k of Object.keys(PB))if(!PA[k]||!same(PA[k].para,PB[k].para))ss.ch.set('ped:'+k,{k:labelFor(sh,k)+' (pedido de aprovação)',de:fmtV(PB[k].de),para:fmtV(PB[k].para)});
+  for(const k of Object.keys(PA))if(!PB[k]&&!same(getP(sh,k),PA[k].para))ss.ch.set('ped:'+k,{k:labelFor(sh,k)+' (pedido cancelado)',de:fmtV(PA[k].para),para:fmtV(PA[k].de)});
   const ub=(before.ultimas||[])[0],ua=(sh.ultimas||[])[0];if(ua&&(!ub||ua.t!==ub.t))ss.ch.set('conj:'+ua.t,{k:'Palavra conjurada',de:'',para:etWord(ua.seq)});
   if(!ss.ch.size)return;clearTimeout(ss.timer);ss.timer=setTimeout(()=>writeSess(sh,ss),1500);}
 async function writeSess(sh,ss){const list=[...ss.ch.values()];const doc={ficha:sh.id,nome:sh.nome||'',camp:sh.camp,inicio:ss.inicio,fim:ss.last,mudancas:list.slice(0,80),extra:Math.max(0,list.length-80)};
   try{await db.doc('pjs/'+S.uid+'/logs/'+ss.id).set(doc);}catch(e){}}
+async function writeLogFor(sh,mudancas,tipo){if(S.mode!=='cloud'||!sh.owner||sh.owner===S.uid)return;const t=Date.now();try{await db.doc('pjs/'+sh.owner+'/logs/'+uid()).set({ficha:sh.id,nome:sh.nome||'',camp:sh.camp,inicio:t,fim:t,tipo,mudancas});}catch(e){}}
 async function writeLogNow(sh,mudancas,tipo){if(S.mode!=='cloud'||S.master||sh.owner!==S.uid)return;const t=Date.now();
   try{await db.doc('pjs/'+S.uid+'/logs/'+uid()).set({ficha:sh.id,nome:sh.nome||'',camp:sh.camp,inicio:t,fim:t,tipo:tipo||'',mudancas});}catch(e){}}
 window.addEventListener('pagehide',()=>{for(const id in logSess){const ss=logSess[id];if(ss.timer){clearTimeout(ss.timer);const sh=findSheet(id);if(sh)writeSess(sh,ss);}}});
+async function saveRoll(r,sh){if(S.mode!=='cloud'||!S.uid)return;const camp=sh?sh.camp:lastCamp;if(!camp)return;
+  const d={camp,ficha:sh?sh.id:'',nome:sh?(sh.nome||''):'',label:r.label,total:r.total,detail:r.detail||'',t:Date.now()};if(r.crit)d.crit=true;if(r.fail)d.fail=true;
+  try{await db.doc('pjs/'+S.uid+'/rolagens/'+uid()).set(d);}catch(e){}}
+function campRolls(cid){const out=[];for(const m of Object.values(S.rolls))for(const r of Object.values(m||{}))if(r.camp===cid)out.push(r);return out.sort((a,b)=>(a.t||0)-(b.t||0));}
 function campLogs(cid){const out=[];for(const m of Object.values(S.logs))for(const l of Object.values(m||{}))if(l.camp===cid)out.push(l);return out.sort((a,b)=>(b.fim||0)-(a.fim||0));}
 const seenLogs=cid=>num(store.get('mesa.logvisto.'+cid));
 const setSeenLogs=cid=>store.set('mesa.logvisto.'+cid,String(Date.now()));
@@ -4238,12 +4459,24 @@ function logsView(c){const all=campLogs(c.id);const f=ui.logF&&ui.logF[c.id]||''
   resolveNames([...new Set(all.map(l=>l.pid))]).then(()=>{if(!S.names.__log&&all.length){S.names.__log=1;if(ui.campTab==='registro')render();}});
   const fichas=[...new Map(all.map(l=>[l.ficha,(findSheet(l.ficha)||{}).nome||l.nome])).entries()];
   const t=x=>new Date(x||0).toLocaleString('pt-BR',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'});
-  return `<div class="row" style="margin-bottom:12px"><label class="field" style="flex-direction:row;align-items:center;gap:8px"><span>Ficha</span><select id="logF"><option value="">Todas</option>${fichas.map(([id,n])=>`<option value="${esc(id)}" ${f===id?'selected':''}>${esc(n||'sem nome')}</option>`).join('')}</select></label>
+  const peds=allSheets().filter(s=>s.camp===c.id&&s.owner&&Object.keys(s.pendentes||{}).length);
+  return `<label class="check-line"><input type="checkbox" id="aprOn" ${c.aprovacao!==false?'checked':''}> Mudanças importantes dos jogadores (atributos, nível, classe, perícias${c.sys==='etmos'?', partículas':''}) precisam da minha aprovação</label>
+    ${peds.length?`<h3 class="subh">Pedidos de aprovação</h3>${peds.map(sh=>`<div class="pedcard"><div class="row" style="justify-content:space-between"><b>${esc(sh.nome||'Ficha')}</b><a class="btn small" href="#ficha-${sh.id}">Abrir ficha</a></div>${pendList(sh,true)}</div>`).join('')}<h3 class="subh">Alterações</h3>`:''}
+    <div class="row" style="margin-bottom:12px"><label class="field" style="flex-direction:row;align-items:center;gap:8px"><span>Ficha</span><select id="logF"><option value="">Todas</option>${fichas.map(([id,n])=>`<option value="${esc(id)}" ${f===id?'selected':''}>${esc(n||'sem nome')}</option>`).join('')}</select></label>
     <span class="note">Alterações que os jogadores fizeram nas próprias fichas depois de concluir a criação. Só você vê.</span></div>
     ${list.length?list.map(l=>{const sh=findSheet(l.ficha);return `<article class="logitem${(l.fim||0)>seen?' new':''}"><header><b>${esc((sh&&sh.nome)||l.nome||'Ficha')}</b><span class="note">por ${esc(S.names[l.pid]||'jogador')} · ${t(l.inicio)}${l.fim&&l.fim-l.inicio>60000?' – '+new Date(l.fim).toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'}):''}</span>${sh?`<a class="btn small" href="#ficha-${sh.id}" style="margin-left:auto">Abrir ficha</a>`:''}</header>
-      ${l.tipo==='criada'?'<p class="logc">Concluiu a criação da ficha.</p>':`<ul>${(l.mudancas||[]).map(m=>`<li><span class="k">${esc(m.k)}</span>${m.de!==''&&m.de!=null?`<span class="de">${esc(m.de)}</span><span aria-hidden="true">→</span>`:''}<span class="para">${esc(m.para)}</span></li>`).join('')}${l.extra?`<li class="note">e mais ${l.extra} alterações</li>`:''}</ul>`}</article>`;}).join('')
+      ${l.tipo==='criada'?'<p class="logc">Concluiu a criação da ficha.</p>':`${l.tipo==='aprovacao'?'<p class="logc">Decisão do mestre sobre pedidos de aprovação.</p>':''}<ul>${(l.mudancas||[]).map((m,i)=>`<li class="${m.revertido?'rev':''}"><span class="k">${esc(m.k)}</span>${m.de!==''&&m.de!=null?`<span class="de">${esc(m.de)}</span><span aria-hidden="true">→</span>`:''}<span class="para">${esc(m.para)}</span>${m.revertido?'<span class="tag-rev">desfeito</span>':(m.p&&sh?`<button class="btn small" data-undo="${esc(l.pid)}|${esc(l.id)}|${i}" style="margin-left:auto">Desfazer</button>`:'')}</li>`).join('')}${l.extra?`<li class="note">e mais ${l.extra} alterações</li>`:''}</ul>${sh&&(l.mudancas||[]).filter(m=>m.p&&!m.revertido).length>1?`<div class="row" style="justify-content:flex-end;margin-top:6px"><button class="btn small" data-undoall="${esc(l.pid)}|${esc(l.id)}">Desfazer tudo desta entrada</button></div>`:''}`}</article>`;}).join('')
       :'<div class="empty">Nenhuma alteração registrada ainda.</div>'}`;}
-function bindLogs(app,c){const s=app.querySelector('#logF');if(s)s.onchange=()=>{(ui.logF=ui.logF||{})[c.id]=s.value;render();};}
+function bindLogs(app,c){bindPend(app);const ap=app.querySelector('#aprOn');if(ap)ap.onchange=()=>{c.aprovacao=ap.checked;saveCamp(c);toast(ap.checked?'Aprovação ligada.':'Aprovação desligada: os jogadores mudam tudo direto.');};const s=app.querySelector('#logF');if(s)s.onchange=()=>{(ui.logF=ui.logF||{})[c.id]=s.value;render();};
+  const find=v=>{const [pid,lid]=v.split('|');return (S.logs[pid]||{})[lid];};
+  const undo=async(l,idx)=>{const sh=findSheet(l.ficha);if(!sh)return;const ch=[];
+    for(const i of idx){const m=l.mudancas[i];if(!m||!m.p||m.revertido)continue;const cur=getP(sh,m.p);
+      if(!same(cur,m.pv)&&!confirm(`“${m.k}” mudou de novo depois disso (agora: ${fmtV(cur)}). Desfazer mesmo assim?`))continue;
+      const old=getP(sh,m.p);setP(sh,m.p,clone(m.dv));afterSet(sh,m.p,m.dv,old);m.revertido=Date.now();ch.push({k:m.k+' (desfeito pelo mestre)',de:fmtV(m.pv),para:fmtV(m.dv)});}
+    if(!ch.length)return;queueSave(sh);const d=Object.assign({},l);delete d.id;delete d.pid;
+    try{await db.doc('pjs/'+l.pid+'/logs/'+l.id).set(d);}catch(e){toast('A ficha voltou, mas não consegui marcar o registro.');}toast(ch.length>1?`${ch.length} alterações desfeitas.`:'Alteração desfeita.');render();};
+  for(const b of app.querySelectorAll('[data-undo]'))b.onclick=()=>{const [pid,lid,i]=b.dataset.undo.split('|');const l=find(pid+'|'+lid);if(l)undo(l,[num(i)]);};
+  for(const b of app.querySelectorAll('[data-undoall]'))b.onclick=()=>{const l=find(b.dataset.undoall);if(l)undo(l,l.mudancas.map((_,i)=>i).reverse());};}
 
 /* ================= LINK WITH THE MAP ================= */
 let lastCamp=null;try{lastCamp=sessionStorage.getItem('mesa.camp');}catch(e){}
@@ -4275,28 +4508,30 @@ const F=(k,label,o={})=>`<label class="${o.cls||''}" style="display:flex;flex-di
 function viewSheet(app,sh){const camp=S.camps[sh.camp];crumbs([['Campanhas','#inicio']].concat(camp?[[camp.nome,'#campanha-'+camp.id]]:[]).concat([[sh.nome||'Ficha','#ficha-'+sh.id]]));
   const ro=!canEdit(sh);if(!S.master&&sh.owner!==S.uid){app.innerHTML='<div class="empty">Esta ficha não é sua.</div>';crumbs([['Campanhas','#inicio']]);return;}const tab=ui.sheetTab[sh.id]||(sh.sys==='etmos'?'personagem':'principal');const sc=HOST.scrollTop;
   const body=sh.sys==='op'?opSheet(sh,tab):sh.sys==='etmos'?etSheet(sh,tab):dndSheet(sh,tab);
-  app.innerHTML=`${S.readOnlyMsg?`<div class="banner">${esc(S.readOnlyMsg)}</div>`:''}<div id="sheetRoot" class="sheet ${sh.sys}">${sh.criacao==='rascunho'?(sh.owner===S.uid&&!S.master?`<div class="draftbar"><span><b>Ficha em criação.</b> Preencha com calma. Quando terminar, conclua: a partir daí o mestre acompanha cada alteração no registro.</span><button type="button" class="btn small" id="shDone">Concluir criação</button></div>`:'<div class="draftbar"><span><b>Em criação.</b> O jogador ainda não concluiu esta ficha.</span></div>'):''}${ro?'<div class="ro-note">Somente leitura: esta ficha é de outro jogador.</div>':''}<fieldset ${ro?'disabled':''}>${body}</fieldset>
-    <div class="tools"><span class="note" style="margin-right:auto;color:var(--sm)">${sh.kind==='npc'?'NPC · visível só para o mestre':''}</span>${window.Atlas&&Atlas.hasToken(sh.id)?'<button class="btn small" id="shMap">Mostrar no mapa</button>':''}<button class="btn small" id="shLink">Copiar link da ficha</button>${canEdit(sh)?'<button class="btn small danger" id="shDel">Apagar ficha</button>':''}</div></div>`;
+  app.innerHTML=`${S.readOnlyMsg?`<div class="banner">${esc(S.readOnlyMsg)}</div>`:''}<div id="sheetRoot" class="sheet ${sh.sys}">${pendList(sh,S.master)}${sh.criacao==='rascunho'?(sh.owner===S.uid&&!S.master?`<div class="draftbar"><span><b>Ficha em criação.</b> Preencha com calma. Quando terminar, conclua: a partir daí o mestre acompanha cada alteração no registro.</span><button type="button" class="btn small" id="shDone">Concluir criação</button></div>`:'<div class="draftbar"><span><b>Em criação.</b> O jogador ainda não concluiu esta ficha.</span></div>'):''}${ro?'<div class="ro-note">Somente leitura: esta ficha é de outro jogador.</div>':''}<fieldset ${ro?'disabled':''}>${body}</fieldset>
+    <div class="tools"><span class="note" style="margin-right:auto;color:var(--sm)">${sh.kind==='npc'?(sh.owner&&sh.owner!==S.uid?'NPC criado por convite · visível para você e para quem o criou':'NPC · visível só para o mestre'):''}</span>${window.Atlas&&Atlas.hasToken(sh.id)?'<button class="btn small" id="shMap">Mostrar no mapa</button>':''}${S.master&&sh.kind==='npc'?'<button class="btn small" id="shBest">Salvar no bestiário</button>':''}<button class="btn small" id="shLink">Copiar link da ficha</button>${canEdit(sh)?'<button class="btn small danger" id="shDel">Apagar ficha</button>':''}</div></div>`;
   HOST.scrollTop=sc;bindSheet($('#sheetRoot'),sh);}
 function bindSheet(root,sh){
   for(const el of root.querySelectorAll('[data-k]')){const k=el.dataset.k,v=getP(sh,k);if(el.type==='checkbox')el.checked=!!v;else el.value=v==null?'':v;
-    el.addEventListener(el.tagName==='SELECT'||el.type==='checkbox'||el.dataset.re?'change':'input',()=>{let val=el.type==='checkbox'?el.checked:el.dataset.t==='n'?num(el.value):el.value;const old=getP(sh,k);setP(sh,k,val);if(afterSet(sh,k,val,old)){queueSave(sh);render();return;}
+    const prot=isProt(sh,k);el.addEventListener(prot||el.tagName==='SELECT'||el.type==='checkbox'||el.dataset.re?'change':'input',()=>{let val=el.type==='checkbox'?el.checked:el.dataset.t==='n'?num(el.value):el.value;const old=getP(sh,k);if(prot){propose(sh,k,val);return;}setP(sh,k,val);if(afterSet(sh,k,val,old)){queueSave(sh);render();return;}
       if(el.dataset.re){queueSave(sh);render();return;}calc(root,sh);queueSave(sh);});}
   for(const b of root.querySelectorAll('.stabs button'))b.onclick=()=>{ui.sheetTab[sh.id]=b.dataset.t;render();};
-  for(const b of root.querySelectorAll('[data-cycle]'))b.onclick=()=>{const k=b.dataset.cycle,mx=num(b.dataset.max||2);const v=(num(getP(sh,k))+1)%(mx+1);setP(sh,k,v);b.dataset.v=v;b.setAttribute('aria-label',b.getAttribute('aria-label').replace(/:.*/,': '+['sem proficiência','proficiente','especialista'][v]));calc(root,sh);queueSave(sh);};
-  for(const b of root.querySelectorAll('[data-grau]'))b.onclick=()=>{const [k,i]=b.dataset.grau.split('|');const cur=num(getP(sh,k));const v=cur===num(i)?num(i)-1:num(i);setP(sh,k,Math.max(0,v));queueSave(sh);render();};
+  for(const b of root.querySelectorAll('[data-cycle]'))b.onclick=()=>{const k=b.dataset.cycle,mx=num(b.dataset.max||2);const v=(num(getP(sh,k))+1)%(mx+1);if(!setField(sh,k,v))return;b.dataset.v=v;b.setAttribute('aria-label',b.getAttribute('aria-label').replace(/:.*/,': '+['sem proficiência','proficiente','especialista'][v]));calc(root,sh);queueSave(sh);};
+  for(const b of root.querySelectorAll('[data-grau]'))b.onclick=()=>{const [k,i]=b.dataset.grau.split('|');const cur=num(getP(sh,k));const v=cur===num(i)?num(i)-1:num(i);if(!setField(sh,k,Math.max(0,v)))return;queueSave(sh);render();};
   for(const b of root.querySelectorAll('[data-add]'))b.onclick=()=>{const k=b.dataset.add;const arr=getP(sh,k)||[];arr.push(JSON.parse(b.dataset.tpl||'{}'));setP(sh,k,arr);queueSave(sh);render();};
   for(const b of root.querySelectorAll('[data-del]'))b.onclick=()=>{const [k,i]=b.dataset.del.split('|');const arr=getP(sh,k)||[];arr.splice(num(i),1);queueSave(sh);render();};
-  for(const b of root.querySelectorAll('[data-step]'))b.onclick=()=>{const k=b.dataset.step,lim=b.dataset.lim?num(getP(sh,b.dataset.lim))||(b.dataset.limf?calcVal(sh,b.dataset.limf):1e9):b.dataset.limf?calcVal(sh,b.dataset.limf):1e9;let v=num(getP(sh,k))+num(b.dataset.d);if(num(b.dataset.d)>0)v=Math.min(v,lim);if(b.dataset.floor!=null)v=Math.max(v,num(b.dataset.floor));setP(sh,k,v);
+  for(const b of root.querySelectorAll('[data-step]'))b.onclick=()=>{const k=b.dataset.step,lim=b.dataset.lim?num(getP(sh,b.dataset.lim))||(b.dataset.limf?calcVal(sh,b.dataset.limf):1e9):b.dataset.limf?calcVal(sh,b.dataset.limf):1e9;let v=num(getP(sh,k))+num(b.dataset.d);if(num(b.dataset.d)>0)v=Math.min(v,lim);if(b.dataset.floor!=null)v=Math.max(v,num(b.dataset.floor));if(!setField(sh,k,v))return;
     const inp=root.querySelector(`[data-k="${k}"]`);if(inp)inp.value=v;calc(root,sh);queueSave(sh);};
-  for(const b of root.querySelectorAll('[data-pip]'))b.onclick=()=>{const k=b.dataset.pip,i=num(b.dataset.i);const cur=num(getP(sh,k));setP(sh,k,Math.max(0,cur===i?i-1:i));queueSave(sh);render();};
+  for(const b of root.querySelectorAll('[data-pip]'))b.onclick=()=>{const k=b.dataset.pip,i=num(b.dataset.i);const cur=num(getP(sh,k));if(!setField(sh,k,Math.max(0,cur===i?i-1:i)))return;queueSave(sh);render();};
   for(const b of root.querySelectorAll('[data-cond]'))b.onclick=()=>{const c=b.dataset.cond;sh.cond=sh.cond||[];const i=sh.cond.indexOf(c);if(i>=0)sh.cond.splice(i,1);else sh.cond.push(c);b.setAttribute('aria-pressed',String(i<0));queueSave(sh);};
   for(const el of root.querySelectorAll('[data-roll]'))el.addEventListener('click',e=>{if(e.target.closest('input,select,button:not([data-roll])'))return;doRoll(sh,el.dataset.roll);});
   for(const el of root.querySelectorAll('[data-roll]'))el.addEventListener('keydown',e=>{if((e.key==='Enter'||e.key===' ')&&e.target===el){e.preventDefault();doRoll(sh,el.dataset.roll);}});
   for(const b of root.querySelectorAll('[data-cast]'))b.onclick=()=>{const r=sh.rituais[num(b.dataset.cast)];const c=num(r.custo);if(num(sh.pe)<c){toast('PE insuficiente para conjurar.');return;}sh.pe=num(sh.pe)-c;queueSave(sh);toast(`${r.nome||'Ritual'} conjurado: −${c} PE.`);render();};
   const dn=$('#shDone');if(dn)dn.onclick=()=>{sh.criacao='pronta';sh.criadaEm=Date.now();logBase[sh.id]=clone(sh);queueSave(sh);writeLogNow(sh,[{k:'Ficha concluída',para:sh.nome||''}],'criada');toast('Ficha concluída. O mestre foi avisado.');render();};
+  const sbb=$('#shBest');if(sbb)sbb.onclick=()=>saveToBest(sh);
   $('#shLink').onclick=()=>copyText(APP_URL+'#ficha-'+sh.id);const sm=$('#shMap');if(sm)sm.onclick=()=>Atlas.showToken(sh.id);const d=$('#shDel');if(d)d.onclick=()=>confirmBox(`Apagar a ficha “${sh.nome||'sem nome'}”? Isso não pode ser desfeito.`,async()=>{const cid=sh.camp;await removeSheet(sh);location.hash=cid?'campanha-'+cid:'inicio';render();});
   if(sh.sys==='etmos')bindEtmos(root,sh);
+  bindPend(root);for(const b of root.querySelectorAll('[data-cancelp]'))b.onclick=()=>{if(sh.pendentes)delete sh.pendentes[b.dataset.cancelp];queueSave(sh);render();};
   calc(root,sh);}
 /* rules that react to a field: ritual cost follows its circle, OP current values follow a raised maximum */
 function afterSet(sh,k,val,old){let m;if(sh.sys==='op'&&(m=k.match(/^rituais\.(\d+)\.circ$/))){const r=sh.rituais[num(m[1])];if(num(r.custo)===OP.custo[num(old)]||!r.custo)r.custo=OP.custo[num(val)];return true;}
@@ -4310,7 +4545,7 @@ function calcVal(sh,name){const [f,a]=name.split(':');
 function calc(root,sh){for(const el of root.querySelectorAll('[data-c]')){const v=calcVal(sh,el.dataset.c);el.textContent=el.dataset.fmt==='s'?sgn(v):el.dataset.fmt==='kg'?(Math.round(v*10)/10).toLocaleString('pt-BR')+' kg':v;}
   for(const el of root.querySelectorAll('[data-meter]')){const [cur,mx]=el.dataset.meter.split('|');const m=calcVal(sh,mx),f=m>0?clamp(num(getP(sh,cur))/m,0,1):0;el.firstElementChild.style.width=(f*100)+'%';}
   const cg=root.querySelector('[data-carga]');if(cg){const over=sh.sys==='op'?opEsp(sh)>opCarga(sh):dWeight(sh)>dCap(sh);cg.style.color=over?'var(--sa)':'';cg.textContent=over?'Sobrecarregado':'';}}
-function doRoll(sh,spec){const [f,a,b]=spec.split(':');const who=sh.nome||'Ficha';
+function doRoll(sh,spec){rollSheet=sh;const [f,a,b]=spec.split(':');const who=sh.nome||'Ficha';
   if(sh.sys==='op'){if(f==='atr')return rollOp(`${who} · ${OP.atrs.find(x=>x[0]===a)[1]}`,num(sh.atr[a]),0);if(f==='per'){const sk=OP.skills.find(x=>x[0]===a);return rollOp(`${who} · ${sk[1]}`,num(sh.atr[sk[2]]),opSkill(sh,a));}
     if(f==='atk'){const at=sh.ataques[num(a)];const sk=OP.skills.find(x=>x[0]===(at.per||'luta'))||OP.skills[15];return rollOp(`${who} · ${at.nome||'Ataque'}`,num(sh.atr[sk[2]]),opSkill(sh,sk[0])+num(at.bonus));}
     if(f==='dmg'){const at=sh.ataques[num(a)];return rollExpr(`${who} · dano de ${at.nome||'ataque'}`,at.dano);}return;}
@@ -4348,9 +4583,9 @@ function etSheet(sh,tab){
   else if(tab==='combate')b=etCombat(sh);
   else if(tab==='grimorio'){
     const known=Object.keys(sh.parts||{}).filter(k=>sh.parts[k]).length;
-    const col=g=>`<div class="box"><h4>${ETMOS.grupos.find(x=>x[0]===g)[1]}</h4><div class="eparts">${ETMOS.parts[g].map(([id,n,nv])=>`<label class="epart">${glyph(id)}<input type="checkbox" data-k="parts.${id}" data-re="1"><span><b>${esc(etSil(id))}</b> ${esc(n)}${nv?` <small>${nv}º nível</small>`:''}</span></label>`).join('')}</div></div>`;
+    const col=g=>`<div class="box"><h4>${ETMOS.grupos.find(x=>x[0]===g)[1]}</h4><div class="eparts">${partsFor(sh,g).map(([id,n,nv,cu])=>`<label class="epart">${glyph(id)}<input type="checkbox" data-k="parts.${id}" data-re="1"><span><b>${esc(etSil(id))}</b> ${esc(n)}${nv?` <small>${nv}º nível</small>`:''}${cu?' <small class="damesa">da mesa</small>':''}</span></label>`).join('')}</div></div>`;
     const saved=(sh.palavras||[]).map((w,i)=>`<div class="esaved"><div class="glrow">${w.seq.map(id=>glyph(id,'gls')).join('')}</div><div class="esw"><b>${esc(etWord(w.seq))}</b><input data-k="palavras.${i}.nota" placeholder="Para que serve" aria-label="Anotação da palavra"></div><button type="button" class="btn small" data-et-use="${i}">Usar no combate</button><button type="button" class="x" data-del="palavras|${i}" aria-label="Apagar palavra">×</button></div>`).join('');
-    b=`${Object.keys(glifos()).length?'':'<p class="banner" style="color:#2b1830">Os símbolos das partículas não carregaram nesta página; as sílabas aparecem no lugar deles.</p>'}<p class="note" style="margin:0 0 10px">Marque as partículas que o personagem conhece (${known} de ${Object.keys(ET_ALL).length}). Só elas aparecem no combate.</p>
+    b=`${Object.keys(glifos()).length?'':'<p class="banner" style="color:#2b1830">Os símbolos das partículas não carregaram nesta página; as sílabas aparecem no lugar deles.</p>'}<p class="note" style="margin:0 0 10px">Marque as partículas que o personagem conhece (${known} de ${ETMOS.grupos.reduce((a,[g])=>a+partsFor(sh,g).length,0)}). Só elas aparecem no combate.</p>
       <div class="egrim">${col('func')}${col('obj')}${col('car')}${col('comp')}</div>
       <div class="box" style="margin-top:12px"><h4>Palavras guardadas</h4>${saved||'<p class="note">Nenhuma ainda. Monte uma palavra no Combate e use “Guardar no grimório”.</p>'}</div>`;}
   else b=`<div class="grid2"><div class="box"><h4>Básico</h4><textarea data-k="basico" aria-label="Básico"></textarea></div><div class="box"><h4>Pontos de importância</h4><textarea data-k="pontos" aria-label="Pontos de importância"></textarea></div>
@@ -4359,11 +4594,11 @@ function etSheet(sh,tab){
     <div class="box" style="grid-column:1/-1"><h4>Futuro</h4><textarea data-k="futuro" aria-label="Futuro"></textarea></div></div>`;
   return head+tabs+`<div class="sbody">${b}</div>`;}
 function etCombat(sh){
-  const st=etState(sh.id),own=g=>ETMOS.parts[g].filter(p=>sh.parts&&sh.parts[p[0]]);const any=ETMOS.grupos.some(([g])=>own(g).length);
+  const st=etState(sh.id),own=g=>partsFor(sh,g).filter(p=>sh.parts&&sh.parts[p[0]]);const any=ETMOS.grupos.some(([g])=>own(g).length);
   const status=`<div class="estatus"><span>Fadiga: <b>${esc(etFad(sh))}</b></span><span>Ferimentos: <b>${num(sh.ferimentos)}/${etLimF(sh)}</b></span><span>Estresse: <b>${num(sh.estresse)}/${etLimE(sh)}</b></span><span>Complexidade máxima: <b>${ETMOS.complex[num(sh.complex)]}</b></span></div>`;
   if(st.done&&st.seq.length){const seq=st.seq,fad=num(sh.fadiga);
     return status+`<section class="ecast" aria-live="polite"><p class="lbl">Palavra conjurada</p><h2 class="etw">${esc(etWord(seq))}</h2>
-      <div class="ecast-gl">${seq.map(id=>`<figure>${glyph(id,'glb')}<figcaption><b>${esc(etSil(id))}</b><span>${esc(ET_ALL[id].n)}</span></figcaption></figure>`).join('<span class="plus" aria-hidden="true">·</span>')}</div>
+      <div class="ecast-gl">${seq.map(id=>`<figure>${glyph(id,'glb')}<figcaption><b>${esc(etSil(id))}</b><span>${esc(etInfo(id).n)}</span></figcaption></figure>`).join('<span class="plus" aria-hidden="true">·</span>')}</div>
       <p class="esyl">${seq.map(etSil).join(' · ')}</p>
       ${fad>=6?`<p class="ewarn">${etFad(sh)}: se a magia não for trivial, role 2d6 contra Corpo +${fad>=9?3:4}. <button type="button" class="btn small" id="etFadRoll">Rolar 2d6</button></p>`:''}
       <div class="row" style="justify-content:center"><button type="button" class="btn" data-et-again>Nova palavra</button><button type="button" class="btn" data-et-edit>Ajustar esta</button><button type="button" class="btn" data-et-keep>Guardar no grimório</button></div></section>`+etRecent(sh);}
@@ -4386,7 +4621,7 @@ function bindEtmos(root,sh){const st=etState(sh.id);
   on('[data-et-keep]',()=>{sh.palavras=sh.palavras||[];if(sh.palavras.some(w=>w.seq.join()===st.seq.join())){toast('Essa palavra já está no grimório.');return;}sh.palavras.push({seq:[...st.seq],nota:''});queueSave(sh);toast('Palavra guardada no grimório.');});
   on('[data-et-recall]',b=>{const w=(sh.ultimas||[])[num(b.dataset.etRecall)];if(!w)return;st.seq=[...w.seq];st.done=true;render();});
   on('[data-et-use]',b=>{const w=(sh.palavras||[])[num(b.dataset.etUse)];if(!w)return;st.seq=[...w.seq];st.done=false;ui.sheetTab[sh.id]='combate';render();});
-  on('#etFadRoll',()=>{const f=num(sh.fadiga)>=9?3:4,alvo=num(sh.atr.corpo)+f;rollExpr(`${sh.nome||'Ficha'} · 2d6 contra Corpo +${f} (até ${alvo} tá tranquilo)`,'2d6');});}
+  on('#etFadRoll',()=>{const f=num(sh.fadiga)>=9?3:4,alvo=num(sh.atr.corpo)+f;rollSheet=sh;rollExpr(`${sh.nome||'Ficha'} · 2d6 contra Corpo +${f} (até ${alvo} tá tranquilo)`,'2d6');});}
 /* ---------- D&D 5e ---------- */
 function dndSheet(sh,tab){
   const head=`<header class="dhead"><div class="dname"><span class="lbl">Nome do personagem</span><input data-k="nome" placeholder="Nome" aria-label="Nome do personagem"></div>

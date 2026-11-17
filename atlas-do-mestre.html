@@ -283,6 +283,8 @@ ol.steps{margin:8px 0 0;padding-left:20px;font-size:14px;line-height:1.5;color:v
         <div class="seg" id="fogModeSeg" style="margin-top:8px"><button data-m="reveal">Revelar</button><button data-m="hide">Esconder</button></div>
         <div class="row"><label for="fogBrush">Pincel</label><input type="range" id="fogBrush" min="1" max="30" value="4"><output id="fogBrushOut">4</output></div>
         <div class="actions" style="justify-content:flex-start;margin-top:6px"><button class="btn" id="fogAll">Revelar tudo</button><button class="btn" id="fogNone">Cobrir tudo</button></div>
+        <label class="check"><input type="checkbox" id="fogVis" checked> Revelar pela visão dos tokens</label>
+        <p class="note">Tokens com <b>Visão</b> (em Selecionar) abrem a névoa ao redor de si quando você os coloca ou move. O que já foi visto continua revelado.</p>
         <p class="note">Você vê a névoa translúcida; os jogadores, pela Mesa dos jogadores, veem só o que foi revelado. Ícones, rótulos e tokens debaixo da névoa não são enviados a eles.</p>
       </section>
       <section class="sec" id="secText" hidden>
@@ -2467,6 +2469,11 @@ function rebuildFog(){fogDirty=false;if(!map.fogOn){fogBig=null;return;}ensureFo
   b.globalCompositeOperation='source-in';const P=PAL[map.style];b.fillStyle=shade(P.paper,-.6);b.fillRect(0,0,W*S,H*S);
   b.globalCompositeOperation='source-atop';for(let i=0;i<W*H/2;i++){b.fillStyle=i%2?'rgba(0,0,0,.07)':'rgba(255,255,255,.04)';b.fillRect(hash(i,1,91)*W*S,hash(i,2,91)*H*S,1+hash(i,3,91)*2.5,1+hash(i,4,91)*2.5);}b.globalCompositeOperation='source-over';}
 function drawFog(ctx,W,H,player){if(!map.fogOn)return;if(fogDirty||!fogBig)rebuildFog();if(!fogBig)return;ctx.save();ctx.globalAlpha=player?1:.42;ctx.imageSmoothingEnabled=true;ctx.drawImage(fogBig,0,0,W,H);ctx.restore();}
+/* token vision: each token with "visao" (grid squares) clears the fog around it; explored stays revealed */
+function visionReveal(){if(!map||playerMode||!map.fogOn||map.fogVis===false)return false;let any=false;const gs=map.grid.type==='none'?3:map.grid.size;
+  for(const o of map.objects){if(o.kind!=='token'||!(o.visao>0)||o.secret)continue;if(!map.fog)ensureFog();const r=o.visao*gs,cx=o.x/CP,cy=o.y/CP;
+    for(let y=Math.max(0,Math.floor(cy-r));y<=Math.min(map.H-1,Math.ceil(cy+r));y++)for(let x=Math.max(0,Math.floor(cx-r));x<=Math.min(map.W-1,Math.ceil(cx+r));x++){const i=y*map.W+x;if(map.fog[i]!==1&&Math.hypot(x+.5-cx,y+.5-cy)<=r){map.fog[i]=1;any=true;}}}
+  if(any)fogDirty=true;return any;}
 function fogVisible(x,y){if(!map.fogOn||!map.fog)return true;const cx=clamp(Math.floor(x/CP),0,map.W-1),cy=clamp(Math.floor(y/CP),0,map.H-1);return map.fog[cy*map.W+cx]===1;}
 function fogStamp(wx,wy){const r=ui.fogBrush,cx=wx/CP,cy=wy/CP,v=ui.fogMode==='reveal'?1:0;ensureFog();for(let y=Math.floor(cy-r);y<=Math.ceil(cy+r);y++)for(let x=Math.floor(cx-r);x<=Math.ceil(cx+r);x++){
   if(x<0||y<0||x>=map.W||y>=map.H)continue;if(Math.hypot(x+.5-cx,y+.5-cy)<=r)map.fog[y*map.W+x]=v;}fogDirty=true;}
@@ -2478,6 +2485,7 @@ const TOKEN_SIZES=[[.5,'Miúdo'],[1,'Médio'],[2,'Grande'],[3,'Enorme'],[4,'Colo
 function gridPx(){return (map.grid.type==='none'?3:map.grid.size)*CP;}
 function tokenR(o){return Math.max(6,(o.size||1)*gridPx()*.46);}
 function drawToken(ctx,o,master){const r=tokenR(o),x=o.x,y=o.y,col=o.color||'#2f7fb0';ctx.save();
+  if(!playerMode&&o.visao>0&&ui.sels&&ui.sels.has(o.id)){const vr=o.visao*gridPx();ctx.save();ctx.strokeStyle='rgba(255,214,90,.9)';ctx.fillStyle='rgba(255,214,90,.08)';ctx.lineWidth=2/view.z;ctx.setLineDash([8/view.z,6/view.z]);ctx.beginPath();ctx.arc(x,y,vr,0,TAU);ctx.fill();ctx.stroke();ctx.restore();}
   ctx.fillStyle='rgba(0,0,0,.35)';ctx.beginPath();ctx.ellipse(x+r*.12,y+r*.2,r*1.02,r*.98,0,0,TAU);ctx.fill();
   const g=ctx.createRadialGradient(x-r*.35,y-r*.4,r*.1,x,y,r);g.addColorStop(0,shade(col,.35));g.addColorStop(1,shade(col,-.28));ctx.fillStyle=g;ctx.beginPath();ctx.arc(x,y,r,0,TAU);ctx.fill();
   ctx.lineWidth=Math.max(1.5,r*.13);ctx.strokeStyle='#f6f1e6';ctx.stroke();ctx.lineWidth=Math.max(.8,r*.05);ctx.strokeStyle='#1d1a16';ctx.beginPath();ctx.arc(x,y,r*1.07,0,TAU);ctx.stroke();
@@ -3038,6 +3046,7 @@ function wirePanel(){
   $('fogOn').onchange=e=>setFogOn(e.target.checked);
   for(const b of $('fogModeSeg').children)b.onclick=()=>{ui.fogMode=b.dataset.m;refreshPanel();};
   $('fogBrush').oninput=e=>{ui.fogBrush=+e.target.value;$('fogBrushOut').textContent=ui.fogBrush;requestDraw();};
+  $('fogVis').onchange=e=>{pushHistory();map.fogVis=e.target.checked;changed();requestDraw();};
   $('fogAll').onclick=()=>{pushHistory();map.fogOn=true;ensureFog();map.fog.fill(1);fogDirty=true;changed();refreshPanel();requestDraw();};
   $('fogNone').onclick=()=>{pushHistory();map.fogOn=true;ensureFog();map.fog.fill(0);fogDirty=true;changed();refreshPanel();requestDraw();};
   $('parentBtn').onclick=()=>{if(map.parent)openMapById(map.parent.id);};
@@ -3193,12 +3202,14 @@ function tokenEditor(sb,o){const r=document.createElement('div');r.className='ro
   const a=hp.querySelector('#tokHpSel'),b=hp.querySelector('#tokHpMaxSel');a.value=o.hp==null?(o.hpMax||0):o.hp;b.value=o.hpMax||0;
   const upd=()=>{pushHistory();o.hpMax=Math.max(0,+b.value||0);o.hp=clamp(+a.value||0,0,o.hpMax||9999);const fid=fichaId(o);if(fid&&window.Fichas)Fichas.setHp(fid,o.hp);changed();requestDraw();};a.onchange=upd;b.onchange=upd;
   hp.querySelector('#tokDmg').onclick=()=>{a.value=Math.max(0,(+a.value||0)-1);upd();};hp.querySelector('#tokHeal').onclick=()=>{a.value=(+a.value||0)+1;if(+b.value&&+a.value>+b.value)a.value=b.value;upd();};sb.appendChild(hp);
+  const vr=document.createElement('div');vr.className='row';vr.innerHTML='<label for="tokVis">Visão</label><input type="number" id="tokVis" min="0" max="60" style="width:4.5em;flex:0 0 auto"><span class="note" style="margin:0">quadros</span>';const vi=vr.querySelector('input');vi.value=o.visao||0;
+  vi.onchange=()=>{pushHistory();const v=Math.max(0,Math.min(60,+vi.value||0));if(v)o.visao=v;else delete o.visao;changed();requestDraw();if(v&&!map.fogOn)toast('A visão abre a névoa quando ela está ligada (ferramenta Névoa).');};sb.appendChild(vr);
   const fid=fichaId(o),F=window.Fichas,list=F?F.list():[];
   const fl=document.createElement('div');fl.className='row';fl.innerHTML='<label for="tokFicha">Ficha</label><select id="tokFicha" style="width:100%;min-width:0"></select>';const fs=fl.querySelector('select');
   fs.appendChild(new Option(list.length?'Nenhuma':'Nenhuma ficha criada ainda',''));let grp=null,gname=null;
   for(const f of list){const gn=f.campNome||'Sem campanha';if(gn!==gname){grp=document.createElement('optgroup');grp.label=gn;fs.appendChild(grp);gname=gn;}grp.appendChild(new Option(`${f.nome}${f.kind==='npc'?' (NPC)':''}`,f.id));}
   if(fid&&!list.some(f=>f.id===fid))fs.appendChild(new Option('Ficha não encontrada',fid));fs.value=fid||'';
-  fs.onchange=()=>{pushHistory();const v=fs.value;if(v){o.ficha=v;const f=F&&F.get(v);if(f){o.name=f.nome;if(f.cor)o.color=f.cor;o.hp=Math.max(0,f.pv);o.hpMax=f.pvMax;}}else delete o.ficha;changed();refreshPanel();requestDraw();};sb.appendChild(fl);
+  fs.onchange=()=>{pushHistory();const v=fs.value;if(v){o.ficha=v;const f=F&&F.get(v);if(f){o.name=f.nome;if(o.visao==null&&f.kind==='pc')o.visao=6;if(f.cor)o.color=f.cor;o.hp=Math.max(0,f.pv);o.hpMax=f.pvMax;}}else delete o.ficha;changed();refreshPanel();requestDraw();};sb.appendChild(fl);
   if(fid){const n=document.createElement('p');n.className='note';n.style.margin='4px 0 0';n.textContent='A vida deste token segue a ficha, e o dano daqui também muda a ficha.';sb.appendChild(n);
     const a=document.createElement('button');a.className='btn';a.textContent='Abrir ficha';a.style.marginTop='6px';a.onclick=()=>F&&F.open(fid);sb.appendChild(a);}}
 function buildTokenPanel(){const cs=$('tokCats');if(!cs.children.length){for(const [k,v] of Object.entries(TOKEN_CATS)){const b=document.createElement('button');b.dataset.k=k;b.textContent=v.n;b.onclick=()=>{ui.tokCat=k;ui.tokColor=v.c;refreshPanel();};cs.appendChild(b);}}
@@ -3210,7 +3221,7 @@ function buildTokenPanel(){const cs=$('tokCats');if(!cs.children.length){for(con
   const tl=$('tokList');tl.innerHTML='';const toks=map.objects.filter(o=>o.kind==='token');if(!toks.length)tl.innerHTML='<div class="empty">Nenhum token no mapa.</div>';
   for(const o of toks){const b=document.createElement('button');b.className='sw';b.style.width='100%';b.innerHTML=`<span class="c" style="background:${o.color}"></span><span class="t"></span>`;b.querySelector('.t').textContent=`${o.name||'Token'}${o.hpMax?` · ${o.hp==null?o.hpMax:o.hp}/${o.hpMax}`:''}${o.secret?' · oculto':''}`;
     b.onclick=()=>{setTool('select');setSel([o.id]);};tl.appendChild(b);}}
-function buildFogPanel(){$('fogOn').checked=!!map.fogOn;for(const b of $('fogModeSeg').children)b.setAttribute('aria-pressed',String(b.dataset.m===ui.fogMode));$('fogBrush').value=ui.fogBrush;$('fogBrushOut').textContent=ui.fogBrush;}
+function buildFogPanel(){$('fogOn').checked=!!map.fogOn;$('fogVis').checked=map.fogVis!==false;for(const b of $('fogModeSeg').children)b.setAttribute('aria-pressed',String(b.dataset.m===ui.fogMode));$('fogBrush').value=ui.fogBrush;$('fogBrushOut').textContent=ui.fogBrush;}
 function setFogOn(on){pushHistory();map.fogOn=on;if(on){ensureFog();}fogDirty=true;changed();refreshPanel();requestDraw();}
 /* tokens linked to character sheets */
 function fichaId(o){const f=o&&o.ficha;if(!f)return null;const m=String(f).match(/#ficha-([A-Za-z0-9-]+)$/);return m?m[1]:/^[A-Za-z0-9-]+$/.test(f)?f:null;}
@@ -3299,17 +3310,17 @@ let db=null, uidUser=null, saving=false, pendingSave=false, saveTimer=null;
 function setStatus(t,err){const s=$('status');s.textContent=t;s.classList.toggle('err',!!err);}
 function rle(a){const out=[];let v=a[0],n=1;for(let i=1;i<a.length;i++){if(a[i]===v)n++;else{out.push(v,n);v=a[i];n=1;}}out.push(v,n);return out;}
 function unrle(r,len){const a=new Uint8Array(len);let k=0;for(let i=0;i<r.length;i+=2){a.fill(r[i],k,k+r[i+1]);k+=r[i+1];}return a;}
-function serialize(m){return {v:1,id:m.id,name:m.name,scale:m.scale,W:m.W,H:m.H,terrain:rle(m.terrain),objects:m.objects,grid:m.grid,showScale:m.showScale,style:m.style,smooth:m.smooth,layers:m.layers,light:m.light,doorPaths:m.doorPaths!==false,nightWin:m.nightWin!==false,view:m.view||'34',texOn:m.texOn!==false,time:m.time||'dia',weather:m.weather||'limpo',wxAnim:m.wxAnim!==false,fogOn:!!m.fogOn,fog:m.fogOn&&m.fog?rle(m.fog):null,parent:m.parent||null,mesa:m.mesa||null,updatedAt:m.updatedAt,sample:!!m.sample};}
+function serialize(m){return {v:1,id:m.id,name:m.name,scale:m.scale,W:m.W,H:m.H,terrain:rle(m.terrain),objects:m.objects,grid:m.grid,showScale:m.showScale,style:m.style,smooth:m.smooth,layers:m.layers,light:m.light,doorPaths:m.doorPaths!==false,nightWin:m.nightWin!==false,view:m.view||'34',texOn:m.texOn!==false,time:m.time||'dia',weather:m.weather||'limpo',wxAnim:m.wxAnim!==false,fogOn:!!m.fogOn,fogVis:m.fogVis!==false,fog:m.fogOn&&m.fog?rle(m.fog):null,parent:m.parent||null,mesa:m.mesa||null,updatedAt:m.updatedAt,sample:!!m.sample};}
 function deserialize(d){
   if(!d||!d.W||!d.H||!Array.isArray(d.terrain))throw new Error('formato inválido');
   const m={id:d.id||uid(),name:String(d.name||'Mapa'),scale:SCALES[d.scale]?d.scale:'continente',W:d.W|0,H:d.H|0,terrain:unrle(d.terrain,(d.W|0)*(d.H|0)),
     objects:Array.isArray(d.objects)?d.objects.filter(o=>o&&['line','icon','label','token'].includes(o.kind)):[],grid:Object.assign({type:'hex',size:8,dist:50,unit:'km'},d.grid||{}),
-    showScale:d.showScale!==false,style:STYLES.includes(d.style)?d.style:'parchment',smooth:d.smooth!==false,layers:Object.assign({grid:true,lines:true,icons:true,labels:true},d.layers||{}),light:Object.assign({on:true,pow:.65,dir:-135},d.light||{}),view:d.view==='top'||d.view==='34'?d.view:((d.scale==='cidade'||(Array.isArray(d.objects)&&d.objects.some(o=>o&&o.kind==='icon'&&/^(q_|h\||k\|)/.test(o.type||''))))?'34':'top'),doorPaths:d.doorPaths!==false,nightWin:d.nightWin!==false,texOn:d.texOn!==false,time:TIMES[d.time]?d.time:'dia',weather:WEATHERS[d.weather]?d.weather:'limpo',wxAnim:d.wxAnim!==false,fogOn:!!d.fogOn,fog:Array.isArray(d.fog)?unrle(d.fog,(d.W|0)*(d.H|0)):null,parent:d.parent||null,mesa:d.mesa||null,updatedAt:d.updatedAt||Date.now(),sample:!!d.sample};
+    showScale:d.showScale!==false,style:STYLES.includes(d.style)?d.style:'parchment',smooth:d.smooth!==false,layers:Object.assign({grid:true,lines:true,icons:true,labels:true},d.layers||{}),light:Object.assign({on:true,pow:.65,dir:-135},d.light||{}),view:d.view==='top'||d.view==='34'?d.view:((d.scale==='cidade'||(Array.isArray(d.objects)&&d.objects.some(o=>o&&o.kind==='icon'&&/^(q_|h\||k\|)/.test(o.type||''))))?'34':'top'),doorPaths:d.doorPaths!==false,nightWin:d.nightWin!==false,texOn:d.texOn!==false,time:TIMES[d.time]?d.time:'dia',weather:WEATHERS[d.weather]?d.weather:'limpo',wxAnim:d.wxAnim!==false,fogOn:!!d.fogOn,fogVis:d.fogVis!==false,fog:Array.isArray(d.fog)?unrle(d.fog,(d.W|0)*(d.H|0)):null,parent:d.parent||null,mesa:d.mesa||null,updatedAt:d.updatedAt||Date.now(),sample:!!d.sample};
   for(let i=0;i<m.terrain.length;i++)if(m.terrain[i]>=TERR.length)m.terrain[i]=2;
   return m;
 }
 function loadMap(m){geomVer++;map=m;if(!m.view)m.view='34';if(!mainCat(ui.uCat)&&ui.uCat!=='all'&&ui.uCat!=='interior'){ui.uCat=m.view==='34'?'casa34':'casa';ui.uicon=m.view==='34'?'h|5|4|2|g|r|cs':'u_casa';}if(!mainWall(ui.wall)){ui.wall=m.view==='34'?'w3_pedra':'w_pedra';ui.wallW=WALLS[ui.wall].w;}urbKey='';wallKey='';thumbCache.clear();ui.sel=null;ui.sels=new Set();ruler=null;fogDirty=true;atmDirty=true;noisePat=null;$('noteCard').hidden=true;ensureWeatherAnim();setupLayers();refreshPanel();store.set('atlas.last',m.id);requestDraw();}
-function changed(skipStamp){geomVer++;if(!map||playerMode)return;if(!skipStamp)map.updatedAt=Date.now();if(map.sample){map.sample=false;}
+function changed(skipStamp){geomVer++;if(!map||playerMode)return;visionReveal();if(!skipStamp)map.updatedAt=Date.now();if(map.sample){map.sample=false;}
   atmDirty=true;setStatus('Alterações não salvas');clearTimeout(saveTimer);saveTimer=setTimeout(save,1500);scheduleMesa();}
 async function save(){
   if(!map||playerMode)return;if(saving){pendingSave=true;return;}
