@@ -391,6 +391,8 @@ ol.steps{margin:8px 0 0;padding-left:20px;font-size:14px;line-height:1.5;color:v
       <ol class="steps"><li>No menu Compartilhar, convide cada jogador como <b>Editor</b>. O mesmo convite vale para o mapa e para as fichas.</li><li>Escolha abaixo a campanha desta mesa. Os jogadores dela entram pelo botão <b>Mapa</b>; o link acima também funciona.</li><li>Use a ferramenta Névoa para revelar o mapa durante a sessão; tokens e mudanças aparecem para eles em segundos.</li></ol>
       <label class="field" style="margin-top:10px"><span>Campanha desta mesa</span><select id="mesaCamp"></select></label>
       <p class="note" id="mesaCampNote" style="margin:4px 0 0">Os jogadores da campanha escolhida veem este mapa ao clicar em <b>Mapa</b>.</p>
+      <div id="mesaInvBox" hidden style="margin-top:10px"><label class="field" style="margin:0"><span>Convite da campanha: o jogador cria a ficha e entra nesta mesa</span></label>
+        <div class="row"><input type="text" id="mesaInv" readonly aria-label="Link de convite da campanha"><button class="btn primary" id="mesaInvCopy">Copiar convite</button></div></div>
       <div class="actions" style="justify-content:flex-start"><button class="btn" id="mesaNew">Gerar link novo</button></div>
     </div>
     <p class="note" id="mesaState" style="margin-top:10px"></p>
@@ -3227,11 +3229,12 @@ function mesaLink(){return map&&map.mesa?ARTIFACT_URL+'#mesa-'+map.mesa.id:'';}
 function openMesa(){$('mesaModal').hidden=false;renderMesa();}
 function renderMesa(){const on=!!(map.mesa&&map.mesa.on);
   const cs=$('mesaCamp'),camps=window.Fichas?Fichas.camps():[];cs.innerHTML='';cs.appendChild(new Option(camps.length?'Nenhuma':'Crie uma campanha em Fichas',''));for(const c of camps)cs.appendChild(new Option(c.nome,c.id));
-  const cur=map.mesa&&camps.find(c=>c.mesa===map.mesa.id);cs.value=cur?cur.id:'';cs.disabled=!camps.length;$('mesaOn').checked=on;$('mesaLinkBox').hidden=!map.mesa;$('mesaLink').value=mesaLink();$('mesaNoDb').hidden=!!db;$('mesaOn').disabled=!db;
+  const cur=map.mesa&&camps.find(c=>c.mesa===map.mesa.id);cs.value=cur?cur.id:'';cs.disabled=!camps.length;$('mesaInvBox').hidden=!cur;if(cur)$('mesaInv').value=Fichas.inviteLink(cur.id);$('mesaOn').checked=on;$('mesaLinkBox').hidden=!map.mesa;$('mesaLink').value=mesaLink();$('mesaNoDb').hidden=!!db;$('mesaOn').disabled=!db;
   if(!on)$('mesaState').textContent=map.mesa?'Transmissão pausada. Os jogadores continuam vendo a última versão.':'A mesa ainda não foi ativada para este mapa.';}
 function wireMesa(){$('mesaBtn').onclick=openMesa;
   $('mesaOn').onchange=e=>{if(!db)return;if(!map.mesa)map.mesa={id:uid()+uid().slice(0,4),on:false};map.mesa.on=e.target.checked;changed();renderMesa();if(map.mesa.on)pushMesa();};
   $('mesaCopy').onclick=()=>{const v=mesaLink();const ta=$('mesaLink');try{navigator.clipboard.writeText(v).then(()=>toast('Link copiado.'),()=>{ta.select();toast('Selecione e copie o link.');});}catch(e){ta.select();}};
+  $('mesaInvCopy').onclick=()=>{const v=$('mesaInv').value;const ta=$('mesaInv');try{navigator.clipboard.writeText(v).then(()=>toast('Convite copiado.'),()=>{ta.select();toast('Selecione e copie o convite.');});}catch(e){ta.select();}};
   $('mesaCamp').onchange=async e=>{if(!window.Fichas||!map.mesa)return;const cid=e.target.value;const cur=Fichas.camps().find(c=>c.mesa===map.mesa.id);
     if(cur&&cur.id!==cid)await Fichas.linkMesa(cur.id,null);if(cid){if(!map.mesa.on){map.mesa.on=true;changed();pushMesa();}await Fichas.linkMesa(cid,{mesa:map.mesa.id,mapa:map.id,nome:map.name});toast('Mesa ligada à campanha.');}renderMesa();};
   $('mesaNew').onclick=()=>{if(!db)return;const prev=map.mesa&&window.Fichas&&Fichas.camps().find(c=>c.mesa===map.mesa.id);map.mesa={id:uid()+uid().slice(0,4),on:true};if(prev)Fichas.linkMesa(prev.id,{mesa:map.mesa.id,mapa:map.id,nome:map.name});changed();renderMesa();pushMesa();toast('Novo link gerado. O link antigo deixa de receber atualizações.');};}
