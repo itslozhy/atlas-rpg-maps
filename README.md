@@ -5,7 +5,7 @@
 
 **[Versão com mesa ao vivo e fichas compartilhadas](https://claude.ai/artifact/1wUYbQ513Syib6KfoBeN8k)** · no claude.ai, só para quem o mestre convidar.
 
-<sub>Última atualização: 17/11/2026 às 13:12 (horário de Brasília). O GitHub Pages publica a versão nova poucos minutos depois de cada envio.</sub>
+<sub>Última atualização: 17/11/2026 às 14:12 (horário de Brasília). O GitHub Pages publica a versão nova poucos minutos depois de cada envio.</sub>
 <!-- LINKS:FIM -->
 
 Mapas e fichas de RPG de mesa numa página só. O botão **Mapa | Fichas** no topo troca de seção sem sair da página, e as duas partes conversam entre si.
@@ -35,6 +35,19 @@ Mapas e fichas de RPG de mesa numa página só. O botão **Mapa | Fichas** no to
 - **Partículas da mesa (Etmos):** o mestre cria partículas novas, desenhando o símbolo na própria página.
 - **Visão dos tokens (mapa):** cada token pode ter um alcance de visão que abre a névoa ao redor dele.
 
+## Fora do claude.ai: Firebase
+
+No GitHub Pages, a página usa o Firebase (projeto `atlas-rpg-6910f`) para guardar campanhas, fichas e mapas e para transmitir a mesa ao vivo. Cada pessoa entra com a conta Google. No claude.ai, continua usando o banco de lá. A troca é feita por `nuvem-firebase.js`, que só se ativa no endereço do GitHub Pages.
+
+Configuração no console do Firebase (uma vez):
+
+1. **Firestore Database:** criar o banco em modo de produção (local sugerido: `southamerica-east1`, São Paulo).
+2. **Firestore › Regras:** colar o conteúdo de `firestore.rules` e publicar.
+3. **Authentication › Método de login:** ativar o Google.
+4. **Authentication › Configurações › Domínios autorizados:** adicionar `itslozhy.github.io`.
+
+Depois, o mestre abre a página, entra com a conta Google e escolhe "Sou o mestre". A primeira conta registrada fica como mestre para sempre. Os jogadores entram pelos convites gerados na aba Convites da campanha: só quem usou um convite vira membro e enxerga a mesa.
+
 ## Arquivos
 
 | Arquivo | Para que serve |
@@ -43,6 +56,8 @@ Mapas e fichas de RPG de mesa numa página só. O botão **Mapa | Fichas** no to
 | `grimorio-do-mestre.html` | Código-fonte das fichas (estilo isolado num shadow root) e a ponte entre as duas seções. |
 | `mesa-do-mestre.html` | Página montada, publicada como artefato no claude.ai. |
 | `index.html` | A mesma página completa, para abrir direto no navegador. |
+| `nuvem-firebase.js` | Conexão com o Firebase (banco, login e mesa ao vivo) fora do claude.ai. |
+| `firestore.rules` | Regras de acesso do Firestore, para colar no console do Firebase. |
 | `scripts/build.py` | Monta `mesa-do-mestre.html` e `index.html` a partir dos dois arquivos-fonte. |
 | `scripts/etmos_simbolos.py` | Baixa o PDF de partículas do Etmos e vetoriza os símbolos em `etmos-simbolos.json`. |
 | `etmos-simbolos.json` | Os símbolos vetorizados, embutidos na página pelo build. |
@@ -51,7 +66,7 @@ Os símbolos das partículas do Etmos são arte do [Balde Galáctico](https://ba
 
 ## Como usar
 
-Abra `index.html` no navegador. Fora do claude.ai, os dados ficam salvos só no navegador; a sincronização entre mestre e jogadores, a conta na nuvem e a transmissão da mesa dependem do ambiente de artefatos do claude.ai.
+Abra o link do GitHub Pages (no topo deste arquivo). Com o Firebase configurado, mestre e jogadores entram com a conta Google e tudo sincroniza; quem escolher "Usar sem conta" fica com os dados só no próprio navegador. Abrindo `index.html` direto do computador, a página funciona só no modo local.
 
 Depois de editar um arquivo-fonte:
 

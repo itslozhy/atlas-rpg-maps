@@ -527,7 +527,7 @@ async function initStore(){
 function subscribe(){
   setStatus('Carregando…');const to=setTimeout(()=>{if(!S.ready){setStatus('Sem resposta do servidor ainda',true);}},10000);
   const done=()=>{if(!S.ready){S.ready=true;clearTimeout(to);setStatus('Sincronizado');}onRemote();};
-  const err=e=>{setStatus(e&&e.code==='revoked'?'Acesso revogado':'Não foi possível sincronizar',true);};
+  const err=e=>{if(!S.ready)done();if(e&&e.code==='invalid_argument'){setStatus('Sem mesa ainda: use o convite do mestre');}else setStatus(e&&e.code==='revoked'?'Acesso revogado':'Não foi possível sincronizar',true);};
   unsub.c=db.collection('campanhas').onSnapshot(s=>{S.camps={};for(const d of s.docs){const v=d.data();if(v)S.camps[d.id]=Object.assign({id:d.id},v);}done();},err);
   watchPlayer(S.uid);
   const coll=(name,key,f)=>{unsub[key]=db.collection(name).onSnapshot(s=>{const m={};for(const d of s.docs){const v=d.data();if(v)m[d.id]=Object.assign({id:d.id},v);}S[f]=m;done();},()=>{});};
@@ -537,6 +537,8 @@ function subscribe(){
     unsub.us=db.collection('usados').onSnapshot(s=>{S.usados={};for(const d of s.docs){const v=d.data();if(v)S.usados[d.id]=v;}done();},err);unsub.n=db.collection('npcs').onSnapshot(s=>{S.npcs={};for(const d of s.docs){const v=d.data();if(v)S.npcs[d.id]=v;}done();},err);
     unsub.s=db.collection('segredos').onSnapshot(s=>{S.notes={};for(const d of s.docs){const v=d.data();if(v)S.notes[d.id]=v;}done();},err);}
 }
+/* after joining a table (Firebase), listen again: the first listeners were refused before the membership existed */
+function resubscribe(){for(const k of Object.keys(unsub)){try{unsub[k]&&unsub[k]();}catch(e){}delete unsub[k];}subscribe();}
 function watchPlayer(pid){if(!pid||unsub['u'+pid])return;
   if(S.master)unsub['r'+pid]=db.collection('pjs/'+pid+'/rolagens').onSnapshot(s=>{const m={};for(const d of s.docs){const v=d.data();if(v)m[d.id]=Object.assign({id:d.id,pid},v);}S.rolls[pid]=m;onRemote();},()=>{});
   if(S.master&&pid!==S.uid)unsub['dc'+pid]=db.collection('pjs/'+pid+'/docs').onSnapshot(s=>{const m={};for(const d of s.docs){const v=d.data();if(v)m[d.id]=Object.assign({id:d.id,pid},v);}S.pdocs[pid]=m;onRemote();},()=>{});
@@ -818,7 +820,7 @@ function partForm(c,old){const p=old?clone(old):{id:'X'+tok().slice(0,10),sil:''
 /* ================= INVITES (one link = one sheet) ================= */
 const inviteLink=id=>APP_URL+'#convite-'+id;
 const tok=()=>{const a=new Uint8Array(12);crypto.getRandomValues(a);return [...a].map(b=>'abcdefghijkmnopqrstuvwxyz23456789'[b%33]).join('');};
-async function newInvite(cid,tipo,para){const id=tok();const v={camp:cid,tipo,para:para||'',criadoEm:Date.now()};
+async function newInvite(cid,tipo,para){const id=tok();const cc=S.camps[cid]||{};const v={camp:cid,tipo,para:para||'',criadoEm:Date.now(),campNome:cc.nome||'',sys:cc.sys||'dnd',desc:cc.desc||''};
   if(S.mode==='local'){toast('Convites precisam da página aberta pelo claude.ai.');return null;}
   try{await db.doc('convites/'+id).set(v);S.convites[id]=Object.assign({id},v);return id;}catch(e){toast('Não foi possível criar o convite agora.');return null;}}
 function inviteForm(c,tipo){openModal(`<h2>${tipo==='npc'?'Convite para criar um NPC':'Convite para um jogador'}</h2>
@@ -862,7 +864,7 @@ function viewInvite(app,id){crumbs([['Convite','#convite-'+id]]);
   const box=(t,msg,extra)=>`<div class="join"><h1 class="view">${t}</h1><div class="empty">${msg}</div>${extra||''}</div>`;
   if(st.state==='error'){app.innerHTML=box('Convite','Não consegui ler este convite. Confira se o mestre te convidou como Editor no menu Compartilhar e tente de novo.');return;}
   if(st.state==='missing'){app.innerHTML=box('Convite','Este convite não existe ou foi cancelado pelo mestre. Peça um novo.');return;}
-  const v=st.conv,c=S.camps[v.camp];if(!c){app.innerHTML=box('Convite','A campanha deste convite não foi encontrada.');return;}
+  const v=st.conv,c=S.camps[v.camp]||(v.campNome?{id:v.camp,nome:v.campNome,sys:SYS[v.sys]?v.sys:'dnd',desc:v.desc||''}:null);if(!c){app.innerHTML=box('Convite','A campanha deste convite não foi encontrada.');return;}
   if(st.uso){const mine=st.uso.uid===S.uid;const sh=mine&&findSheet(st.uso.ficha);
     app.innerHTML=box(esc(c.nome),mine?'Você já usou este convite.':'Este convite já foi usado. Para criar uma ficha, peça um novo convite ao mestre.',sh?`<div class="row" style="justify-content:center;margin-top:12px"><a class="btn primary" href="#ficha-${sh.id}">Abrir minha ficha</a></div>`:'');return;}
   const can=canCreate()&&!S.master;const npc=v.tipo==='npc';
@@ -878,8 +880,12 @@ function viewInvite(app,id){crumbs([['Convite','#convite-'+id]]);
   $('#joinForm').onsubmit=async e=>{e.preventDefault();if(!can)return;const n=$('#joinNome').value.trim();if(!n){$('#joinNome').focus();return;}
     const fresh=await Promise.all([db.doc('usados/'+id).get(),db.doc('convites/'+id).get()]).catch(()=>null);
     if(fresh&&(fresh[0].exists||!fresh[1].exists)){st.uso=fresh[0].exists?fresh[0].data():null;if(!fresh[1].exists)st.state='missing';render();return;}
-    const sh=createSheet(c,v.tipo==='npc'?'npc':'pc',n,{id});if(!sh)return;
-    st.uso={uid:S.uid,ficha:sh.id,em:Date.now()};try{await db.doc('usados/'+id).set(st.uso);}catch(e){}};
+    /* outside claude.ai (Firebase) the person first becomes a member of the table with this invite */
+    if(db.entrar){try{await db.entrar(id);}catch(e){toast('Este convite não pôde ser usado. Peça um novo ao mestre.');return;}}
+    st.uso={uid:S.uid,ficha:'',em:Date.now()};
+    const sh=createSheet(c,v.tipo==='npc'?'npc':'pc',n,{id});if(!sh)return;st.uso.ficha=sh.id;
+    try{await db.doc('usados/'+id).set(st.uso);}catch(e){}
+    if(db.entrar)resubscribe();};
   if(can)setTimeout(()=>{const i=$('#joinNome');if(i)i.focus();},50);}
 
 /* ================= PLAYER CHANGE LOG ================= */

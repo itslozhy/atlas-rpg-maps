@@ -16,8 +16,10 @@ fichas = (root / "grimorio-do-mestre.html").read_text(encoding="utf-8")
 # a ponte precisa existir antes do script do Atlas; as fichas rodam depois dele
 cut = atlas.rindex("<script>")
 end_ponte = fichas.index("</script>", fichas.index('<script id="ponte">')) + len("</script>")
+# conexão com o Firebase: só se ativa fora do claude.ai (GitHub Pages); precisa vir antes dos outros scripts
+nuvem = "<script>\n" + (root / "nuvem-firebase.js").read_text(encoding="utf-8") + "\n</script>\n"
 def montar(glifos=""):
-    return atlas[:cut] + fichas[:end_ponte] + "\n" + atlas[cut:] + "\n" + glifos + fichas[end_ponte:]
+    return nuvem + atlas[:cut] + fichas[:end_ponte] + "\n" + atlas[cut:] + "\n" + glifos + fichas[end_ponte:]
 
 # símbolos do Etmos (arte do Balde Galáctico, gerados por scripts/etmos_simbolos.py):
 # vão como dado, um por linha, para nenhuma linha da página ficar gigante
