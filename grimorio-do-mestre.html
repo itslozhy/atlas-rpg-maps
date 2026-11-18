@@ -362,6 +362,18 @@ ul.rolls .t{color:var(--muted);font-variant-numeric:tabular-nums}ul.rolls .w{fon
 .gen ul{list-style:none;margin:6px 0 0;padding:0;display:grid;gap:4px}.gen li span{display:block;font-size:12px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted)}
 .bestl{display:grid;gap:6px}.bestit{display:flex;gap:10px;align-items:center;background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:6px 10px}.bestit b{flex:1;min-width:0}
 .check-line{display:flex;gap:8px;align-items:flex-start;margin:0 0 12px;font-size:14.5px}
+.sheet .pname{display:flex;gap:12px;align-items:center;min-width:0}.sheet .pname .pn{flex:1;min-width:0;display:flex;flex-direction:column}
+.sheet .portrait{flex:0 0 auto;width:84px;height:84px;border-radius:12px;border:2px solid var(--sa);padding:0;overflow:hidden;background:var(--sp2);cursor:pointer;box-shadow:0 3px 10px rgba(0,0,0,.25)}
+.sheet .portrait img{width:100%;height:100%;object-fit:cover;display:block}.sheet .portrait.empty{display:grid;place-items:center;color:var(--sm);font-size:12.5px;border-style:dashed}
+.sheet .portrait:disabled{cursor:default}.sheet .portrait:not(:disabled):hover{transform:translateY(-1px)}
+.sheet.dnd .portrait{border-radius:50%;border-color:var(--gold)}.sheet.op .portrait{border-radius:4px;filter:grayscale(.25) contrast(1.05)}.sheet.etmos .portrait{border-radius:10px}
+@media (max-width:640px){.sheet .portrait{width:64px;height:64px}}
+.pc .av.pic{padding:0;overflow:hidden;border:2px solid var(--panel)}.pc .av.pic img{width:100%;height:100%;object-fit:cover;display:block}
+.modal .box.wide{width:min(780px,100%)}
+.pvwrap{display:grid;grid-template-columns:220px minmax(0,1fr);gap:14px;align-items:start}@media (max-width:640px){.pvwrap{grid-template-columns:minmax(0,1fr)}}
+.pvimg{width:220px;height:220px;border-radius:14px;overflow:hidden;background:var(--panel-2);display:grid;place-items:center;border:1px solid var(--line);max-width:100%}.pvimg img{width:100%;height:100%;object-fit:cover}
+.avctl{display:flex;flex-direction:column;gap:5px;max-height:420px;overflow:auto;padding-right:4px}.avctl .lab{font-size:12px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin-top:4px}
+.avsw{display:flex;gap:5px;flex-wrap:wrap}.avsw button{width:24px;height:24px;border-radius:50%;border:2px solid var(--line);cursor:pointer;padding:0}.avsw button[aria-pressed="true"]{border-color:var(--fg);box-shadow:0 0 0 2px var(--accent)}
 .mesabox{display:flex;gap:10px;align-items:center;flex-wrap:wrap;background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:10px 14px;margin:12px 0 0}
 .mesabox .dot{width:9px;height:9px;border-radius:50%;background:var(--ok);flex:0 0 auto}
 .mesabox .dot.off{background:var(--muted)}
@@ -641,7 +653,7 @@ function pcCard(sh,camp){const [pv,mx]=hpOf(sh),f=mx>0?clamp(pv/mx,0,1):0;const 
   else if(sh.sys==='op'){const san=num(sh.san),smx=opMax(sh,'san'),pe=num(sh.pe),pmx=opMax(sh,'pe');stats=`<div><b>${opDef(sh)}</b>Defesa</div><div><b>${pe}/${pmx}</b>PE</div><div><b>${san}/${smx}</b>SAN</div>`;}
   else stats=`<div><b>${num(sh.ca)}</b>CA</div><div><b>${sgn(dIni(sh))}</b>Iniciativa</div><div><b>${10+dSkill(sh,'percepcao')}</b>Perc. passiva</div>`;
   const quick=canEdit(sh)?`<div class="row">${[-5,-1,1,5].map(d=>`<button class="btn small" data-hp="${sh.id}" data-d="${d}" aria-label="${d>0?'Curar':'Dano'} ${Math.abs(d)}">${d>0?'+':'−'}${Math.abs(d)}</button>`).join('')}<a class="btn small" href="#ficha-${sh.id}" style="margin-left:auto">Abrir ficha</a></div>`:`<div class="row"><a class="btn small" href="#ficha-${sh.id}">Ver ficha</a></div>`;
-  return `<article class="card pc"><div class="hd"><span class="av" style="background:${safeColor(sh.cor)}">${esc(ini)}</span><div><h3>${esc(sh.nome||'Sem nome')}</h3>${sh.criacao==='rascunho'?'<span class="draft">Em criação</span>':''}<div class="meta">${esc(subOf(sh))}${owner?' · '+esc(owner):''}</div></div></div>
+  return `<article class="card pc"><div class="hd"><span class="av${portraitThumb(sh)?' pic':''}" style="background:${safeColor(sh.cor)}">${portraitThumb(sh)?`<img src="${esc(portraitThumb(sh))}" alt="">`:esc(ini)}</span><div><h3>${esc(sh.nome||'Sem nome')}</h3>${sh.criacao==='rascunho'?'<span class="draft">Em criação</span>':''}<div class="meta">${esc(subOf(sh))}${owner?' · '+esc(owner):''}</div></div></div>
     <div><div class="row" style="justify-content:space-between;font-size:13px"><span>${sh.sys==='op'?'PV':sh.sys==='etmos'?'Ferimentos restantes':'Pontos de vida'}</span><b class="num">${pv} / ${mx}${num(sh.pvTemp)?` (+${num(sh.pvTemp)})`:''}</b></div><div class="bar"><i style="width:${f*100}%;background:${barColor(f)}"></i></div></div>
     <div class="stats">${stats}</div>${(sh.cond||[]).length?`<div class="chips">${sh.cond.map(c=>`<span class="chip">${esc(c)}</span>`).join('')}</div>`:''}${quick}</article>`;}
 function viewCamp(app,c){lastCamp=c.id;try{sessionStorage.setItem('mesa.camp',c.id);}catch(e){}crumbs([['Campanhas','#inicio'],[c.nome,'#campanha-'+c.id]]);
@@ -683,7 +695,7 @@ function createSheet(c,kind,nome,inv){if(!S.master&&!inv){toast('Para criar uma 
   logBase[sh.id]=clone(sh);queueSave(sh);location.hash='ficha-'+sh.id;return sh;}
 async function copyText(t){try{await navigator.clipboard.writeText(t);toast('Link copiado.');}catch(e){openModal(`<h2>Copie o link</h2><input class="field" style="padding:8px" value="${esc(t)}" readonly id="cpy"><div class="row" style="justify-content:flex-end"><button class="btn" data-close>Fechar</button></div>`);setTimeout(()=>$('#cpy').select(),30);}}
 function openModal(html){$('#modalBox').innerHTML=html;$('#modal').hidden=false;for(const b of $('#modalBox').querySelectorAll('[data-close]'))b.onclick=closeModal;const f=$('#modalBox').querySelector('input,textarea');if(f)setTimeout(()=>f.focus(),30);}
-function closeModal(){$('#modal').hidden=true;}
+function closeModal(){$('#modal').hidden=true;$('#modalBox').classList.remove('wide');}
 $('#modal').addEventListener('click',e=>{if(e.target.id==='modal')closeModal();});window.addEventListener('keydown',e=>{if(e.key==='Escape'&&Mesa.view()==='fichas')closeModal();});
 function confirmBox(msg,ok){openModal(`<h2>Tem certeza?</h2><p>${esc(msg)}</p><div class="row" style="justify-content:flex-end"><button class="btn" data-close>Cancelar</button><button class="btn primary" id="cfOk" style="background:var(--bad);border-color:var(--bad)">Apagar</button></div>`);$('#cfOk').onclick=()=>{closeModal();ok();};}
 
@@ -897,7 +909,7 @@ function viewInvite(app,id){crumbs([['Convite','#convite-'+id]]);
    Edits close together form one entry, keeping each field's first old value and latest new value. */
 const clone=o=>JSON.parse(JSON.stringify(o));
 const logBase={},logSess={};
-const LOG_SKIP=new Set(['updatedAt','_mx','id','owner','kind','criacao','criadaEm','convite','tipo','camp','createdAt','ultimas','pendentes']);
+const LOG_SKIP=new Set(['updatedAt','_mx','id','owner','kind','criacao','criadaEm','convite','tipo','camp','createdAt','ultimas','pendentes','retrato']);
 const same=(a,b)=>JSON.stringify(a)===JSON.stringify(b);
 function flatLog(o,pre,out){for(const [k,v] of Object.entries(o||{})){if(!pre&&LOG_SKIP.has(k))continue;const p=pre?pre+'.'+k:k;
     if(Array.isArray(v)&&v.every(x=>x==null||typeof x!=='object'))out[p]=v.slice();else if(v&&typeof v==='object')flatLog(v,p,out);else out[p]=v;}return out;}
@@ -947,6 +959,7 @@ function logChange(sh){if(!shouldLog(sh)){logBase[sh.id]=clone(sh);return;}
   const PA=before.pendentes||{},PB=sh.pendentes||{};
   for(const k of Object.keys(PB))if(!PA[k]||!same(PA[k].para,PB[k].para))ss.ch.set('ped:'+k,{k:labelFor(sh,k)+' (pedido de aprovação)',de:fmtV(PB[k].de),para:fmtV(PB[k].para)});
   for(const k of Object.keys(PA))if(!PB[k]&&!same(getP(sh,k),PA[k].para))ss.ch.set('ped:'+k,{k:labelFor(sh,k)+' (pedido cancelado)',de:fmtV(PA[k].para),para:fmtV(PA[k].de)});
+  if(!same(before.retrato||null,sh.retrato||null))ss.ch.set('retrato',{k:'Retrato',de:'',para:sh.retrato?'alterado':'removido'});
   const ub=(before.ultimas||[])[0],ua=(sh.ultimas||[])[0];if(ua&&(!ub||ua.t!==ub.t))ss.ch.set('conj:'+ua.t,{k:'Palavra conjurada',de:'',para:etWord(ua.seq)});
   if(!ss.ch.size)return;clearTimeout(ss.timer);ss.timer=setTimeout(()=>writeSess(sh,ss),1500);}
 async function writeSess(sh,ss){const list=[...ss.ch.values()];const doc={ficha:sh.id,nome:sh.nome||'',camp:sh.camp,inicio:ss.inicio,fim:ss.last,mudancas:list.slice(0,80),extra:Math.max(0,list.length-80)};
@@ -995,7 +1008,7 @@ function openCampMap(c){if(S.master&&c.mapa){Atlas.openMap(c.mapa);Mesa.go('mapa
 Mesa.mapTarget=()=>{if(S.master)return null;const c=S.camps[lastCamp]||Object.values(S.camps).find(x=>x.mesa&&allSheets().some(s=>s.camp===x.id&&s.owner===S.uid));return c&&c.mesa?'#mesa-'+c.mesa:null;};
 const listeners=new Set();let notifyQ=false;
 function notify(){if(notifyQ)return;notifyQ=true;queueMicrotask(()=>{notifyQ=false;if(window.Atlas&&Atlas.sync)try{Atlas.sync();}catch(e){console.error(e);}for(const f of listeners)try{f();}catch(e){}});}
-function brief(sh){const [pv,mx]=hpOf(sh);const c=S.camps[sh.camp];return {id:sh.id,nome:sh.nome||(sh.kind==='npc'?'NPC sem nome':'Sem nome'),kind:sh.kind,sys:sh.sys,cor:sh.cor,camp:sh.camp,campNome:c?c.nome:'',pv,pvMax:mx,mine:sh.owner===S.uid,editable:canEdit(sh)};}
+function brief(sh){const [pv,mx]=hpOf(sh);const c=S.camps[sh.camp];return {id:sh.id,nome:sh.nome||(sh.kind==='npc'?'NPC sem nome':'Sem nome'),kind:sh.kind,sys:sh.sys,cor:sh.cor,camp:sh.camp,campNome:c?c.nome:'',pv,pvMax:mx,mine:sh.owner===S.uid,editable:canEdit(sh),thumb:portraitThumb(sh)};}
 window.Fichas={
   ready:()=>S.ready,master:()=>S.master,
   list:()=>allSheets().map(brief).sort((a,b)=>(a.campNome+a.nome).localeCompare(b.campNome+b.nome,'pt-BR')),
@@ -1009,6 +1022,107 @@ window.Fichas={
   inviteLink,
   async newInvite(cid,tipo){const id=await newInvite(cid,tipo||'pc','');return id?inviteLink(id):null;}
 };
+
+/* ================= PORTRAITS ================= */
+/* sh.retrato = {tipo:'img', src, thumb} for an uploaded picture, or {tipo:'avatar', spec, thumb} for a bust built here.
+   thumb (72 px) is what the party cards and the map tokens use. */
+/* lighten (amt > 0) or darken (amt < 0) a #rrggbb colour */
+function avShade(hex,amt){const n=parseInt(String(hex).slice(1,7),16);if(isNaN(n))return hex;const c=[n>>16,n>>8&255,n&255].map(v=>Math.round(amt>0?v+(255-v)*amt:v*(1+amt)));return '#'+c.map(v=>Math.max(0,Math.min(255,v)).toString(16).padStart(2,'0')).join('');}
+const AV={
+  pele:['#f6d7c3','#eabf9f','#d39b72','#b07650','#8a5636','#5e3a24','#9fb4a0','#b7a5d1'],
+  cabeloCor:['#1f1a17','#4a3020','#7a4a2a','#b0702f','#d9b25e','#e8dcc0','#9a9a9a','#a3282a','#2f4f7f','#5d3a7a'],
+  olhos:['#5a3a22','#3a6a9a','#4f8a4a','#7a7a7a','#c9a227','#8a2a2a','#6a4fa0'],
+  roupaCor:['#7b1e1e','#2f5a7a','#3f6a3a','#8a5a1a','#4a4a52','#5a3f7a','#c9b48a','#1f1f22'],
+  fundo:['#cdb68a','#8fa9b8','#9db08a','#b58a8a','#6e6a82','#3a3440','#e6d9b8','#2c3e50'],
+  cabelo:[['curto','Curto'],['longo','Longo'],['careca','Careca'],['coque','Coque'],['moicano','Moicano'],['tranca','Trança'],['cacheado','Cacheado'],['capuz','Capuz']],
+  barba:[['nenhuma','Nenhuma'],['curta','Curta'],['longa','Longa'],['bigode','Bigode']],
+  orelhas:[['humana','Humanas'],['elfica','Élficas'],['animal','De fera']],
+  roupa:[['tunica','Túnica'],['armadura','Armadura'],['manto','Manto'],['terno','Terno'],['jaqueta','Jaqueta'],['uniforme','Uniforme escolar']],
+  extra:[['nenhum','Nenhum'],['chapeu','Chapéu'],['coroa','Coroa'],['oculos','Óculos'],['cicatriz','Cicatriz'],['tapaolho','Tapa-olho'],['chifres','Chifres'],['brinco','Brinco']],
+  expr:[['neutra','Neutra'],['sorriso','Sorriso'],['seria','Séria'],['brava','Brava']]};
+function avRandom(){const p=a=>a[Math.floor(Math.random()*a.length)],k=a=>p(a)[0];return {pele:p(AV.pele.slice(0,6)),cabeloCor:p(AV.cabeloCor),olhos:p(AV.olhos),roupaCor:p(AV.roupaCor),fundo:p(AV.fundo),
+  cabelo:k(AV.cabelo),barba:Math.random()<.6?'nenhuma':k(AV.barba),orelhas:Math.random()<.7?'humana':k(AV.orelhas),roupa:k(AV.roupa),extra:Math.random()<.5?'nenhum':k(AV.extra),expr:k(AV.expr)};}
+/* draws the bust on a square canvas context of side S */
+function drawAvatar(g,S,a){const u=S/100,sh=(c,v)=>avShade(c,v);g.save();g.scale(u,u);
+  const bg=g.createRadialGradient(50,40,8,50,50,72);bg.addColorStop(0,sh(a.fundo,.22));bg.addColorStop(1,sh(a.fundo,-.25));g.fillStyle=bg;g.fillRect(0,0,100,100);
+  const skin=a.pele,hair=a.cabeloCor,cloth=a.roupaCor,ink='rgba(30,20,15,.85)';g.lineJoin='round';g.lineCap='round';
+  const hairBack=()=>{g.fillStyle=hair;if(a.cabelo==='longo'||a.cabelo==='tranca'){g.beginPath();g.moveTo(29,40);g.quadraticCurveTo(26,70,33,84);g.lineTo(67,84);g.quadraticCurveTo(74,70,71,40);g.closePath();g.fill();}
+    if(a.cabelo==='cacheado'){for(const [x,y,r] of[[30,44,8],[29,56,8],[33,67,7],[70,44,8],[71,56,8],[67,67,7]]){g.beginPath();g.arc(x,y,r,0,7);g.fill();}}
+    if(a.cabelo==='capuz'){g.fillStyle=sh(cloth,-.1);g.beginPath();g.moveTo(22,92);g.quadraticCurveTo(18,40,50,20);g.quadraticCurveTo(82,40,78,92);g.closePath();g.fill();}};
+  hairBack();
+  /* shoulders and clothes */
+  g.fillStyle=cloth;g.beginPath();g.moveTo(10,100);g.quadraticCurveTo(14,76,38,72);g.lineTo(62,72);g.quadraticCurveTo(86,76,90,100);g.closePath();g.fill();g.strokeStyle=ink;g.lineWidth=.9;g.stroke();
+  const cg=g.createLinearGradient(10,0,90,0);cg.addColorStop(0,'rgba(255,255,255,.12)');cg.addColorStop(1,'rgba(0,0,0,.2)');g.fillStyle=cg;g.fill();
+  if(a.roupa==='armadura'){g.fillStyle='#b9bcc2';for(const x of[24,76]){g.beginPath();g.ellipse(x,82,13,8,x<50?-.35:.35,0,7);g.fill();g.stroke();}g.fillStyle='#d6d8dc';g.beginPath();g.moveTo(38,73);g.lineTo(62,73);g.lineTo(58,100);g.lineTo(42,100);g.closePath();g.fill();g.stroke();
+    g.fillStyle='#7a7d84';for(const [x,y] of[[19,80],[29,84],[71,84],[81,80]]){g.beginPath();g.arc(x,y,1,0,7);g.fill();}}
+  if(a.roupa==='manto'){g.fillStyle=sh(cloth,-.25);g.beginPath();g.moveTo(36,72);g.lineTo(50,90);g.lineTo(64,72);g.lineTo(60,72);g.lineTo(50,84);g.lineTo(40,72);g.closePath();g.fill();g.fillStyle='#c9a227';g.beginPath();g.arc(50,78,2.2,0,7);g.fill();}
+  if(a.roupa==='terno'||a.roupa==='uniforme'){g.fillStyle='#f2efe8';g.beginPath();g.moveTo(42,72);g.lineTo(50,86);g.lineTo(58,72);g.closePath();g.fill();g.fillStyle=a.roupa==='terno'?'#2a2a30':'#a3282a';g.beginPath();g.moveTo(48.5,76);g.lineTo(51.5,76);g.lineTo(52.5,90);g.lineTo(50,93);g.lineTo(47.5,90);g.closePath();g.fill();
+    g.strokeStyle=ink;g.beginPath();g.moveTo(42,72);g.lineTo(47,92);g.moveTo(58,72);g.lineTo(53,92);g.stroke();}
+  if(a.roupa==='jaqueta'){g.strokeStyle=sh(cloth,-.4);g.lineWidth=1.2;g.beginPath();g.moveTo(50,74);g.lineTo(50,100);g.moveTo(40,73);g.lineTo(46,86);g.moveTo(60,73);g.lineTo(54,86);g.stroke();}
+  if(a.roupa==='tunica'){g.strokeStyle=sh(cloth,-.35);g.lineWidth=1;g.beginPath();g.moveTo(44,73);g.quadraticCurveTo(50,80,56,73);g.stroke();g.beginPath();g.moveTo(50,79);g.lineTo(50,88);g.stroke();}
+  /* neck, ears, head */
+  g.fillStyle=sh(skin,-.12);g.fillRect(44,58,12,16);g.strokeStyle=ink;g.lineWidth=.8;g.beginPath();g.moveTo(44,60);g.lineTo(44,72);g.moveTo(56,60);g.lineTo(56,72);g.stroke();
+  g.fillStyle=skin;for(const s of[-1,1]){g.beginPath();if(a.orelhas==='elfica'){g.moveTo(50+s*17,44);g.lineTo(50+s*29,34);g.lineTo(50+s*18,52);}else if(a.orelhas==='animal'){g.moveTo(50+s*14,30);g.lineTo(50+s*22,14);g.lineTo(50+s*20,34);}else g.ellipse(50+s*18,46,3.6,6,0,0,7);g.closePath();g.fill();g.stroke();}
+  const hg=g.createRadialGradient(44,38,4,50,46,26);hg.addColorStop(0,sh(skin,.12));hg.addColorStop(1,sh(skin,-.14));g.fillStyle=hg;g.beginPath();g.ellipse(50,45,17.5,21,0,0,7);g.fill();g.stroke();
+  /* beard under the face details */
+  g.fillStyle=hair;if(a.barba==='longa'){g.beginPath();g.moveTo(34,48);g.quadraticCurveTo(36,72,50,80);g.quadraticCurveTo(64,72,66,48);g.quadraticCurveTo(58,62,50,62);g.quadraticCurveTo(42,62,34,48);g.closePath();g.fill();}
+  if(a.barba==='curta'){g.globalAlpha=.55;g.beginPath();g.moveTo(34,48);g.quadraticCurveTo(37,64,50,66);g.quadraticCurveTo(63,64,66,48);g.quadraticCurveTo(58,58,50,58);g.quadraticCurveTo(42,58,34,48);g.closePath();g.fill();g.globalAlpha=1;}
+  /* eyes, brows, nose, mouth */
+  for(const s of[-1,1]){const ex=50+s*7;g.fillStyle='#fbf8f2';g.beginPath();g.ellipse(ex,44,3.4,2.2,0,0,7);g.fill();g.fillStyle=a.olhos;g.beginPath();g.arc(ex,44,1.7,0,7);g.fill();g.fillStyle='#111';g.beginPath();g.arc(ex,44,.8,0,7);g.fill();
+    g.fillStyle='rgba(255,255,255,.9)';g.beginPath();g.arc(ex-.6,43.4,.4,0,7);g.fill();g.strokeStyle=sh(hair,-.1);g.lineWidth=1.6;g.beginPath();const b=a.expr==='brava'?1.6:0;g.moveTo(ex-s*-4,39.6-(s>0?0:b)*0);g.moveTo(ex-4*s,39.8+(a.expr==='brava'?-1:0));g.lineTo(ex+4*s,39.2+(a.expr==='brava'?1.4:0));g.stroke();}
+  g.strokeStyle=sh(skin,-.4);g.lineWidth=.9;g.beginPath();g.moveTo(50,46);g.lineTo(48.6,52);g.lineTo(50.6,52.6);g.stroke();
+  g.strokeStyle='#7a3b33';g.lineWidth=1.2;g.beginPath();if(a.expr==='sorriso'){g.moveTo(45,56.5);g.quadraticCurveTo(50,60.5,55,56.5);}else if(a.expr==='brava'){g.moveTo(45.5,58.5);g.quadraticCurveTo(50,56.2,54.5,58.5);}else if(a.expr==='seria'){g.moveTo(45.5,57.5);g.lineTo(54.5,57.5);}else{g.moveTo(45.5,57.2);g.quadraticCurveTo(50,58.4,54.5,57.2);}g.stroke();
+  if(a.barba==='bigode'||a.barba==='longa'||a.barba==='curta'){g.fillStyle=hair;g.beginPath();g.moveTo(43.5,55.5);g.quadraticCurveTo(50,51.5,56.5,55.5);g.quadraticCurveTo(50,54,43.5,55.5);g.fill();}
+  /* hair on top */
+  g.fillStyle=hair;const top=()=>{g.beginPath();g.moveTo(32.5,42);g.quadraticCurveTo(31,22,50,21);g.quadraticCurveTo(69,22,67.5,42);g.quadraticCurveTo(64,30,50,30);g.quadraticCurveTo(38,30,32.5,42);g.closePath();g.fill();g.strokeStyle=sh(hair,-.35);g.lineWidth=.6;g.stroke();};
+  if(a.cabelo==='curto'||a.cabelo==='longo'||a.cabelo==='tranca'||a.cabelo==='cacheado')top();
+  if(a.cabelo==='coque'){top();g.beginPath();g.arc(50,18,6.5,0,7);g.fill();g.stroke();}
+  if(a.cabelo==='moicano'){g.beginPath();g.moveTo(46,26);g.lineTo(50,12);g.lineTo(54,26);g.closePath();g.fill();g.fillRect(46.5,24,7,10);}
+  if(a.cabelo==='tranca'){g.strokeStyle=sh(hair,-.3);g.lineWidth=.8;for(let i=0;i<5;i++){g.beginPath();g.ellipse(67,52+i*6,3.4,3.2,0,0,7);g.fillStyle=hair;g.fill();g.stroke();}}
+  if(a.cabelo==='cacheado'){for(const [x,y] of[[38,26],[46,22],[54,22],[62,26]]){g.beginPath();g.arc(x,y,5,0,7);g.fill();}}
+  if(a.cabelo==='capuz'){g.fillStyle=cloth;g.beginPath();g.moveTo(31,50);g.quadraticCurveTo(28,20,50,18);g.quadraticCurveTo(72,20,69,50);g.quadraticCurveTo(64,28,50,28);g.quadraticCurveTo(36,28,31,50);g.closePath();g.fill();g.strokeStyle=ink;g.stroke();}
+  /* accessories */
+  g.strokeStyle=ink;g.lineWidth=.9;
+  if(a.extra==='chapeu'){g.fillStyle='#4a3424';g.beginPath();g.ellipse(50,28,26,5.5,0,0,7);g.fill();g.stroke();g.beginPath();g.moveTo(38,28);g.quadraticCurveTo(38,10,50,10);g.quadraticCurveTo(62,10,62,28);g.closePath();g.fill();g.stroke();g.fillStyle='#a3282a';g.fillRect(38.4,22,23.2,3);}
+  if(a.extra==='coroa'){g.fillStyle='#d9b23a';g.beginPath();g.moveTo(37,26);g.lineTo(37,16);g.lineTo(42,21);g.lineTo(46,13);g.lineTo(50,20);g.lineTo(54,13);g.lineTo(58,21);g.lineTo(63,16);g.lineTo(63,26);g.closePath();g.fill();g.stroke();g.fillStyle='#a3282a';g.beginPath();g.arc(50,23,1.6,0,7);g.fill();}
+  if(a.extra==='oculos'){g.lineWidth=1.1;for(const s of[-1,1]){g.beginPath();g.arc(50+s*7,44,4.6,0,7);g.stroke();}g.beginPath();g.moveTo(47.6,43.6);g.lineTo(52.4,43.6);g.stroke();}
+  if(a.extra==='cicatriz'){g.strokeStyle='#9a4a44';g.lineWidth=1.1;g.beginPath();g.moveTo(39,36);g.lineTo(45,51);g.stroke();for(let k=0;k<3;k++){g.beginPath();g.moveTo(40+k*2,40+k*4);g.lineTo(43.4+k*2,39+k*4);g.stroke();}}
+  if(a.extra==='tapaolho'){g.fillStyle='#1d1a18';g.beginPath();g.ellipse(57,44,4.4,3.6,0,0,7);g.fill();g.beginPath();g.moveTo(33,36);g.lineTo(67,48);g.stroke();}
+  if(a.extra==='chifres'){g.fillStyle='#3a2f2a';for(const s of[-1,1]){g.beginPath();g.moveTo(50+s*8,26);g.quadraticCurveTo(50+s*22,22,50+s*20,6);g.quadraticCurveTo(50+s*14,18,50+s*4,27);g.closePath();g.fill();g.stroke();}}
+  if(a.extra==='brinco'){g.fillStyle='#d9b23a';g.beginPath();g.arc(68,52.5,1.6,0,7);g.fill();g.stroke();}
+  const vg=g.createRadialGradient(50,50,40,50,50,72);vg.addColorStop(0,'rgba(0,0,0,0)');vg.addColorStop(1,'rgba(0,0,0,.28)');g.fillStyle=vg;g.fillRect(0,0,100,100);
+  g.restore();}
+const avCache=new Map();
+function avatarURL(spec,size){const key=size+'|'+JSON.stringify(spec);if(avCache.has(key))return avCache.get(key);const cv=document.createElement('canvas');cv.width=cv.height=size;drawAvatar(cv.getContext('2d'),size,spec);
+  const u=cv.toDataURL(size<=96?'image/jpeg':'image/png',.85);if(avCache.size>60)avCache.clear();avCache.set(key,u);return u;}
+const portraitSrc=sh=>{const r=sh&&sh.retrato;if(!r)return '';if(r.tipo==='img')return safeImg(r.src)||'';if(r.tipo==='avatar'&&r.spec)return avatarURL(r.spec,240);return '';};
+const portraitThumb=sh=>{const r=sh&&sh.retrato;return r?safeImg(r.thumb)||'':'';};
+/* a square crop of an uploaded picture, as JPEG */
+function cropSquare(file,size,q){return new Promise((res,rej)=>{const img=new Image(),url=URL.createObjectURL(file);img.onload=()=>{URL.revokeObjectURL(url);const s=Math.min(img.naturalWidth,img.naturalHeight),cv=document.createElement('canvas');cv.width=cv.height=size;const g=cv.getContext('2d');
+    g.fillStyle='#fff';g.fillRect(0,0,size,size);g.drawImage(img,(img.naturalWidth-s)/2,(img.naturalHeight-s)/2,s,s,0,0,size,size);res(cv.toDataURL('image/jpeg',q));};img.onerror=()=>{URL.revokeObjectURL(url);rej(new Error('formato'));};img.src=url;});}
+function thumbFrom(src){return new Promise(res=>{const img=new Image();img.onload=()=>{const cv=document.createElement('canvas');cv.width=cv.height=72;const g=cv.getContext('2d');g.drawImage(img,0,0,72,72);res(cv.toDataURL('image/jpeg',.8));};img.onerror=()=>res('');img.src=src;});}
+function portraitCell(sh){const src=portraitSrc(sh),ed=canEdit(sh);
+  return `<button type="button" class="portrait${src?'':' empty'}" id="shPortrait" ${ed?'':'disabled'} title="${ed?'Retrato do personagem: clique para mudar':'Retrato do personagem'}" aria-label="Retrato do personagem">${src?`<img src="${esc(src)}" alt="">`:`<span>${ed?'+ Retrato':'Sem retrato'}</span>`}</button>`;}
+function portraitEditor(sh){const cur=sh.retrato||null;let mode=cur&&cur.tipo==='img'?'img':'avatar';let spec=cur&&cur.tipo==='avatar'?Object.assign({},cur.spec):avRandom();let img=cur&&cur.tipo==='img'?cur.src:'';
+  const swatches=(key,list)=>`<div class="avsw">${list.map(c=>`<button type="button" data-av="${key}" data-v="${c}" style="background:${c}" aria-label="${key}" aria-pressed="${spec[key]===c}"></button>`).join('')}</div>`;
+  const opts=(key,list)=>`<div class="seg">${list.map(([v,n])=>`<button type="button" data-av="${key}" data-v="${v}" aria-pressed="${spec[key]===v}">${n}</button>`).join('')}</div>`;
+  const draw=()=>{openModal(`<h2>Retrato</h2><div class="seg" id="pvMode"><button type="button" data-m="avatar" aria-pressed="${mode==='avatar'}">Montar retrato</button><button type="button" data-m="img" aria-pressed="${mode==='img'}">Enviar imagem</button></div>
+    <div class="pvwrap"><div class="pvimg">${mode==='avatar'?`<img src="${avatarURL(spec,240)}" alt="Prévia do retrato">`:img?`<img src="${esc(img)}" alt="Prévia do retrato">`:'<span class="note">Nenhuma imagem</span>'}</div>
+    ${mode==='avatar'?`<div class="avctl"><button type="button" class="btn small" id="avRand">Sortear tudo</button>
+      <span class="lab">Pele</span>${swatches('pele',AV.pele)}<span class="lab">Cabelo</span>${opts('cabelo',AV.cabelo)}${swatches('cabeloCor',AV.cabeloCor)}
+      <span class="lab">Olhos</span>${swatches('olhos',AV.olhos)}<span class="lab">Expressão</span>${opts('expr',AV.expr)}<span class="lab">Barba</span>${opts('barba',AV.barba)}<span class="lab">Orelhas</span>${opts('orelhas',AV.orelhas)}
+      <span class="lab">Roupa</span>${opts('roupa',AV.roupa)}${swatches('roupaCor',AV.roupaCor)}<span class="lab">Detalhe</span>${opts('extra',AV.extra)}<span class="lab">Fundo</span>${swatches('fundo',AV.fundo)}</div>`
+    :`<div class="avctl"><label class="field"><span>Imagem (JPG ou PNG)</span><input type="file" id="pvFile" accept="image/*"></label><p class="note">A imagem é cortada em quadrado pelo centro e reduzida para caber na ficha.</p></div>`}</div>
+    <div class="row" style="justify-content:flex-end">${cur?'<button class="btn danger" id="pvDel">Remover retrato</button>':''}<button class="btn" data-close>Cancelar</button><button class="btn primary" id="pvOk">Usar este retrato</button></div>`);
+    $('#modalBox').classList.add('wide');
+    for(const b of R.querySelectorAll('#pvMode button'))b.onclick=()=>{mode=b.dataset.m;draw();};
+    for(const b of R.querySelectorAll('[data-av]'))b.onclick=()=>{spec[b.dataset.av]=b.dataset.v;draw();};
+    const rr=$('#avRand');if(rr)rr.onclick=()=>{spec=avRandom();draw();};
+    const f=$('#pvFile');if(f)f.onchange=async()=>{const file=f.files[0];if(!file)return;try{img=await cropSquare(file,256,.85);draw();}catch(e){toast('Não consegui abrir essa imagem.');}};
+    const del=$('#pvDel');if(del)del.onclick=()=>{delete sh.retrato;queueSave(sh);closeModal();render();};
+    $('#pvOk').onclick=async()=>{if(mode==='img'&&!img){toast('Escolha uma imagem.');return;}
+      sh.retrato=mode==='img'?{tipo:'img',src:img,thumb:await thumbFrom(img)}:{tipo:'avatar',spec:Object.assign({},spec),thumb:avatarURL(spec,72)};queueSave(sh);closeModal();render();toast('Retrato atualizado.');};};
+  draw();}
 
 /* ================= SHEET VIEW ================= */
 const F=(k,label,o={})=>`<label class="${o.cls||''}" style="display:flex;flex-direction:column;gap:2px;min-width:0"><span class="lbl">${label}</span>${o.sel?`<select data-k="${k}">${o.sel.map(v=>Array.isArray(v)?`<option value="${esc(v[0])}">${esc(v[1])}</option>`:`<option>${esc(v)}</option>`).join('')}</select>`:`<input data-k="${k}"${o.n?` type="number" data-t="n"${o.min!=null?` min="${o.min}"`:''}${o.max!=null?` max="${o.max}"`:''}`:''} placeholder="${esc(o.ph||'')}">`}</label>`;
@@ -1038,6 +1152,7 @@ function bindSheet(root,sh){
   const sbb=$('#shBest');if(sbb)sbb.onclick=()=>saveToBest(sh);
   $('#shLink').onclick=()=>copyText(APP_URL+'#ficha-'+sh.id);const sm=$('#shMap');if(sm)sm.onclick=()=>Atlas.showToken(sh.id);const d=$('#shDel');if(d)d.onclick=()=>confirmBox(`Apagar a ficha “${sh.nome||'sem nome'}”? Isso não pode ser desfeito.`,async()=>{const cid=sh.camp;await removeSheet(sh);location.hash=cid?'campanha-'+cid:'inicio';render();});
   if(sh.sys==='etmos')bindEtmos(root,sh);
+  const pt=$('#shPortrait');if(pt&&canEdit(sh))pt.onclick=()=>portraitEditor(sh);
   bindPend(root);for(const b of root.querySelectorAll('[data-cancelp]'))b.onclick=()=>{if(sh.pendentes)delete sh.pendentes[b.dataset.cancelp];queueSave(sh);render();};
   calc(root,sh);}
 /* rules that react to a field: ritual cost follows its circle, OP current values follow a raised maximum */
@@ -1068,7 +1183,7 @@ const condBox=(sh,list)=>`<div class="conds">${list.map(c=>`<button type="button
 const etPips=(k,n,cur,lbl)=>`<span class="epips" role="group" aria-label="${esc(lbl)}">${Array.from({length:n},(_,i)=>`<button type="button" class="epip${cur>=i+1?' on':''}" data-pip="${k}" data-i="${i+1}" aria-label="${esc(lbl)} ${i+1}"></button>`).join('')}</span>`;
 const etState=id=>(ui.et=ui.et||{})[id]||(ui.et[id]={seq:[],done:false});
 function etSheet(sh,tab){
-  const head=`<header class="ehead"><div class="ename"><span class="lbl">Nome do personagem</span><input data-k="nome" placeholder="Nome" aria-label="Nome do personagem"></div>
+  const head=`<header class="ehead"><div class="ename pname">${portraitCell(sh)}<div class="pn"><span class="lbl">Nome do personagem</span><input data-k="nome" placeholder="Nome" aria-label="Nome do personagem"></div></div>
     <div class="emeta">${F('jogador','Nome do jogador')}${F('ano','Ano escolar',{ph:'2º'})}${F('idade','Idade',{n:1,min:0})}${F('nivel','Nível',{n:1,min:0})}${F('empenho','Dados de empenho',{ph:'3'})}</div>
     <div class="elogo" aria-hidden="true">ETMOS<small>RPG</small></div></header>`;
   const tabs=stabs(sh,tab,[['personagem','Personagem'],['combate','Combate'],['grimorio','Grimório'],['conceito','Conceito']]);let b='';
@@ -1131,7 +1246,7 @@ function bindEtmos(root,sh){const st=etState(sh.id);
   on('#etFadRoll',()=>{const f=num(sh.fadiga)>=9?3:4,alvo=num(sh.atr.corpo)+f;rollSheet=sh;rollExpr(`${sh.nome||'Ficha'} · 2d6 contra Corpo +${f} (até ${alvo} tá tranquilo)`,'2d6');});}
 /* ---------- D&D 5e ---------- */
 function dndSheet(sh,tab){
-  const head=`<header class="dhead"><div class="dname"><span class="lbl">Nome do personagem</span><input data-k="nome" placeholder="Nome" aria-label="Nome do personagem"></div>
+  const head=`<header class="dhead"><div class="dname pname">${portraitCell(sh)}<div class="pn"><span class="lbl">Nome do personagem</span><input data-k="nome" placeholder="Nome" aria-label="Nome do personagem"></div></div>
     <div class="dmeta">${F('classe','Classe',{ph:'Guerreiro'})}${F('subclasse','Subclasse')}${F('nivel','Nível',{n:1,min:1,max:20})}${F('especie','Espécie',{ph:'Anão'})}${F('antecedente','Antecedente')}${F('alinhamento','Alinhamento')}${F('jogador','Jogador')}${F('xp','XP',{n:1,min:0})}</div></header>`;
   const tabs=stabs(sh,tab,[['principal','Principal'],['magias','Magias'],['inventario','Inventário'],['historia','História'],['notas','Notas']]);let b='';
   if(tab==='principal'){
@@ -1170,7 +1285,7 @@ function dndSheet(sh,tab){
 
 /* ---------- Ordem Paranormal ---------- */
 function opSheet(sh,tab){
-  const head=`<header class="ohead"><div class="oname"><span class="lbl">Agente</span><input data-k="nome" placeholder="Nome do agente" aria-label="Nome do agente"></div>
+  const head=`<header class="ohead"><div class="oname pname">${portraitCell(sh)}<div class="pn"><span class="lbl">Agente</span><input data-k="nome" placeholder="Nome do agente" aria-label="Nome do agente"></div></div>
     <div class="ometa">${F('origem','Origem',{ph:'Acadêmico'})}${F('classe','Classe',{sel:Object.entries(OP.classes).map(([k,v])=>[k,v.n])})}${F('trilha','Trilha')}${F('nex','NEX',{sel:OP.nex.map(n=>[n,n+'%'])})}
       ${F('patente','Patente',{sel:OP.patentes})}${F('pp','Prestígio',{n:1,min:0})}${F('afinidade','Afinidade',{sel:[['','Nenhuma']].concat(Object.entries(OP.elementos).map(([k,v])=>[k,v.n]))})}${F('jogador','Jogador')}</div></header>`;
   const tabs=stabs(sh,tab,[['principal','Status'],['pericias','Perícias'],['combate','Combate'],['rituais','Rituais'],['habilidades','Habilidades'],['inventario','Inventário'],['dossie','Dossiê']]);let b='';
