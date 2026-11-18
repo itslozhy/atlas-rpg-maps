@@ -2066,7 +2066,8 @@ function getSprite(type,s,P,rot,tint,scale,L,unlit){
   let sil=null;if(L.on){sil=document.createElement('canvas');sil.width=sil.height=px;const h=sil.getContext('2d');const B=px*4+200;h.shadowColor='#000';h.shadowBlur=Math.max(1,s*scale*.04);h.shadowOffsetX=B;h.drawImage(cv,-B,0);}
   sp={img:cv,sil,size};if(spriteCache.size>900){let n=0;for(const k of spriteCache.keys()){spriteCache.delete(k);if(++n>300)break;}}spriteCache.set(key,sp);return sp;
 }
-function groundPatch(c,type,x,y,s){const q=isQ(type);if(!q&&!type.startsWith('u_'))return;if(FLAT.has(type))return;const cx=clamp(Math.floor(x/CP),0,map.W-1),cy=clamp(Math.floor((y+s*.25)/CP),0,map.H-1),t=map.terrain[cy*map.W+cx];if(WATER.has(t)||t===37||t===38)return;
+function groundPatch(c,type,x,y,s){const q=isQ(type);if(RELEVO_IDS.has(type)){const cx=clamp(Math.floor(x/CP),0,map.W-1),cy=clamp(Math.floor((y+s*.28)/CP),0,map.H-1),t=map.terrain[cy*map.W+cx];if(WATER.has(t))return;
+    const col=shade(TERR[t].c[sIdx()],-.1);c.save();c.translate(x,y+s*.29);c.scale(1,.3);const r=s*.62,g=c.createRadialGradient(0,0,r*.2,0,0,r);g.addColorStop(0,hexA(col,.6));g.addColorStop(1,hexA(col,0));c.fillStyle=g;c.beginPath();c.arc(0,0,r,0,TAU);c.fill();c.restore();return;}if(!q&&!type.startsWith('u_'))return;if(FLAT.has(type))return;const cx=clamp(Math.floor(x/CP),0,map.W-1),cy=clamp(Math.floor((y+s*.25)/CP),0,map.H-1),t=map.terrain[cy*map.W+cx];if(WATER.has(t)||t===37||t===38)return;
   const col=shade(TERR[t].c[sIdx()],-.22);c.save();c.translate(x,y+(q?s*.3:0));c.scale(1,q?.4:.8);const r=s*(q?.5:.46);const g=c.createRadialGradient(0,0,r*.35,0,0,r);const rgb=col.match(/[\d.]+/g).slice(0,3).join(',');g.addColorStop(0,`rgba(${rgb},.55)`);g.addColorStop(1,`rgba(${rgb},0)`);
   c.fillStyle=g;c.beginPath();c.arc(0,0,r,0,TAU);c.fill();c.restore();}
 function drawIcon(c,type,x,y,s,P,rot,tint,onMap){
@@ -2780,6 +2781,7 @@ function reliefKit(c,P,Q){
   R.vgrad=vgrad;R.hgrad=hgrad;R.lit=lit;
   return R;
 }
+const RELEVO_IDS=new Set();
 const RELEVO_DEFS=[
   ['q_mont_pico','Montanha','relevo34','*'],['q_mont_nevada','Montanha nevada','relevo34','*'],['q_mont_rochosa','Pico rochoso','relevo34','*'],['q_mont_dupla','Montanha de dois picos','relevo34','*'],
   ['q_cordilheira34','Cordilheira','relevo34','*'],['q_mont_verde','Montanha arborizada','relevo34','*'],['q_vulcao34','Vulcão ativo','relevo34','*'],['q_vulcao_extinto','Vulcão extinto com lago','relevo34','*'],
@@ -2870,7 +2872,20 @@ Object.assign(Q_FN,{
     c.fillStyle=shade(col,-.2);for(const x of[-3.5,-1,1.5,3.8]){c.beginPath();c.moveTo(x-.8,4.2+Math.abs(x)*.3);c.lineTo(x,6.8+Math.abs(x)*.25);c.lineTo(x+.8,4.2+Math.abs(x)*.3);c.closePath();c.fill();}
     R.boulder(-9,12,1.8,col);R.boulder(9,12.4,1.5,col);R.bush(-12,9,1.6,R.c.tree);},
 });
-for(const d of RELEVO_DEFS){URB_DEFS.push(d);ICONS[d[0]]=d[1];ICON_DEFS.push([d[0],d[1],'relevo',d[3]]);}
+/* every relief piece melts into the ground it stands on: the lowest band of the drawing fades out (the map's ground patch
+   shows through), and a soft skirt of the piece's own colour spreads behind its foot */
+function reliefBlend(c,P,b){const y=b.y==null?12:b.y,h=b.h==null?5:b.h,k=b.k==null?.8:b.k,w=b.w==null?21:b.w,TAU2=Math.PI*2;
+  c.save();c.globalCompositeOperation='destination-out';const g=c.createLinearGradient(0,y-h,0,y+1.5);g.addColorStop(0,'rgba(0,0,0,0)');g.addColorStop(1,`rgba(0,0,0,${k})`);c.fillStyle=g;c.fillRect(-48,y-h,96,64);c.restore();
+  const col=b.col?b.col(P):null;if(!col)return;c.save();c.globalCompositeOperation='destination-over';c.translate(0,y-1);c.scale(1,.3);
+  const rg=c.createRadialGradient(0,0,0,0,0,w);rg.addColorStop(0,hexA(col,.55));rg.addColorStop(.6,hexA(col,.22));rg.addColorStop(1,hexA(col,0));c.fillStyle=rg;c.beginPath();c.arc(0,0,w,0,TAU2);c.fill();c.restore();}
+{const rock=P=>shade(P.mtn||'#cfba92',-.06),sand=P=>TERR[7].c[sIdx()],grass=P=>P.grass||TERR[5].c[sIdx()],canyon=P=>TERR[20].c[sIdx()];
+  const B={q_mont_pico:{col:rock},q_mont_nevada:{col:rock},q_mont_rochosa:{col:rock,y:12.5},q_mont_dupla:{col:rock,w:23},q_cordilheira34:{col:rock,w:24},q_mont_verde:{col:grass},
+    q_vulcao34:{col:rock},q_vulcao_extinto:{col:grass},q_mont_cristal:{col:rock},q_duna:{col:sand,y:11.5,h:4},q_dunas:{col:sand,y:13.5,h:4,w:23},q_duna_alta:{col:sand,y:12,h:5},
+    q_cachoeira34:{col:grass,y:15.4,h:2.5,k:.55},q_cachoeira_alta:{col:grass,y:14.8,h:2.5,k:.55},q_cascata:{col:grass,y:15,h:2.5,k:.55},q_cachoeira_larga:{col:grass,y:15.6,h:2.5,k:.55,w:24},
+    q_colina34:{col:grass,h:4},q_colinas34:{col:grass,y:13,h:4,w:23},q_plato:{col:canyon,y:12,h:4},q_escarpa:{col:rock,y:11,h:3.5,w:24},q_canion:{col:canyon,y:15,h:3.5,k:.65,w:23},
+    q_arco_pedra:{col:canyon,y:12.6,h:4},q_agulha:{col:rock,y:12.6,h:5,w:14},q_rochedos:{col:rock,y:13.4,h:5},q_cratera:{col:null,y:12,h:3,k:.6},q_caverna34:{col:rock,y:12.4,h:4}};
+  for(const [id,b] of Object.entries(B)){const f=Q_FN[id];Q_FN[id]=(c,P,Q)=>{f(c,P,Q);reliefBlend(c,P,b);};}}
+for(const d of RELEVO_DEFS){RELEVO_IDS.add(d[0]);URB_DEFS.push(d);ICONS[d[0]]=d[1];ICON_DEFS.push([d[0],d[1],'relevo',d[3]]);}
 URB_CATS.relevo34='Relevo e natureza (3/4)';CATS.relevo='Relevo em 3/4 (montanhas, dunas, cachoeiras)';
 const isQ=t=>t.startsWith('q_')||t.startsWith('h|')||t.startsWith('k|');
 /* ===== map view: 3/4 or top-down ===== */
@@ -2878,6 +2893,9 @@ const V34_CATS=new Set(['casa34','loja34','taverna34','castelo34','edif34','prac
 const viewOf=()=>(map&&map.view)||'34';
 const mainCat=cat=>viewOf()==='34'?V34_CATS.has(cat):!V34_CATS.has(cat);
 const mainWall=id=>viewOf()==='34'?id.startsWith('w3_'):!id.startsWith('w3_');
+/* the foot of a mountain or hill painted by the brush: a band of its own colour over the base line that fades into the ground */
+function footBlend(c,cx,y,w,col,dep){c.save();c.beginPath();c.rect(cx-w*1.4,y-dep*.35,w*2.8,dep*1.5);c.clip();c.translate(cx,y);c.scale(1,dep/(w*1.15));
+  const rg=c.createRadialGradient(0,0,0,0,0,w*1.15);rg.addColorStop(0,hexA(col,.75));rg.addColorStop(.55,hexA(col,.4));rg.addColorStop(1,hexA(col,0));c.fillStyle=rg;c.beginPath();c.arc(0,0,w*1.15,0,Math.PI*2);c.fill();c.restore();}
 /* 3/4 terrain decoration: trees, pines, hills and mountains with volume, drawn by the brush */
 function decor34(c,v,x,y,h1,h2,cx,cy,base,P,LC,LSX,LSY,st){
   if(v!==3&&v!==4&&v!==5&&v!==6&&v!==17&&v!==18&&v!==23)return false;const ink=P.ink;c.lineWidth=.9;c.strokeStyle=ink;const sh=LC.on?.12+LC.pow*.16:0;
@@ -2894,7 +2912,8 @@ function decor34(c,v,x,y,h1,h2,cx,cy,base,P,LC,LSX,LSY,st){
   if(v===23){if(!(x%2===0&&y%2===(x>>1)%2))return true;const tx=cx+(h2-.5)*CP,ty=cy+CP*.5;if(sh){c.fillStyle=`rgba(0,0,0,${sh*.8})`;c.beginPath();c.ellipse(tx+LSX*CP*.5,ty,CP*.7,CP*.22,0,0,TAU);c.fill();}
     c.strokeStyle=shade(base,-.5);c.lineWidth=1.6;c.beginPath();c.moveTo(tx,ty);c.lineTo(tx,ty-CP*1.3);c.stroke();c.lineWidth=1;c.beginPath();c.moveTo(tx,ty-CP*.6);c.lineTo(tx-CP*.5,ty-CP*1.15);c.moveTo(tx,ty-CP*.85);c.lineTo(tx+CP*.5,ty-CP*1.35);c.moveTo(tx-CP*.28,ty-CP*.9);c.lineTo(tx-CP*.3,ty-CP*1.4);c.stroke();c.strokeStyle=ink;return true;}
   if(v===5){if(!(x%3===0&&y%3===(x%2)))return true;const hx=cx+(h2-.5)*CP,hy=cy+CP*.5,w=CP*1.45,hh=CP*1.05;if(sh){c.fillStyle=`rgba(0,0,0,${sh*.8})`;c.beginPath();c.ellipse(hx+LSX*w*.5,hy+LSY*2,w*1.05,CP*.3,0,0,TAU);c.fill();}
-    c.beginPath();c.moveTo(hx-w,hy);c.bezierCurveTo(hx-w*.6,hy-hh*1.5,hx+w*.6,hy-hh*1.5,hx+w,hy);c.closePath();const g=c.createLinearGradient(hx-w,0,hx+w,0);g.addColorStop(0,shade(base,LSX>0?.16:-.26));g.addColorStop(1,shade(base,LSX>0?-.26:.16));c.fillStyle=g;c.fill();c.stroke();
+    c.beginPath();c.moveTo(hx-w,hy);c.bezierCurveTo(hx-w*.6,hy-hh*1.5,hx+w*.6,hy-hh*1.5,hx+w,hy);c.closePath();const g=c.createLinearGradient(hx-w,0,hx+w,0);g.addColorStop(0,shade(base,LSX>0?.16:-.26));g.addColorStop(1,shade(base,LSX>0?-.26:.16));c.fillStyle=g;c.fill();
+    {const sg=c.createLinearGradient(0,hy-hh*1.2,0,hy);sg.addColorStop(0,ink);sg.addColorStop(.65,ink);sg.addColorStop(1,hexA(ink,0));c.strokeStyle=sg;}c.beginPath();c.moveTo(hx-w,hy);c.bezierCurveTo(hx-w*.6,hy-hh*1.5,hx+w*.6,hy-hh*1.5,hx+w,hy);c.stroke();footBlend(c,hx,hy,w,base,CP*.6);
     c.strokeStyle=P.soft;c.lineWidth=.7;c.beginPath();c.moveTo(hx-w*.3,hy-hh*.55);c.lineTo(hx-w*.3+1,hy-hh*.55-2.4);c.moveTo(hx+w*.2,hy-hh*.75);c.lineTo(hx+w*.2+1,hy-hh*.75-2.4);c.stroke();c.strokeStyle=ink;return true;}
   if(!(x%3===1&&y%3===((x>>1)%3)))return true;
   const mx=cx+(h2-.5)*CP*.9,my=(y+1)*CP+(h1-.5)*CP*.6,w=CP*2,hgt=CP*(2.7+h1*1.5),lit=LSX>0,pk=[mx+(h2-.5)*CP*.5,my-hgt],rb=[mx+w*.14,my];
@@ -2905,7 +2924,7 @@ function decor34(c,v,x,y,h1,h2,cx,cy,base,P,LC,LSX,LSY,st){
   c.fillStyle=lit?shade(cl,-.05):shade(cd,.08);c.beginPath();c.moveTo(mx-w*.82,my);c.lineTo(mx-w*.5,my-hgt*.42);c.lineTo(mx-w*.22,my);c.closePath();c.fill();c.fillStyle=lit?shade(cd,.06):shade(cl,-.08);c.beginPath();c.moveTo(mx+w*.4,my);c.lineTo(mx+w*.62,my-hgt*.34);c.lineTo(mx+w*.9,my);c.closePath();c.fill();
   if(hgt>CP*3.1){const k=.3;c.fillStyle=lit?'#ffffff':'#d2dbe4';c.beginPath();c.moveTo(pk[0],pk[1]);c.lineTo(pk[0]-(pk[0]-(mx-w))*k,pk[1]+hgt*k);c.lineTo(pk[0]-w*.12,pk[1]+hgt*k*.72);c.lineTo(pk[0]+(rb[0]-pk[0])*k,pk[1]+hgt*k*.95);c.closePath();c.fill();
     c.fillStyle=lit?'#d2dbe4':'#ffffff';c.beginPath();c.moveTo(pk[0],pk[1]);c.lineTo(pk[0]+(rb[0]-pk[0])*k,pk[1]+hgt*k*.95);c.lineTo(pk[0]+w*.2,pk[1]+hgt*k*.7);c.lineTo(pk[0]+(mx+w-pk[0])*k,pk[1]+hgt*k);c.closePath();c.fill();}
-  c.strokeStyle=ink;c.lineWidth=.9;c.beginPath();c.moveTo(mx-w,my);c.lineTo(pk[0],pk[1]);c.lineTo(mx+w,my);c.moveTo(pk[0],pk[1]);c.lineTo(rb[0],rb[1]);c.stroke();
+  {const sg=c.createLinearGradient(0,pk[1],0,my);sg.addColorStop(0,ink);sg.addColorStop(.7,ink);sg.addColorStop(1,hexA(ink,0));c.strokeStyle=sg;}c.lineWidth=.9;c.beginPath();c.moveTo(mx-w,my);c.lineTo(pk[0],pk[1]);c.lineTo(mx+w,my);c.moveTo(pk[0],pk[1]);c.lineTo(rb[0],rb[1]);c.stroke();footBlend(c,mx,my,w,base,CP*.9);
   c.strokeStyle=P.soft;c.lineWidth=.6;c.beginPath();c.moveTo(pk[0]-w*.2,pk[1]+hgt*.45);c.lineTo(mx-w*.45,my-hgt*.12);c.moveTo(pk[0]+w*.32,pk[1]+hgt*.5);c.lineTo(mx+w*.5,my-hgt*.14);c.stroke();c.strokeStyle=ink;return true;}
 /* cached wall sprites so 3/4 walls can be depth-sorted with buildings */
 const wallCache=new Map();
@@ -2937,10 +2956,68 @@ function alongPath(pts,every,fn){const sp=samplePath(pts);let acc=0;for(let i=1;
   if(acc>=every){acc=0;const ang=Math.atan2(sp[i][1]-sp[i-1][1],sp[i][0]-sp[i-1][0]);fn(sp[i][0],sp[i][1],ang);}}}
 /* rivers and canals: all banks first, then all water, so confluences read as one body */
 const WATERWAYS=new Set(['rio','canal']);
+/* ===== soft ends: streets and rivers fade out at loose ends; rivers melt into the sea or a lake ===== */
+const rgbOf=c=>{c=String(c||'#000');if(c[0]==='#'){if(c.length===4)c='#'+c[1]+c[1]+c[2]+c[2]+c[3]+c[3];const n=parseInt(c.slice(1,7),16);return [n>>16,n>>8&255,n&255];}const m=(c.match(/[\d.]+/g)||[0,0,0]).map(Number);return [m[0]|0,m[1]|0,m[2]|0];};
+const toHex=a=>'#'+a.map(v=>Math.max(0,Math.min(255,Math.round(v))).toString(16).padStart(2,'0')).join('');
+function mixHex(a,b,t){const A=rgbOf(a),B=rgbOf(b);return toHex(A.map((v,i)=>v+(B[i]-v)*t));}
+function hexA(c,a){const A=rgbOf(c);return `rgba(${A[0]},${A[1]},${A[2]},${a})`;}
+/* the same polyline with points at most `step` apart, so per-piece fades are smooth */
+function densify(sp,step){const out=[sp[0]];for(let i=1;i<sp.length;i++){const a=sp[i-1],b=sp[i],d=Math.hypot(b[0]-a[0],b[1]-a[1]),k=Math.ceil(d/step);for(let j=1;j<=k;j++)out.push([a[0]+(b[0]-a[0])*j/k,a[1]+(b[1]-a[1])*j/k]);}return out;}
+function cumLen(sp){const c=[0];for(let i=1;i<sp.length;i++)c.push(c[i-1]+Math.hypot(sp[i][0]-sp[i-1][0],sp[i][1]-sp[i-1][1]));return c;}
+function pointAt(sp,cum,s){if(s<=0)return sp[0];for(let i=1;i<sp.length;i++)if(cum[i]>=s){const t=(s-cum[i-1])/((cum[i]-cum[i-1])||1);return [sp[i-1][0]+(sp[i][0]-sp[i-1][0])*t,sp[i-1][1]+(sp[i][1]-sp[i-1][1])*t];}return sp[sp.length-1];}
+function subPath(sp,cum,s0,s1){const out=[pointAt(sp,cum,s0)];for(let i=0;i<sp.length;i++)if(cum[i]>s0&&cum[i]<s1)out.push(sp[i]);out.push(pointAt(sp,cum,s1));return out;}
+/* the colour the water really has on the map at (x, y), read from the painted terrain layer */
+function waterColorAt(x,y){try{if(!hiCtx)return null;const X=clamp(Math.round(x)-3,0,hi.width-7),Y=clamp(Math.round(y)-3,0,hi.height-7),d=hiCtx.getImageData(X,Y,7,7).data;let r=0,g=0,b=0,n=0;
+  for(let i=0;i<d.length;i+=4){if(d[i+3]<200)continue;r+=d[i];g+=d[i+1];b+=d[i+2];n++;}return n?toHex([r/n,g/n,b/n]):null;}catch(e){return null;}}
+function terrAt(x,y){const cx=clamp(Math.floor(x/CP),0,map.W-1),cy=clamp(Math.floor(y/CP),0,map.H-1);return map.terrain[cy*map.W+cx];}
+/* stroke a polyline whose ends fade over E.a (start) and E.b (end) map units; ends without fade keep a round cap */
+function strokeSoft(ctx,sp,E){if(!E||(!E.a&&!E.b)||sp.length<2)return strokePoly(ctx,sp);
+  const cum=cumLen(sp),L=cum[cum.length-1];if(L<1)return strokePoly(ctx,sp);const a=Math.min(E.a||0,L*.45),b=Math.min(E.b||0,L*.45);
+  const ga=ctx.globalAlpha,cap=ctx.lineCap;ctx.lineCap='butt';if(L-a-b>.3)strokePoly(ctx,subPath(sp,cum,a,L-b));
+  const K=Math.max(6,Math.min(14,Math.round(Math.max(a,b)/2)));
+  if(a>0)for(let i=0;i<K;i++){ctx.globalAlpha=ga*((i+.5)/K);strokePoly(ctx,subPath(sp,cum,a*i/K,a*(i+1)/K+.05));}
+  if(b>0)for(let i=0;i<K;i++){ctx.globalAlpha=ga*(1-(i+.5)/K);strokePoly(ctx,subPath(sp,cum,L-b+b*i/K-.05,L-b+b*(i+1)/K));}
+  ctx.globalAlpha=ga;ctx.lineCap=cap;
+  for(const [on,p,q] of[[!a,sp[0],sp[1]],[!b,sp[sp.length-1],sp[sp.length-2]]])if(on){const d=Math.hypot(q[0]-p[0],q[1]-p[1])||1;strokePoly(ctx,[p,[p[0]+(q[0]-p[0])/d*.01,p[1]+(q[1]-p[1])/d*.01]]);}}
+/* which ends of a street are loose (fade) and which meet another street (stay) */
+const endCache=new Map();
+function streetEnds(o,sp){const key=geomVer+'|'+o.w+'|'+o.pts.length;const c=endCache.get(o.id);if(c&&c.key===key)return c.E;
+  const others=map.objects.filter(q=>q!==o&&q.kind==='line'&&PATHLIKE.has(q.type)&&q.pts&&q.pts.length>1).map(q=>({q,sp:samplePath(q.pts)}));
+  const p0=sp[0],p1=sp[sp.length-1],loop=Math.hypot(p0[0]-p1[0],p0[1]-p1[1])<o.w*1.5;
+  const conn=p=>loop||others.some(it=>{const r=nearestOnPath(it.sp,p);return r&&r.d<=Math.max(2,it.q.w*(it.q.type==='avenida'?1.5:1)+1.5);});
+  const fl=Math.max(7,o.w*4.5);const E={a:conn(p0)?0:fl,b:conn(p1)?0:fl};if(endCache.size>400)endCache.clear();endCache.set(o.id,{key,E});return E;}
+/* each end of a river: 'none' (meets another river), 'free' (fades on land) or 'mouth' (enters water; d = distance from the end to the shore) */
+function riverEnds(o,sp,cum){const key=geomVer+'|'+o.w+'|'+o.pts.length+'|r';const c=endCache.get(o.id);if(c&&c.key===key)return c.E;const L=cum[cum.length-1],si=sIdx();
+  const others=map.objects.filter(q=>q!==o&&q.kind==='line'&&WATERWAYS.has(q.type)&&q.pts&&q.pts.length>1).map(q=>({q,sp:samplePath(q.pts)}));
+  const end=(idx)=>{const p=sp[idx],t=terrAt(p[0],p[1]);
+    if(WATER.has(t)){let d=0;if(idx===0){for(let i=0;i<sp.length;i++){if(!WATER.has(terrAt(sp[i][0],sp[i][1]))){d=cum[i];break;}if(i===sp.length-1)d=L;}}
+      else{for(let i=sp.length-1;i>=0;i--){if(!WATER.has(terrAt(sp[i][0],sp[i][1]))){d=L-cum[i];break;}if(i===0)d=L;}}
+      const q=sp[idx===0?Math.min(1,sp.length-1):Math.max(0,sp.length-2)],dl=Math.hypot(p[0]-q[0],p[1]-q[1])||1,far=[p[0]+(p[0]-q[0])/dl*Math.max(10,o.w*3),p[1]+(p[1]-q[1])/dl*Math.max(10,o.w*3)];
+      return {k:'mouth',d,col:waterColorAt(far[0],far[1])||TERR[t].c[si]};}
+    if(others.some(it=>{const r=nearestOnPath(it.sp,p);return r&&r.d<=Math.max(2,it.q.w+1.5);}))return {k:'none'};
+    return {k:'free'};};
+  const E={a:end(0),b:end(sp.length-1)};if(endCache.size>400)endCache.clear();endCache.set(o.id,{key,E});return E;}
+/* alpha and colour shift of a river piece at distance s from one end; w = local width */
+function riverEndFx(e,s,w,pass){if(!e||e.k==='none')return {a:1,t:0};
+  if(e.k==='free'){const fl=Math.max(5,w*3);return {a:Math.min(1,s/fl),t:0};}
+  /* the painted coastline sits a little beyond the last land cell, so the river stays solid past it (covering the line) before fading */
+  const d=e.d,fl=Math.max(10,w*3.6),keep=w*1.3+CP*1.9;
+  if(pass===0)return {a:clamp((s-(d-keep*.8))/(w*.9),0,1),t:0};
+  return {a:s>=d-keep?1:clamp(1-(d-keep-s)/fl,0,1),t:clamp(((d+w*4)-s)/(w*4+keep+fl*.5),0,1)};}
+
 function drawRiver(ctx,o,P,pass){const w=o.w,all=pass==null;ctx.save();ctx.lineCap='round';ctx.lineJoin='round';
   if(o.type==='canal'){const sp=samplePath(o.pts);if(all||pass===0){ctx.strokeStyle=P.ink;ctx.lineWidth=w*1.4+2;strokePoly(ctx,sp);}if(all||pass===1){ctx.strokeStyle=P.river;ctx.lineWidth=w*1.4;strokePoly(ctx,sp);}ctx.restore();return;}
-  const sp=samplePath(o.pts),n=sp.length;for(let ps=0;ps<2;ps++){if(!all&&ps!==pass)continue;ctx.strokeStyle=ps?P.river:P.water;
-    for(let i=1;i<n;i++){const f=i/(n-1);ctx.lineWidth=(w*(.35+.65*f))+(ps?0:Math.max(1.2,w*.35));ctx.beginPath();ctx.moveTo(sp[i-1][0],sp[i-1][1]);ctx.lineTo(sp[i][0],sp[i][1]);ctx.stroke();}}
+  /* river water leans toward the lakes' tone; loose ends fade, and an end inside the sea or a lake melts into it */
+  let sp=samplePath(o.pts),cum=cumLen(sp);const E0=riverEnds(o,sp,cum),E={a:E0.a,b:E0.b},base=mixHex(P.river,TERR[1].c[sIdx()],.4);
+  /* a mouth gets drawn a little further into the water, so the river has room to melt into it */
+  const ext=Math.max(16,w*5.4)+CP*2,grow=(p,q)=>{const d=Math.hypot(p[0]-q[0],p[1]-q[1])||1;return [1,2,3,4].map(k=>[p[0]+(p[0]-q[0])/d*ext*k/4,p[1]+(p[1]-q[1])/d*ext*k/4]);};
+  if(E.a.k==='mouth'&&sp.length>1){sp=grow(sp[0],sp[1]).reverse().concat(sp);E.a=Object.assign({},E.a,{d:E.a.d+ext});}
+  if(E.b.k==='mouth'&&sp.length>1){sp=sp.concat(grow(sp[sp.length-1],sp[sp.length-2]));E.b=Object.assign({},E.b,{d:E.b.d+ext});}
+  sp=densify(sp,Math.max(2.5,w*.55));cum=cumLen(sp);const n=sp.length,L=cum[n-1];
+  for(let ps=0;ps<2;ps++){if(!all&&ps!==pass)continue;
+    for(let i=1;i<n;i++){const f=i/(n-1),lw=w*(.35+.65*f),sm=(cum[i-1]+cum[i])/2,fa=riverEndFx(E.a,sm,lw,ps),fb=riverEndFx(E.b,L-sm,lw,ps),al=Math.min(fa.a,fb.a);if(al<=.01)continue;
+      let col=ps?base:P.water;if(ps){const t=Math.max(fa.t,fb.t);if(t>0)col=mixHex(base,(fa.t>=fb.t?E.a.col:E.b.col)||base,t);}
+      ctx.globalAlpha=al;ctx.lineCap=al<.999?'butt':'round';ctx.strokeStyle=col;ctx.lineWidth=lw+(ps?0:Math.max(1.2,w*.35));ctx.beginPath();ctx.moveTo(sp[i-1][0],sp[i-1][1]);ctx.lineTo(sp[i][0],sp[i][1]);ctx.stroke();}}
   ctx.restore();}
 function drawLine(ctx,o,P){
   const w=o.w, pts=o.pts; if(!pts||pts.length<2)return;
@@ -3266,27 +3343,27 @@ const ST_KIND={rua_pedra:'pedra',rua_terra:'terra',avenida:'avenida'},ST_RANK={r
 function offsetPoly(sp,d){const out=[];for(let i=0;i<sp.length;i++){const a=sp[Math.max(0,i-1)],b=sp[Math.min(sp.length-1,i+1)];let nx=-(b[1]-a[1]),ny=b[0]-a[0];const l=Math.hypot(nx,ny)||1;out.push([sp[i][0]+nx/l*d,sp[i][1]+ny/l*d]);}return out;}
 /* 3/4 streets. The road sits lower than the sidewalks: the surface is drawn shifted down by d and narrowed by 2d, which uncovers
    the vertical face of the curb on the far (north) side of east-west streets and leaves a thin curb line along north-south ones. */
-function drawStreet34(ctx,o,P,pass){const w=o.w,sp=samplePath(o.pts),all=pass==null;ctx.save();ctx.lineCap='round';ctx.lineJoin='round';
+function drawStreet34(ctx,o,P,pass){const E=streetEnds(o,samplePath(o.pts));const w=o.w,sp=samplePath(o.pts),all=pass==null;ctx.save();ctx.lineCap='round';ctx.lineJoin='round';
   const av=o.type==='avenida',dirt=o.type==='rua_terra',outer=av?w*3+2.4:w*2+2.6,road=av?w*2.1:w*1.4,d=clamp(w*.22,.8,2.6);
   const shift=(pts,dy)=>pts.map(p=>[p[0],p[1]+dy]);
   if(dirt){
-    if(all||pass===0){ctx.globalAlpha=.55;ctx.strokeStyle=TERR[12].c[sIdx()];ctx.lineWidth=w*2+3;strokePoly(ctx,sp);ctx.globalAlpha=1;}
-    if(all||pass===1){const e=TERR[12].c[sIdx()];ctx.strokeStyle=shade(e,-.32);ctx.lineWidth=w*2;strokePoly(ctx,sp);
-      const dd=Math.min(d,1.2),sd=shift(sp,dd);ctx.strokeStyle=streetPattern(ctx,'terra');ctx.lineWidth=w*2-dd*2;strokePoly(ctx,sd);
-      if(w>=2.2){ctx.strokeStyle='rgba(60,38,18,.28)';ctx.lineWidth=Math.max(.6,w*.18);for(const k of[-.42,.42])strokePoly(ctx,offsetPoly(sd,w*k));
-        ctx.strokeStyle='rgba(255,245,220,.18)';ctx.lineWidth=Math.max(.4,w*.1);for(const k of[-.42,.42])strokePoly(ctx,offsetPoly(sd,w*k-Math.max(.5,w*.12)));}}
+    if(all||pass===0){ctx.globalAlpha=.55;ctx.strokeStyle=TERR[12].c[sIdx()];ctx.lineWidth=w*2+3;strokeSoft(ctx,sp,E);ctx.globalAlpha=1;}
+    if(all||pass===1){const e=TERR[12].c[sIdx()];ctx.strokeStyle=shade(e,-.32);ctx.lineWidth=w*2;strokeSoft(ctx,sp,E);
+      const dd=Math.min(d,1.2),sd=shift(sp,dd);ctx.strokeStyle=streetPattern(ctx,'terra');ctx.lineWidth=w*2-dd*2;strokeSoft(ctx,sd,E);
+      if(w>=2.2){ctx.strokeStyle='rgba(60,38,18,.28)';ctx.lineWidth=Math.max(.6,w*.18);for(const k of[-.42,.42])strokeSoft(ctx,offsetPoly(sd,w*k),E);
+        ctx.strokeStyle='rgba(255,245,220,.18)';ctx.lineWidth=Math.max(.4,w*.1);for(const k of[-.42,.42])strokeSoft(ctx,offsetPoly(sd,w*k-Math.max(.5,w*.12)),E);}}
     ctx.restore();return;}
-  if(all||pass===0){ctx.strokeStyle=P.ink;ctx.lineWidth=outer;strokePoly(ctx,sp);ctx.strokeStyle=streetPattern(ctx,'calcada');ctx.lineWidth=outer-1.4;strokePoly(ctx,sp);
-    ctx.strokeStyle=shade(P.wall||'#bdb6a6',.12);ctx.lineWidth=road+2.4;strokePoly(ctx,sp);ctx.strokeStyle='rgba(0,0,0,.3)';ctx.lineWidth=road+.8;strokePoly(ctx,sp);}
-  if(all||pass===2){ctx.strokeStyle=shade(P.wall||'#bdb6a6',-.42);ctx.lineWidth=road;strokePoly(ctx,sp);}
-  if(all||pass===1){const sd=shift(sp,d);ctx.strokeStyle=streetPattern(ctx,av?'avenida':'pedra');ctx.lineWidth=road-2*d;strokePoly(ctx,sd);
-      ctx.strokeStyle='rgba(0,0,0,.16)';ctx.lineWidth=Math.max(.5,w*.12);strokePoly(ctx,offsetPoly(sd,(road/2-d)*.92));strokePoly(ctx,offsetPoly(sd,-(road/2-d)*.92));}
+  if(all||pass===0){ctx.strokeStyle=P.ink;ctx.lineWidth=outer;strokeSoft(ctx,sp,E);ctx.strokeStyle=streetPattern(ctx,'calcada');ctx.lineWidth=outer-1.4;strokeSoft(ctx,sp,E);
+    ctx.strokeStyle=shade(P.wall||'#bdb6a6',.12);ctx.lineWidth=road+2.4;strokeSoft(ctx,sp,E);ctx.strokeStyle='rgba(0,0,0,.3)';ctx.lineWidth=road+.8;strokeSoft(ctx,sp,E);}
+  if(all||pass===2){ctx.strokeStyle=shade(P.wall||'#bdb6a6',-.42);ctx.lineWidth=road;strokeSoft(ctx,sp,E);}
+  if(all||pass===1){const sd=shift(sp,d);ctx.strokeStyle=streetPattern(ctx,av?'avenida':'pedra');ctx.lineWidth=road-2*d;strokeSoft(ctx,sd,E);
+      ctx.strokeStyle='rgba(0,0,0,.16)';ctx.lineWidth=Math.max(.5,w*.12);strokeSoft(ctx,offsetPoly(sd,(road/2-d)*.92),E);strokeSoft(ctx,offsetPoly(sd,-(road/2-d)*.92),E);}
   ctx.restore();}
-function drawStreet(ctx,o,P,pass){if(viewOf()==='34')return drawStreet34(ctx,o,P,pass);const w=o.w,sp=samplePath(o.pts),all=pass==null;ctx.save();ctx.lineCap='round';ctx.lineJoin='round';
-  if(all||pass===0){if(o.type==='rua_terra'){ctx.globalAlpha=.55;ctx.strokeStyle=TERR[12].c[sIdx()];ctx.lineWidth=w*2+3;strokePoly(ctx,sp);ctx.globalAlpha=1;}
-    else if(o.type==='rua_pedra'){ctx.strokeStyle=P.ink;ctx.lineWidth=w*2+2.6;strokePoly(ctx,sp);ctx.strokeStyle=P.wall;ctx.lineWidth=w*2+1.4;strokePoly(ctx,sp);}
-    else{ctx.strokeStyle=P.ink;ctx.lineWidth=w*3+2.4;strokePoly(ctx,sp);ctx.strokeStyle=P.wall;ctx.lineWidth=w*3;strokePoly(ctx,sp);}}
-  if(all||pass===1){ctx.strokeStyle=streetPattern(ctx,ST_KIND[o.type]);ctx.lineWidth=o.type==='rua_pedra'?w*2-1:o.type==='rua_terra'?w*2:w*2.1;strokePoly(ctx,sp);}
+function drawStreet(ctx,o,P,pass){if(viewOf()==='34')return drawStreet34(ctx,o,P,pass);const E=streetEnds(o,samplePath(o.pts));const w=o.w,sp=samplePath(o.pts),all=pass==null;ctx.save();ctx.lineCap='round';ctx.lineJoin='round';
+  if(all||pass===0){if(o.type==='rua_terra'){ctx.globalAlpha=.55;ctx.strokeStyle=TERR[12].c[sIdx()];ctx.lineWidth=w*2+3;strokeSoft(ctx,sp,E);ctx.globalAlpha=1;}
+    else if(o.type==='rua_pedra'){ctx.strokeStyle=P.ink;ctx.lineWidth=w*2+2.6;strokeSoft(ctx,sp,E);ctx.strokeStyle=P.wall;ctx.lineWidth=w*2+1.4;strokeSoft(ctx,sp,E);}
+    else{ctx.strokeStyle=P.ink;ctx.lineWidth=w*3+2.4;strokeSoft(ctx,sp,E);ctx.strokeStyle=P.wall;ctx.lineWidth=w*3;strokeSoft(ctx,sp,E);}}
+  if(all||pass===1){ctx.strokeStyle=streetPattern(ctx,ST_KIND[o.type]);ctx.lineWidth=o.type==='rua_pedra'?w*2-1:o.type==='rua_terra'?w*2:w*2.1;strokeSoft(ctx,sp,E);}
   ctx.restore();}
 function nearestOnPath(sp,p){let best=null,bd=Infinity;for(let i=1;i<sp.length;i++){const a=sp[i-1],b=sp[i],dx=b[0]-a[0],dy=b[1]-a[1],l=dx*dx+dy*dy;let t=l?((p[0]-a[0])*dx+(p[1]-a[1])*dy)/l:0;t=clamp(t,0,1);const q=[a[0]+t*dx,a[1]+t*dy],d=Math.hypot(p[0]-q[0],p[1]-q[1]);if(d<bd){bd=d;best=q;}}return best?{q:best,d:bd}:null;}
 function snapStreetEnds(nl){const grp=PATHLIKE.has(nl.type)?PATHLIKE:WATERWAYS.has(nl.type)?WATERWAYS:null;if(!grp)return 0;let n=0;const others=map.objects.filter(o=>o!==nl&&o.kind==='line'&&grp.has(o.type)).map(o=>({o,sp:samplePath(o.pts)}));
