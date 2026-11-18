@@ -226,6 +226,7 @@ ol.steps{margin:8px 0 0;padding-left:20px;font-size:14px;line-height:1.5;color:v
       </section>
       <section class="sec" id="secUrban" hidden>
         <h3>Detalhes urbanos</h3>
+        <div class="note" id="urbStreetHint" style="margin:0 0 8px;border:1px solid var(--line);border-radius:8px;padding:6px 8px;background:var(--panel-2)">Ruas contínuas (com calçada e meio-fio em 3/4) são traçadas: ferramenta <b>Traçado</b> › Rua de pedra, Avenida ou Rua de terra. <button class="btn" id="urbStreetGo" style="margin-top:6px">Traçar uma rua agora</button></div>
         <p class="note" style="margin:0 0 8px">Peças vistas de cima para montar quarteirões, praças, muralhas e docas.</p>
         <div class="seg" id="uEraSeg" aria-label="Era"></div>
         <div class="row" style="margin-top:8px"><select id="uCat" aria-label="Categoria urbana" style="flex:1;min-width:0"></select></div>
@@ -1639,6 +1640,8 @@ function qKit(c,P,la){
 function parseHouse(t){const a=t.split('|');return {w:+a[1]||5,d:+a[2]||4,st:+a[3]||1,roof:a[4]||'g',wall:a[5]||'r',fl:a[6]||'',shop:SHOPS[a[7]]?a[7]:''};}
 function houseType(h){return ['h',h.w,h.d,h.st,h.roof,h.wall,h.fl].join('|')+(h.shop?'|'+h.shop:'');}
 function drawHouse(c,P,Q,h,tint){
+  /* "de lado" (flag L): the house is turned 90 degrees, so its narrow gable end faces the viewer and the long roof runs back */
+  if(h.fl.includes('L'))return drawHouse(c,P,Q,Object.assign({},h,{w:h.d,d:h.w,roof:h.roof==='p'?'p':'f',fl:h.fl.split('L').join(''),shop:''}),tint);
   const M=4.5,SH=5.2,W=h.w*M,D=h.d*M,H=h.st*SH+(h.st>1?0:.8),rh=h.roof==='f'?Math.min(W*.42,7):h.roof==='p'||h.roof==='m'?0:Math.min(D*.38,4.5);
   const tower=h.fl.includes('t');const tot=D+H+rh+(h.roof==='f'?0:0)+(tower?6:0),sc=Math.min(1,48/tot,40/(W+(tower?6:0)));c.save();c.scale(sc,sc);
   const x=-W/2-(tower?2:0),yb=(H+rh-D)/2+(tower?1:0);const yt=yb-H,yf=yb+D-H;const thatch=tint==='palha';
@@ -1960,6 +1963,10 @@ const TAVERN_PRESETS=[
   ['h|7|4|2|g|s|clt|cama','Hospedaria com torreão'],['h|6|4|3|m|b|cl|caneca','Pub vitoriano'],['h|5|4|1|f|w|cl|caneca','Taverna nórdica'],['h|5|4|2|g|r|cs|cha','Casa de chá'],['h|5|4|2|f|e|cli|vinho','Adega'],
   ['h|8|5|2|g|e|clsb|cama','Estalagem de estrada'],['h|4|5|3|f|e|cl|caneca','Taverna estreita'],['h|6|5|2|h|d|cl|caneca','Taverna sombria'],['h|8|4|4|m|b|clb|cama','Hotel de esquina'],['h|6|4|1|p|y|l|caneca','Cantina de adobe'],['h|5|4|2|m|r|clv|cha','Salão de chá vitoriano']
 ];
+const HOUSE_SIDE=[
+  ['h|7|4|1|g|r|cL','Casa de lado'],['h|8|4|2|g|e|cL','Sobrado enxaimel de lado'],['h|9|3|1|g|w|L','Casa comprida de madeira, de lado'],['h|7|4|2|g|s|csL','Casa de pedra de lado'],
+  ['h|8|5|3|g|b|cL','Prédio de tijolos de lado'],['h|6|3|1|g|y|L','Casa de adobe de lado'],['h|8|4|2|g|r|cpL','Casa com alpendre, de lado'],['h|7|5|2|g|e|ciL','Casa enxaimel com hera, de lado'],
+  ['h|9|4|1|g|w|kL','Celeiro comprido de lado'],['h|6|3|2|g|s|cbL','Sobrado estreito de lado']];
 const HOUSE_PRESETS2=[
   ['h|4|3|1|g|e|c','Casa enxaimel térrea'],['h|6|4|2|g|s|ci','Casa de pedra com hera'],['h|5|4|3|g|b|c','Sobrado de tijolos'],['h|3|3|2|f|r|s','Casinha de dois andares'],['h|7|4|2|h|e|cs','Casa enxaimel larga'],['h|5|5|1|h|y|','Casa quadrada de adobe'],
   ['h|4|4|4|f|e|c','Casa-torre enxaimel'],['h|8|5|1|g|w|pc','Casa de fazenda'],['h|6|4|2|m|r|cm','Casa de mansarda'],['h|5|3|1|g|s|k','Casa velha com musgo'],['h|6|5|2|f|s|cv','Casa do pároco'],['h|7|6|3|m|b|cmb','Palacete de tijolos'],
@@ -1996,6 +2003,7 @@ const CASTLE_PRESETS=[
 for(const [id,n] of SHOP_PRESETS){URB_DEFS.push([id,n,'loja34','*']);ICONS[id]=n;}
 for(const [id,n] of TAVERN_PRESETS){URB_DEFS.push([id,n,'taverna34','*']);ICONS[id]=n;}
 for(const [id,n] of HOUSE_PRESETS2){URB_DEFS.push([id,n,'casa34','*']);ICONS[id]=n;}
+for(const [id,n] of HOUSE_SIDE){URB_DEFS.push([id,n,'casa34','*']);ICONS[id]=n;}
 for(const [id,n] of CASTLE_PRESETS){URB_DEFS.push([id,n,'castelo34','*']);ICONS[id]=n;}
 {const old=Object.assign({},URB_CATS);for(const k of Object.keys(URB_CATS))delete URB_CATS[k];Object.assign(URB_CATS,{casa34:old.casa34,loja34:'Lojas (3/4)',taverna34:'Tavernas e estalagens (3/4)',castelo34:old.castelo34,edif34:old.edif34},old);}
 
@@ -2589,7 +2597,7 @@ function drawMap(ctx,opts){
   if(vig){const g=ctx.createRadialGradient(W/2,H/2,Math.min(W,H)*.35,W/2,H/2,Math.max(W,H)*.75);g.addColorStop(0,'rgba(0,0,0,0)');g.addColorStop(1,vig);ctx.fillStyle=g;ctx.fillRect(0,0,W,H);}
   if(map.layers.grid&&opts.grid&&map.grid.type!=='none')drawGrid(ctx,map.grid,opts.bounds||[0,0,W,H],opts.gridLW||1);
   const vis=o=>!(opts.player&&o.secret);
-  const w3=[],sts=[];if(map.layers.lines){const rest=[],rivs=[];for(const o of map.objects)if(o.kind==='line'&&vis(o)){if(WALLS3[o.type]&&o.pts.length>1)w3.push(o);else if(NEWST.has(o.type)&&o.pts.length>1)sts.push(o);else if(WATERWAYS.has(o.type)&&o.pts.length>1)rivs.push(o);else rest.push(o);}
+  const w3=[],sts=[];if(map.layers.lines){const rest=[],rivs=[];for(const o of map.objects)if(o.kind==='line'&&vis(o)){if(WALLS3[o.type]&&o.pts.length>1)w3.push(o);else if((NEWST.has(o.type)||(o.type==='rua'&&viewOf()==='34'))&&o.pts.length>1)sts.push(o);else if(WATERWAYS.has(o.type)&&o.pts.length>1)rivs.push(o);else rest.push(o);}
     for(let ps=0;ps<2;ps++)for(const o of rivs)drawRiver(ctx,o,P,ps);for(const o of rest)drawLine(ctx,o,P);
     sts.sort((a,b)=>ST_RANK[a.type]-ST_RANK[b.type]);const dp=map.doorPaths!==false&&map.layers.icons,pl=!!opts.player;
     if(dp){drawDoorPaths(ctx,P,pl,0,false);drawDoorPaths(ctx,P,pl,0,true);}for(const o of sts)drawStreet(ctx,o,P,0);
@@ -2626,6 +2634,7 @@ SCALES.interior={n:'Interior / masmorra',terr:[39,35,36,30,28,32,29,26,27,1,0,37
   note:'Pinte Parede de rocha para o maciço e Piso para as salas, ou use Cercas › Parede de masmorra. Portas, móveis e armadilhas ficam em Urbano › Interiores e masmorras.'};
 Object.assign(LINES,{rua_pedra:{n:'Rua de pedra'},rua_terra:{n:'Rua de terra'},avenida:{n:'Avenida'}});
 SCALES.cidade.lines=['rua_pedra','rua_terra','avenida'].concat(SCALES.cidade.lines);
+for(const id of['avenida','rua_pedra','rua_terra'])if(!SCALES.reino.lines.includes(id))SCALES.reino.lines.push(id);
 for(const k of ['mundo','continente','reino'])SCALES[k].lines.push('rua_terra');
 Object.assign(WALLS,{w_parede:{n:'Parede de masmorra',w:6,era:'*'},w_parede_madeira:{n:'Parede de madeira',w:3,era:'*'}});
 LINES.w_parede={n:'Parede de masmorra'};LINES.w_parede_madeira={n:'Parede de madeira'};
@@ -2805,7 +2814,7 @@ function streetPattern(ctx,kind){const v34=viewOf()==='34';const key=map.style+'
   const pat=ctx.createPattern(cv,'repeat');try{pat.setTransform(new DOMMatrix().scale(.5,v34?.34:.5));}catch(e){}return stPats[key]=pat;}
 function rrect(g,x,y,w,h,r){r=Math.min(r,w/2,h/2);g.beginPath();g.moveTo(x+r,y);g.arcTo(x+w,y,x+w,y+h,r);g.arcTo(x+w,y+h,x,y+h,r);g.arcTo(x,y+h,x,y,r);g.arcTo(x,y,x+w,y,r);g.closePath();}
 const P34=()=>PAL[map.style]||PAL.parchment;
-const ST_KIND={rua_pedra:'pedra',rua_terra:'terra',avenida:'avenida'},ST_RANK={rua_terra:0,rua_pedra:1,avenida:2};
+const ST_KIND={rua_pedra:'pedra',rua_terra:'terra',avenida:'avenida',rua:'pedra'},ST_RANK={rua_terra:0,rua_pedra:1,rua:1,avenida:2};
 /* a polyline shifted sideways by d (positive = left of the direction of travel) */
 function offsetPoly(sp,d){const out=[];for(let i=0;i<sp.length;i++){const a=sp[Math.max(0,i-1)],b=sp[Math.min(sp.length-1,i+1)];let nx=-(b[1]-a[1]),ny=b[0]-a[0];const l=Math.hypot(nx,ny)||1;out.push([sp[i][0]+nx/l*d,sp[i][1]+ny/l*d]);}return out;}
 /* 3/4 streets. The road sits lower than the sidewalks: the surface is drawn shifted down by d and narrowed by 2d, which uncovers
@@ -3266,6 +3275,10 @@ function houseControls(box,h,onChange){box.innerHTML='';const prev=document.crea
   rng('Largura',"w",2,8);rng('Profundidade','d',2,6);rng('Andares','st',1,4);
   const seg=(lab,key,opts)=>{const h3=document.createElement('div');h3.className='note';h3.style.margin='8px 0 4px';h3.textContent=lab;box.appendChild(h3);const sg=document.createElement('div');sg.className='seg';
     for(const [v,n] of Object.entries(opts)){const b=document.createElement('button');b.textContent=n;b.setAttribute('aria-pressed',String(h[key]===v));b.onclick=()=>{h[key]=v;for(const x of sg.children)x.setAttribute('aria-pressed',String(x===b));paint();onChange(true);};sg.appendChild(b);}box.appendChild(sg);};
+  {const h3=document.createElement('div');h3.className='note';h3.style.margin='8px 0 4px';h3.textContent='Orientação';box.appendChild(h3);const sg=document.createElement('div');sg.className='seg';
+    for(const [v,n] of [['','De frente'],['L','De lado']]){const b=document.createElement('button');b.textContent=n;b.setAttribute('aria-pressed',String(h.fl.includes('L')===(v==='L')));
+      b.onclick=()=>{h.fl=h.fl.split('L').join('')+v;for(const x of sg.children)x.setAttribute('aria-pressed',String(x===b));paint();onChange(true);};sg.appendChild(b);}box.appendChild(sg);
+    const nt=document.createElement('p');nt.className='note';nt.style.margin='4px 0 0';nt.textContent='De lado: a empena estreita fica virada para quem olha e o telhado se estende para trás, como casas numa rua norte-sul.';box.appendChild(nt);}
   seg('Telhado','roof',QROOF_N);seg('Paredes','wall',QMAT_N);
   {const r=document.createElement('div');r.className='row';const sid='hb_shop'+Math.random().toString(36).slice(2,6);r.innerHTML=`<label for="${sid}">Comércio</label><select id="${sid}" style="flex:1;min-width:0"></select>`;const sel=r.querySelector('select');sel.add(new Option('Nenhum (moradia)',''));
     for(const [k,v] of Object.entries(SHOPS))sel.add(new Option(v.n,k));sel.value=h.shop||'';sel.onchange=()=>{h.shop=sel.value;paint();onChange(true);};box.appendChild(r);}
@@ -3312,6 +3325,8 @@ function refreshPanel(){
     b.innerHTML='<span class="t"></span>';b.prepend(terrThumb(id));b.querySelector('.t').textContent=TERR[id].n;b.title=TERR[id].n;b.onclick=()=>{ui.terr=id;refreshPanel();};tl.appendChild(b);}
   $('terrNote').textContent=sc.note;
   if(!sc.lines.includes(ui.line))ui.line=sc.lines[0];
+  {const st=['rua_pedra','avenida','rua_terra'].some(t=>sc.lines.includes(t));let nt=$('lineHint34');if(!nt){nt=document.createElement('p');nt.id='lineHint34';nt.className='note';$('lineList').after(nt);}
+    nt.textContent=st?(viewOf()==='34'?'Rua de pedra, Avenida e Rua de terra aparecem em 3/4, com calçada, meio-fio e calçamento em perspectiva.':'Rua de pedra, Avenida e Rua de terra ganham calçada e meio-fio quando o mapa está em 3/4 (Estética › Visão).'):'Ruas com calçada ficam disponíveis nos mapas de cidade, reino e interior.';}
   const ll=$('lineList');ll.innerHTML='';for(const id of sc.lines){const b=document.createElement('button');b.textContent=LINES[id].n;b.setAttribute('aria-pressed',String(id===ui.line));b.onclick=()=>{ui.line=id;refreshPanel();};ll.appendChild(b);}
   buildIconPanel();buildUrbanPanel();buildWallPanel();
   const lb=$('labelList');lb.innerHTML='';for(const [id,o] of Object.entries(LABELS)){const b=document.createElement('button');b.textContent=o.n;b.setAttribute('aria-pressed',String(id===ui.label));
@@ -3344,6 +3359,7 @@ function wirePanel(){
   $('gridUnit').onchange=e=>{map.grid.unit=e.target.value.slice(0,8);changed();requestDraw();};
   $('showScale').onchange=e=>{map.showScale=e.target.checked;changed();requestDraw();};
   $('iconCat').onchange=e=>{ui.iconCat=e.target.value;refreshPanel();};
+  $('urbStreetGo').onclick=()=>{const L=SCALES[map.scale].lines;if(!L.includes('rua_pedra')){toast('Ruas com calçada existem nos mapas de cidade, reino e interior.');return;}ui.line='rua_pedra';setTool('line');refreshPanel();toast('Arraste no mapa para traçar a rua.');};
   $('nightWin').onchange=e=>{map.nightWin=e.target.checked;atmDirty=true;changed();requestDraw();};
   $('wxAnim').onchange=e=>{map.wxAnim=e.target.checked;changed();ensureWeatherAnim();requestDraw();};
   $('streetFill').onchange=e=>{ui.streetFill=e.target.checked;};

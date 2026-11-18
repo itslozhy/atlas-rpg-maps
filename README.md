@@ -5,7 +5,7 @@
 
 **[Versão com mesa ao vivo e fichas compartilhadas](https://claude.ai/artifact/1wUYbQ513Syib6KfoBeN8k)** · no claude.ai, só para quem o mestre convidar.
 
-<sub>Última atualização: 17/11/2026 às 22:37 (horário de Brasília). O GitHub Pages publica a versão nova poucos minutos depois de cada envio.</sub>
+<sub>Última atualização: 17/11/2026 às 22:46 (horário de Brasília). O GitHub Pages publica a versão nova poucos minutos depois de cada envio.</sub>
 <!-- LINKS:FIM -->
 
 Mapas e fichas de RPG de mesa numa página só. O botão **Mapa | Fichas** no topo troca de seção sem sair da página, e as duas partes conversam entre si.
@@ -17,7 +17,8 @@ Mapas e fichas de RPG de mesa numa página só. O botão **Mapa | Fichas** no to
 - **Geradores:** continente, arquipélago, mundo, cidade, caverna e masmorra.
 - **Estéticas:** pergaminho, colorido, gravura vitoriana, steampunk, planta técnica e preto e branco.
 - **Relevo em 3/4:** montanhas (pico, nevada, rochosa, dois picos, cordilheira, arborizada, vulcões, cristal), dunas, cachoeiras e relevos (colinas, platô, escarpa, cânion, arco, agulha, rochedos, cratera, caverna), nas ferramentas Urbano e Ícone.
-- **Ruas em 3/4:** calçada, meio-fio e calçamento rebaixado com pedras em perspectiva; ruas de terra com sulcos.
+- **Ruas em 3/4:** ferramenta Traçado › Rua de pedra, Avenida ou Rua de terra (mapas de cidade, reino e interior), com calçada, meio-fio e calçamento rebaixado com pedras em perspectiva; ruas de terra com sulcos.
+- **Casas de lado em 3/4:** presets "de lado" e a opção Orientação no Construtor de casas, com a empena estreita virada para quem olha.
 - **Mesa:** notas por local, mapas vinculados, luz e sombra, hora do dia, clima e transmissão ao vivo para jogadores.
 
 ## Grimório do Mestre (fichas)
