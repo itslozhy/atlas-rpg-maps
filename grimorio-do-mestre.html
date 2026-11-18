@@ -43,8 +43,8 @@ h1.view{font-family:var(--f-title);font-weight:400;font-size:32px;margin:4px 0 4
 .card a.cover{color:inherit;text-decoration:none}
 .badge{display:inline-flex;align-items:center;gap:5px;font-size:12px;letter-spacing:.06em;text-transform:uppercase;font-weight:700;padding:2px 8px;border-radius:99px;border:1px solid currentColor;width:max-content}
 .badge.dnd{color:#8e3a1f}.badge.op{color:#b0122f}
-@media (prefers-color-scheme:dark){:host(:not([data-theme="light"])) .badge.dnd{color:#e6a07f}:host(:not([data-theme="light"])) .badge.op{color:#f07087}:host(:not([data-theme="light"])) .badge.etmos{color:#c9a4e0}}
-:host([data-theme="dark"]) .badge.dnd{color:#e6a07f}:host([data-theme="dark"]) .badge.op{color:#f07087}:host([data-theme="dark"]) .badge.etmos{color:#c9a4e0}
+@media (prefers-color-scheme:dark){:host(:not([data-theme="light"])) .badge.dnd{color:#e6a07f}:host(:not([data-theme="light"])) .badge.op{color:#f07087}:host(:not([data-theme="light"])) .badge.etmos{color:#c9a4e0}:host(:not([data-theme="light"])) .badge.sacra{color:#e2a676}}
+:host([data-theme="dark"]) .badge.dnd{color:#e6a07f}:host([data-theme="dark"]) .badge.op{color:#f07087}:host([data-theme="dark"]) .badge.etmos{color:#c9a4e0}:host([data-theme="dark"]) .badge.sacra{color:#e2a676}
 .empty{border:1px dashed var(--line);border-radius:12px;padding:22px;color:var(--muted);text-align:center;background:var(--panel)}
 .field{display:flex;flex-direction:column;gap:4px;font-size:14px}
 .field>span{color:var(--muted);font-size:13px}
@@ -209,6 +209,55 @@ h1.view{font-family:var(--f-title);font-weight:400;font-size:32px;margin:4px 0 4
 .sheet.op .tag{font-family:"IBM Plex Mono",monospace;font-size:11px;color:var(--sm);border:1px solid var(--sl);border-radius:4px;padding:0 4px}
 
 /* ---- Etmos: lavender school notebook, plum ink, particle cards ---- */
+.sheet.sacra{--sbg:#eedfc0;--sp:#f6ead0;--sp2:#e3cfa6;--sf:#2a1a0e;--sm:#7a5a3a;--sa:#8a3b12;--sab:#fff6e6;--sl:#c7a878;--sl2:#dcc59c;--sh:#fbf2df;
+  background:var(--sbg);color:var(--sf);font-family:"EB Garamond",Georgia,serif;font-size:16px;
+  background-image:radial-gradient(ellipse at 0% 0%,rgba(255,250,235,.6),transparent 55%),radial-gradient(ellipse at 100% 100%,rgba(138,59,18,.16),transparent 55%)}
+.sheet.sacra .box{background:rgba(255,250,238,.45)}
+.sheet.sacra .box>h4,.sheet.sacra .stabs button{font-family:"Rye",Georgia,serif;letter-spacing:.03em;font-weight:400}
+.sheet.sacra .box>h4{font-size:17px;text-transform:none;color:var(--sa);display:flex;gap:10px;align-items:baseline;flex-wrap:wrap}
+.sheet.sacra .spts{font-family:"EB Garamond",Georgia,serif;font-size:14px;color:var(--sm)}
+.sheet.sacra .shead{padding:18px 20px 14px;border-bottom:3px double var(--sa);display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,2fr) auto;gap:16px;align-items:end}
+.sheet.sacra .sname input{font-family:"Rye",Georgia,serif;font-size:26px;color:var(--sa);border-bottom:2px solid var(--sa)}
+.sheet.sacra .smeta{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:8px 12px}
+.sheet.sacra .slogo{font-family:"Rye",Georgia,serif;font-size:26px;color:var(--sa);text-align:right;line-height:1}
+.sheet.sacra .slogo small{display:block;font-size:11px;letter-spacing:.4em;margin-top:3px}
+@media (max-width:980px){.sheet.sacra .shead{grid-template-columns:minmax(0,1fr)}.sheet.sacra .smeta{grid-template-columns:repeat(2,minmax(0,1fr))}.sheet.sacra .slogo{text-align:left}}
+.sheet.sacra .smain{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.sheet.sacra .smain .wide{grid-column:1/-1}
+@media (max-width:760px){.sheet.sacra .smain{grid-template-columns:minmax(0,1fr)}}
+.sheet.sacra .srow,.sheet.sacra .strack{display:flex;align-items:center;gap:10px;padding:4px 0;flex-wrap:wrap}
+.sheet.sacra .srow[data-roll]{cursor:pointer;border-radius:6px}.sheet.sacra .srow[data-roll]:hover{background:var(--sh)}
+.sheet.sacra .srow .n,.sheet.sacra .strack .n{min-width:92px;font-size:17px}
+.sheet.sacra .srow small{color:var(--sm);font-size:12.5px;flex-basis:100%;padding-left:102px;margin-top:-4px}
+.sheet.sacra .sdots,.sheet.sacra .scirc{display:flex;gap:4px;flex-wrap:wrap}
+.sheet.sacra .sdot{width:20px;height:20px;transform:rotate(45deg);border:1.5px solid var(--sa);background:var(--sh);cursor:pointer;padding:0;margin:2px}
+.sheet.sacra .sdot.on{background:var(--sa)}
+.sheet.sacra .sc{width:24px;height:24px;border-radius:50%;border:2px solid var(--sa);background:var(--sh);cursor:pointer;padding:0;position:relative}
+.sheet.sacra .sc.on{background:var(--sa)}
+.sheet.sacra .sc.on::after{content:"";position:absolute;inset:4px;border-radius:50%;border:1.5px solid var(--sab)}
+.sheet.sacra .sstats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-top:10px}
+.sheet.sacra .sstats>div{display:flex;flex-direction:column;gap:2px;background:var(--sh);border:1px solid var(--sl2);border-radius:8px;padding:6px 8px}
+.sheet.sacra .sstats b{font-family:"Rye",Georgia,serif;font-size:24px;color:var(--sa);font-weight:400}
+.sheet.sacra .sstep{display:flex;align-items:center;gap:4px}.sheet.sacra .sstep input{width:44px;text-align:center;font-size:20px}
+.sheet.sacra .sextra{margin-top:8px}.sheet.sacra .sextra summary{cursor:pointer;color:var(--sm);font-size:14px}
+.sheet.sacra .sgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(110px,1fr));gap:8px;margin-top:6px}
+.sheet.sacra .snum{display:flex;flex-direction:column;gap:2px}
+.sheet.sacra .sants{display:grid;grid-template-columns:minmax(0,1fr);gap:0}
+.sheet.sacra .note{color:var(--sm);font-size:13.5px;margin:6px 0 0}
+.sheet.sacra .smount{border:2px solid var(--sa);background:linear-gradient(180deg,rgba(138,59,18,.06),rgba(255,250,238,.45))}
+.sheet.sacra .smhead{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr) auto;gap:12px;align-items:end;margin-bottom:8px}
+.sheet.sacra .smgrid{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(0,1fr);gap:16px}
+@media (max-width:760px){.sheet.sacra .smhead,.sheet.sacra .smgrid{grid-template-columns:minmax(0,1fr)}}
+.sheet.sacra .sfield{display:flex;flex-direction:column;gap:3px;margin-top:6px}
+.sheet.sacra .shab{display:grid;grid-template-columns:minmax(0,1fr) 130px auto;gap:6px 8px;align-items:center;padding:8px 0;border-bottom:1px solid var(--sl2)}
+.sheet.sacra .shab textarea{grid-column:1/-1}
+.sheet.sacra .spassos{margin:8px 0 0;padding-left:22px;display:flex;flex-direction:column;gap:4px}.sheet.sacra .spassos li{display:flex;gap:8px;align-items:center}
+.sheet.sacra .sitens{display:flex;flex-direction:column;gap:2px;margin-bottom:8px}
+.sheet.sacra .sihead,.sheet.sacra .sit{display:grid;grid-template-columns:minmax(0,2fr) minmax(0,1.1fr) 70px 70px 60px auto;gap:6px;align-items:center}
+.sheet.sacra .sihead{font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--sm)}
+.sheet.sacra .sit{padding:6px 0;border-bottom:1px solid var(--sl2)}.sheet.sacra .sit .snotes{grid-column:1/-1;font-size:14px}
+.sheet.sacra .sdmg{display:flex;gap:4px;align-items:center}
+@media (max-width:640px){.sheet.sacra .sihead{display:none}.sheet.sacra .sit{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}}
 .sheet.etmos{--sbg:#e5e0f0;--sp:#eeeaf6;--sp2:#d9d2ea;--sf:#2b1830;--sm:#6b5875;--sa:#4a2350;--sab:#f4effa;--sl:#b6abc9;--sl2:#cdc4dc;--sh:#f7f4fc;
   background:var(--sbg);color:var(--sf);font-family:"EB Garamond",Georgia,serif;font-size:16px;
   background-image:radial-gradient(ellipse at 0% 0%,rgba(255,255,255,.55),transparent 55%),radial-gradient(ellipse at 100% 100%,rgba(74,35,80,.12),transparent 50%)}
@@ -307,7 +356,7 @@ h1.view{font-family:var(--f-title);font-weight:400;font-size:32px;margin:4px 0 4
 .sheet.etmos .erecent b{font-family:"IM Fell English SC",Georgia,serif;font-weight:400;font-size:18px;color:var(--sa)}
 .sheet.etmos .erecent small{margin-left:auto;color:var(--sm)}
 .sheet.etmos .erecent:hover{background:var(--sh)}
-.badge.etmos{color:#5b2a63}
+.badge.etmos{color:#5b2a63}.badge.sacra{color:#8a3b12}
 .etw-mini{font-family:"IM Fell English SC",Georgia,serif;font-weight:400!important}
 /* section switch shared with the map (same look on both sides) */
 .viewsw{display:inline-flex;border:1px solid var(--line);border-radius:8px;overflow:hidden;flex:0 0 auto}
@@ -513,7 +562,18 @@ function glifos(){if(GLIFOS&&Object.keys(GLIFOS).length)return GLIFOS;GLIFOS={};
   try{const el=document.getElementById('etmosGlifos');if(el)GLIFOS=JSON.parse(el.textContent);}catch(e){console.error('símbolos do Etmos ilegíveis',e);}
   if(!Object.keys(GLIFOS).length&&window.ETMOS_GLIFOS)GLIFOS=window.ETMOS_GLIFOS;return GLIFOS;}
 const glyph=(id,cls)=>CUSTOM[id]?`<svg class="${cls||'gl'}" viewBox="0 0 200 200" aria-hidden="true"><path d="${esc(CUSTOM[id].d)}" fill="none" stroke="currentColor" stroke-width="12" stroke-linecap="round" stroke-linejoin="round"/></svg>`:glifos()[id]?`<svg class="${cls||'gl'}" viewBox="0 0 200 200" aria-hidden="true"><path d="${glifos()[id]}"/></svg>`:`<span class="${cls||'gl'} gl-txt" aria-hidden="true">${esc(etSil(id))}</span>`;
-const SYS={dnd:DND,op:OP,etmos:ETMOS};
+/* ---------- Sacramento RPG: velho oeste, 1d6 + antecedente, montaria na mesma ficha ---------- */
+const SACRA={id:'sacra',n:'Sacramento',
+  atrs:[['fis','Físico','+1 Círculo de Vida e +1 de dano por ponto'],['vel','Velocidade','+1 Movimento por ponto'],['int','Intelecto','+1 Ponto de Antecedente por ponto'],['cor','Coragem','+1 Ação de Combate por ponto']],
+  ants:[['atencao','Atenção'],['medicina','Medicina'],['montaria','Montaria'],['negocios','Negócios'],['roubo','Roubo'],['suor','Suor'],['tradicao','Tradição'],['violencia','Violência']],
+  conds:['Sangrando','Atordoado','Caído','Agarrado','Cego','Envenenado','Exausto','Amedrontado','Bêbado','Inconsciente','Morrendo'],
+  tiposHab:['Combate','Profissão']};
+const sacV=(sh,f)=>{const a=sh.atr||{},m=sh.montaria||{};switch(f){
+  case 'vida':return 6+num(a.fis)+num(sh.vidaExtra);case 'dor':return 6+num(sh.dorExtra);
+  case 'mov':return (sh.movBase==null?1:num(sh.movBase))+num(a.vel)+num(sh.movExtra);case 'acoes':return (sh.acoesBase==null?1:num(sh.acoesBase))+num(a.cor)+num(sh.acoesExtra);
+  case 'antpts':return 4+num(a.int);case 'antuso':return SACRA.ants.reduce((t,[k])=>t+num((sh.ant||{})[k]),0);
+  case 'mvida':return 6+num(m.vidaExtra);case 'mdor':return 6+num(m.dorExtra);case 'mpts':return num(m.potencia)+num(m.resistencia);}return 0;};
+const SYS={dnd:DND,op:OP,etmos:ETMOS,sacra:SACRA};
 const COLORS=['#7b1e1e','#2f5a7a','#3f6a3a','#8a5a1a','#5a3f7a','#1f6a6a','#8a2f5a','#4a4a52'];
 
 function newDnd(){return {sys:'dnd',nome:'',jogador:'',classe:'',subclasse:'',nivel:1,especie:'',antecedente:'',alinhamento:'',xp:0,cor:COLORS[Math.floor(Math.random()*COLORS.length)],
@@ -522,6 +582,13 @@ function newDnd(){return {sys:'dnd',nome:'',jogador:'',classe:'',subclasse:'',ni
 function newEtmos(){return {sys:'etmos',nome:'',jogador:'',ano:'',idade:'',nivel:1,empenho:'',cor:COLORS[Math.floor(Math.random()*COLORS.length)],
   atr:{corpo:0,alma:0,mente:0},fadiga:0,ferimentos:0,estresse:0,complex:0,marcos:{fis:0,emo:0,men:0},origens:'',praticas:'',teoricas:'',inventario:'',
   basico:'',aparencia:'',pontos:'',valores:[{a:'',b:''},{a:'',b:''}],futuro:'',parts:{},palavras:[],ultimas:[],cond:[]};}
+function newSacra(){return {sys:'sacra',nome:'',jogador:'',nivel:1,xp:0,recompensa:0,defesa:5,cor:COLORS[Math.floor(Math.random()*COLORS.length)],
+  atr:{fis:0,vel:0,int:0,cor:0},vidaMarc:0,vidaExtra:0,dorMarc:0,dorExtra:0,movBase:1,movExtra:0,acoesBase:1,acoesExtra:0,sina:0,
+  ant:{atencao:0,medicina:0,montaria:0,negocios:0,roubo:0,suor:0,tradicao:0,violencia:0},habilidades:[],redencao:{titulo:'',desc:'',passos:[0,1,2,3,4,5].map(()=>({t:'',ok:false}))},
+  itens:[],dinheiro:'',conceito:'',aparencia:'',passado:'',objetivo:'',anotacoes:'',cond:[],
+  montaria:{nome:'',especie:'',fidelidade:0,vidaMarc:0,vidaExtra:0,dorMarc:0,dorExtra:0,potencia:0,resistencia:0,equip:'',notas:''}};}
+const NEWSHEET={dnd:()=>newDnd(),op:()=>newOp(),etmos:()=>newEtmos(),sacra:()=>newSacra()};
+const newFor=sys=>(NEWSHEET[sys]||NEWSHEET.dnd)();
 function newOp(){const s={sys:'op',nome:'',jogador:'',origem:'',classe:'combatente',trilha:'',nex:5,patente:'Recruta',pp:0,afinidade:'',cor:COLORS[Math.floor(Math.random()*COLORS.length)],
   atr:{agi:1,for:1,int:1,pre:1,vig:1},pvAj:0,peAj:0,sanAj:0,defB:0,desloc:9,resist:'',per:{},ataques:[],rituais:[],habilidades:[],itens:[],cond:[],aparencia:'',personalidade:'',historico:'',objetivo:'',notas:''};
   s.pv=opMax(s,'pv');s.pe=opMax(s,'pe');s.san=opMax(s,'san');s._mx={pv:s.pv,pe:s.pe,san:s.san};return s;}
@@ -653,24 +720,25 @@ function viewHome(app){crumbs([['Campanhas','#inicio']]);const camps=Object.valu
   const nb=$('#newCamp');if(nb)nb.onclick=()=>campForm();if(S.master)bindBestHome(app);}
 function campForm(c){const isNew=!c;c=c||{id:uid(),nome:'',sys:'dnd',desc:'',createdAt:Date.now()};let sys=c.sys;
   openModal(`<h2>${isNew?'Nova campanha':'Editar campanha'}</h2><label class="field"><span>Nome</span><input id="cNome" value="${esc(c.nome)}" placeholder="Ex.: A Maldição de Valdren"></label>
-    <div class="field"><span>Sistema</span><div class="choices" id="cSys">${Object.values(SYS).map(s=>`<button type="button" class="choice" data-s="${s.id}" aria-pressed="${s.id===sys}"><b>${esc(s.n)}</b><small>${{dnd:'Pergaminho, atributos, magias por nível.',op:'Dossiê da Ordem, NEX, rituais e sanidade.',etmos:'Grimório de partículas, fadiga e palavras mágicas.'}[s.id]}</small></button>`).join('')}</div>
+    <div class="field"><span>Sistema</span><div class="choices" id="cSys">${Object.values(SYS).map(s=>`<button type="button" class="choice" data-s="${s.id}" aria-pressed="${s.id===sys}"><b>${esc(s.n)}</b><small>${{dnd:'Pergaminho, atributos, magias por nível.',op:'Dossiê da Ordem, NEX, rituais e sanidade.',etmos:'Grimório de partículas, fadiga e palavras mágicas.',sacra:'Velho oeste: 1d6 + antecedente, Vida e Dor, montaria na ficha.'}[s.id]}</small></button>`).join('')}</div>
     ${isNew?'':'<small class="note">Mudar o sistema não converte as fichas que já existem.</small>'}</div>
     <label class="field"><span>Descrição</span><textarea id="cDesc" rows="3">${esc(c.desc)}</textarea></label>
     <div class="row" style="justify-content:flex-end">${isNew?'':'<button class="btn danger" id="cDel">Apagar campanha</button>'}<button class="btn" data-close>Cancelar</button><button class="btn primary" id="cOk">${isNew?'Criar':'Salvar'}</button></div>`);
   for(const b of $('#cSys').children)b.onclick=()=>{sys=b.dataset.s;for(const x of $('#cSys').children)x.setAttribute('aria-pressed',String(x===b));};
   $('#cOk').onclick=async()=>{const nome=$('#cNome').value.trim();if(!nome){$('#cNome').focus();return;}c.nome=nome;c.sys=sys;c.desc=$('#cDesc').value.trim();closeModal();await saveCamp(c);location.hash='campanha-'+c.id;render();};
   const del=$('#cDel');if(del)del.onclick=()=>confirmBox(`Apagar “${c.nome}”? As fichas continuam guardadas, mas a campanha some da lista.`,async()=>{await removeCamp(c);location.hash='inicio';render();});}
-function hpOf(sh){if(sh.sys==='etmos'){const l=etLimF(sh);return [l-num(sh.ferimentos),l];}if(sh.sys==='op'){const mx=opMax(sh,'pv');return [num(sh.pv),mx];}return [num(sh.pv),num(sh.pvMax)];}
-function setHpVal(sh,v){const [,mx]=hpOf(sh);if(sh.sys==='etmos')sh.ferimentos=clamp(mx-v,0,mx);else sh.pv=clamp(v,-mx,mx);}
+function hpOf(sh){if(sh.sys==='sacra'){const t=sacV(sh,'vida');return [t-num(sh.vidaMarc),t];}if(sh.sys==='etmos'){const l=etLimF(sh);return [l-num(sh.ferimentos),l];}if(sh.sys==='op'){const mx=opMax(sh,'pv');return [num(sh.pv),mx];}return [num(sh.pv),num(sh.pvMax)];}
+function setHpVal(sh,v){const [,mx]=hpOf(sh);if(sh.sys==='sacra'){sh.vidaMarc=clamp(mx-v,0,mx);return;}if(sh.sys==='etmos')sh.ferimentos=clamp(mx-v,0,mx);else sh.pv=clamp(v,-mx,mx);}
 function barColor(f){return f>.5?'#3f9a5a':f>.25?'#d4a42c':'#c0392b';}
-function subOf(sh){if(sh.sys==='etmos')return `Nível ${sh.nivel||1}${sh.ano?' · '+sh.ano+' ano':''}${sh.idade?' · '+sh.idade+' anos':''}`;if(sh.sys==='op')return `${(OP.classes[sh.classe]||{n:''}).n} · NEX ${sh.nex}%${sh.trilha?' · '+sh.trilha:''}`;return `${sh.classe||'Sem classe'} ${sh.nivel||1}${sh.especie?' · '+sh.especie:''}`;}
+function subOf(sh){if(sh.sys==='sacra')return `Nível ${sh.nivel||1}${num(sh.recompensa)?' · Recompensa $'+num(sh.recompensa):''}${sh.montaria&&sh.montaria.nome?' · '+sh.montaria.nome:''}`;if(sh.sys==='etmos')return `Nível ${sh.nivel||1}${sh.ano?' · '+sh.ano+' ano':''}${sh.idade?' · '+sh.idade+' anos':''}`;if(sh.sys==='op')return `${(OP.classes[sh.classe]||{n:''}).n} · NEX ${sh.nex}%${sh.trilha?' · '+sh.trilha:''}`;return `${sh.classe||'Sem classe'} ${sh.nivel||1}${sh.especie?' · '+sh.especie:''}`;}
 function pcCard(sh,camp){const [pv,mx]=hpOf(sh),f=mx>0?clamp(pv/mx,0,1):0;const ini=(sh.nome||'?').trim().split(/\s+/).map(w=>w[0]||'').join('').slice(0,2).toUpperCase()||'?';const owner=sh.kind==='pc'&&S.mode==='cloud'?(sh.owner===S.uid?'você':S.names[sh.owner]||'jogador'):'';
   let stats;if(sh.sys==='etmos'){const ul=(sh.ultimas||[])[0];stats=`<div><b>${num(sh.atr.corpo)}·${num(sh.atr.alma)}·${num(sh.atr.mente)}</b>Corpo·Alma·Mente</div><div><b>${esc(etFad(sh))}</b>Fadiga</div><div><b>${num(sh.estresse)}/${etLimE(sh)}</b>Estresse</div>${ul?`<div style="grid-column:1/-1"><b class="etw-mini">${esc(etWord(ul.seq))}</b>Última palavra</div>`:''}`;}
+  else if(sh.sys==='sacra'){const dt=sacV(sh,'dor');stats=`<div><b>${num(sh.defesa)}</b>Defesa</div><div><b>${dt-num(sh.dorMarc)}/${dt}</b>Dor</div><div><b>${num(sh.sina)}</b>Sina</div>${sh.montaria&&sh.montaria.nome?`<div style="grid-column:1/-1"><b>${esc(sh.montaria.nome)}</b>Montaria</div>`:''}`;}
   else if(sh.sys==='op'){const san=num(sh.san),smx=opMax(sh,'san'),pe=num(sh.pe),pmx=opMax(sh,'pe');stats=`<div><b>${opDef(sh)}</b>Defesa</div><div><b>${pe}/${pmx}</b>PE</div><div><b>${san}/${smx}</b>SAN</div>`;}
   else stats=`<div><b>${num(sh.ca)}</b>CA</div><div><b>${sgn(dIni(sh))}</b>Iniciativa</div><div><b>${10+dSkill(sh,'percepcao')}</b>Perc. passiva</div>`;
   const quick=canEdit(sh)?`<div class="row">${[-5,-1,1,5].map(d=>`<button class="btn small" data-hp="${sh.id}" data-d="${d}" aria-label="${d>0?'Curar':'Dano'} ${Math.abs(d)}">${d>0?'+':'−'}${Math.abs(d)}</button>`).join('')}<a class="btn small" href="#ficha-${sh.id}" style="margin-left:auto">Abrir ficha</a></div>`:`<div class="row"><a class="btn small" href="#ficha-${sh.id}">Ver ficha</a></div>`;
   return `<article class="card pc"><div class="hd"><span class="av${portraitThumb(sh)?' pic':''}" style="background:${safeColor(sh.cor)}">${portraitThumb(sh)?`<img src="${esc(portraitThumb(sh))}" alt="">`:esc(ini)}</span><div><h3>${esc(sh.nome||'Sem nome')}</h3>${sh.criacao==='rascunho'?'<span class="draft">Em criação</span>':''}<div class="meta">${esc(subOf(sh))}${owner?' · '+esc(owner):''}</div></div></div>
-    <div><div class="row" style="justify-content:space-between;font-size:13px"><span>${sh.sys==='op'?'PV':sh.sys==='etmos'?'Ferimentos restantes':'Pontos de vida'}</span><b class="num">${pv} / ${mx}${num(sh.pvTemp)?` (+${num(sh.pvTemp)})`:''}</b></div><div class="bar"><i style="width:${f*100}%;background:${barColor(f)}"></i></div></div>
+    <div><div class="row" style="justify-content:space-between;font-size:13px"><span>${sh.sys==='op'?'PV':sh.sys==='etmos'?'Ferimentos restantes':sh.sys==='sacra'?'Círculos de Vida':'Pontos de vida'}</span><b class="num">${pv} / ${mx}${num(sh.pvTemp)?` (+${num(sh.pvTemp)})`:''}</b></div><div class="bar"><i style="width:${f*100}%;background:${barColor(f)}"></i></div></div>
     <div class="stats">${stats}</div>${(sh.cond||[]).length?`<div class="chips">${sh.cond.map(c=>`<span class="chip">${esc(c)}</span>`).join('')}</div>`:''}${quick}</article>`;}
 function viewCamp(app,c){lastCamp=c.id;try{sessionStorage.setItem('mesa.camp',c.id);}catch(e){}crumbs([['Campanhas','#inicio'],[c.nome,'#campanha-'+c.id]]);
   const sheets=allSheets().filter(s=>s.camp===c.id&&(S.master||s.owner===S.uid));const pcs=sheets.filter(s=>s.kind==='pc'),npcs=sheets.filter(s=>s.kind==='npc');
@@ -706,7 +774,7 @@ function viewCamp(app,c){lastCamp=c.id;try{sessionStorage.setItem('mesa.camp',c.
   for(const b of app.querySelectorAll('[data-hp]'))b.onclick=()=>{const sh=findSheet(b.dataset.hp);if(!sh||!canEdit(sh))return;const [pv,mx]=hpOf(sh);setHpVal(sh,pv+num(b.dataset.d));queueSave(sh);render();};}
 /* master: own sheets and private NPCs. Player: only through an invite (inv = {id, tipo}). */
 function createSheet(c,kind,nome,inv){if(!S.master&&!inv){toast('Para criar uma ficha, use um convite do mestre.');return null;}if(inv&&!canCreate()){toast('Você ainda não pode criar fichas aqui. Peça ao mestre para te convidar como Editor.');return null;}
-  const sh=c.sys==='op'?newOp():c.sys==='etmos'?newEtmos():newDnd();sh.id=uid();sh.camp=c.id;sh.kind=kind;sh.createdAt=Date.now();if(nome)sh.nome=nome;
+  const sh=newFor(c.sys);sh.id=uid();sh.camp=c.id;sh.kind=kind;sh.createdAt=Date.now();if(nome)sh.nome=nome;
   if(inv){sh.owner=S.uid;sh.tipo=kind;sh.convite=inv.id;sh.criacao='rascunho';(S.pcs[S.uid]=S.pcs[S.uid]||{})[sh.id]=sh;}
   else if(kind==='npc'){S.npcs[sh.id]=sh;sh.nome=nome||'Novo NPC';}else{sh.owner=S.uid;(S.pcs[S.uid]=S.pcs[S.uid]||{})[sh.id]=sh;}
   logBase[sh.id]=clone(sh);queueSave(sh);location.hash='ficha-'+sh.id;return sh;}
@@ -777,7 +845,9 @@ function bindDocs(app,c){const f=app.querySelector('#docForm');
 
 /* ================= BESTIARY AND NPC GENERATOR ================= */
 const NPCGEN={
-  nomes:{dnd:['Aldric','Brienne','Corvin','Dagna','Elric','Fenna','Gorim','Hilde','Isolde','Jorund','Kaela','Lothar','Mirela','Nyx','Orsik','Petra','Quillon','Rurik','Sefa','Tamsin','Ulric','Vesna','Wendel','Ysolde','Zarek','Bram','Edda','Tobin','Maela','Cassian'],
+  nomes:{oeste:['Jesse','Clara','Wyatt','Abigail','Silas','Hattie','Ezra','Martha','Caleb','Josephine','Amos','Lottie','Jeb','Ruth','Hank','Della','Elias','Nora','Gideon','Mae','Tobias','Ines','Ramón','Lupe'],
+    oestes:['Calloway','Ward','McCready','Holloway','Dalton','Sutter','Barlow','Whitaker','Kincaid','Morrow','Reyes','Vance','Crowley','Hatfield','Blackwood','o Manco','Duas-Armas','da Ferrovia'],
+    dnd:['Aldric','Brienne','Corvin','Dagna','Elric','Fenna','Gorim','Hilde','Isolde','Jorund','Kaela','Lothar','Mirela','Nyx','Orsik','Petra','Quillon','Rurik','Sefa','Tamsin','Ulric','Vesna','Wendel','Ysolde','Zarek','Bram','Edda','Tobin','Maela','Cassian'],
     dnds:['da Ponte Velha','Ferro-Negro','das Brumas','Pedra-Funda','o Manco','Martelo-Rubro','de Valdren','Sete-Ventos','Corvo-Cinzento','das Cinzas'],
     mod:['Ana','Bruno','Carla','Diego','Elisa','Fábio','Giovana','Heitor','Isabela','João','Karina','Lucas','Marina','Nelson','Olívia','Paulo','Raquel','Sérgio','Tatiane','Vítor','Yara','Rafael','Lívia','Otávio','Bianca'],
     mods:['Albuquerque','Barreto','Cavalcanti','Duarte','Esteves','Fontana','Guimarães','Holanda','Lacerda','Moraes','Nogueira','Pacheco','Queiroz','Ramos','Siqueira','Teixeira','Valadares']},
@@ -789,14 +859,21 @@ const NPCGEN={
       ['Bandido',{ca:12,pv:11,atr:{for:11,des:12,con:12,int:10,sab:10,car:10},ataques:[{nome:'Cimitarra',bonus:'3',dano:'1d6+1'},{nome:'Besta leve',bonus:'3',dano:'1d8+1'}]}],['Veterano',{ca:17,pv:58,atr:{for:16,des:13,con:14,int:10,sab:11,car:10},ataques:[{nome:'Espada longa',bonus:'5',dano:'1d8+3'}]}],
       ['Mago',{ca:12,pv:40,atr:{for:9,des:14,con:11,int:17,sab:12,car:11},ataques:[{nome:'Adaga',bonus:'5',dano:'1d4+2'}]}],['Cavaleiro',{ca:18,pv:52,atr:{for:16,des:11,con:14,int:11,sab:11,car:15},ataques:[{nome:'Montante',bonus:'5',dano:'2d6+3'}]}]],
     op:[['Civil',{classe:'especialista',nex:5,atr:{agi:1,for:1,int:1,pre:1,vig:1}}],['Agente da Ordem',{classe:'combatente',nex:25,atr:{agi:2,for:2,int:1,pre:1,vig:2}}],['Cultista',{classe:'ocultista',nex:20,atr:{agi:1,for:1,int:2,pre:3,vig:1}}],['Investigador',{classe:'especialista',nex:35,atr:{agi:2,for:1,int:3,pre:2,vig:1}}],['Líder de culto',{classe:'ocultista',nex:60,atr:{agi:2,for:1,int:3,pre:4,vig:2}}]],
+    sacra:[['Peão',{nivel:1,atr:{fis:1,vel:1,int:0,cor:0},ant:{suor:2,montaria:1},defesa:5,itens:[{nome:'Faca',dano:'1d6'}],montaria:{nome:'Pangaré',especie:'Cavalo',potencia:1,resistencia:2,fidelidade:2}}],
+      ['Pistoleiro',{nivel:3,atr:{fis:1,vel:2,int:0,cor:2},ant:{violencia:3,atencao:2,montaria:1},defesa:6,itens:[{nome:'Revólver',dano:'1d6+1',municao:'6'}],montaria:{nome:'Tordilho',especie:'Cavalo',potencia:2,resistencia:1,fidelidade:3}}],
+      ['Xerife',{nivel:4,atr:{fis:1,vel:1,int:1,cor:2},ant:{violencia:2,atencao:2,tradicao:1,montaria:2},defesa:6,itens:[{nome:'Rifle',dano:'1d6+2',municao:'10'}],montaria:{nome:'Baio',especie:'Cavalo',potencia:2,resistencia:2,fidelidade:4}}],
+      ['Fora-da-lei',{nivel:2,atr:{fis:2,vel:1,int:0,cor:1},ant:{roubo:2,violencia:2,montaria:1},defesa:5,itens:[{nome:'Escopeta',dano:'2d6',municao:'2'}],montaria:{nome:'Ladrão',especie:'Cavalo',potencia:2,resistencia:1,fidelidade:1}}],
+      ['Pregador',{nivel:2,atr:{fis:0,vel:0,int:2,cor:2},ant:{tradicao:3,medicina:1,negocios:1},defesa:5,itens:[],montaria:{nome:'Mula velha',especie:'Mula',potencia:1,resistencia:2,fidelidade:3}}],
+      ['Comerciante',{nivel:1,atr:{fis:0,vel:0,int:2,cor:0},ant:{negocios:3,atencao:1},defesa:5,itens:[],montaria:{nome:'Carroça e burro',especie:'Burro',potencia:1,resistencia:2,fidelidade:2}}]],
     etmos:[['Estudante',{nivel:1,atr:{corpo:2,alma:2,mente:2},complex:1}],['Monitor',{nivel:3,atr:{corpo:3,alma:3,mente:3},complex:2}],['Professor',{nivel:6,atr:{corpo:2,alma:4,mente:5},complex:4}],['Guardião',{nivel:5,atr:{corpo:5,alma:3,mente:2},complex:3}]]}};
 const pick=a=>a[Math.floor(Math.random()*a.length)];
 function genNpc(sys,perfil){const P=NPCGEN.perfis[sys];const pf=P.find(x=>x[0]===perfil)||pick(P);
-  const nome=sys==='dnd'?pick(NPCGEN.nomes.dnd)+' '+pick(NPCGEN.nomes.dnds):pick(NPCGEN.nomes.mod)+' '+pick(NPCGEN.nomes.mods);
+  const nome=sys==='dnd'?pick(NPCGEN.nomes.dnd)+' '+pick(NPCGEN.nomes.dnds):sys==='sacra'?pick(NPCGEN.nomes.oeste)+' '+pick(NPCGEN.nomes.oestes):pick(NPCGEN.nomes.mod)+' '+pick(NPCGEN.nomes.mods);
   return {nome,perfil:pf[0],pers:pick(NPCGEN.pers),apar:pick(NPCGEN.apar),mot:pick(NPCGEN.mot),seg:pick(NPCGEN.seg),st:clone(pf[1])};}
-function npcFromGen(c,g){const sh=c.sys==='op'?newOp():c.sys==='etmos'?newEtmos():newDnd();sh.nome=g.nome;
+function npcFromGen(c,g){const sh=newFor(c.sys);sh.nome=g.nome;
   if(c.sys==='dnd'){Object.assign(sh,{classe:g.perfil,ca:g.st.ca,pvMax:g.st.pv,pv:g.st.pv,atr:g.st.atr,ataques:g.st.ataques,personalidade:g.pers,aparencia:g.apar,ideais:g.mot,notas:'Segredo: '+g.seg});}
   else if(c.sys==='op'){Object.assign(sh,{classe:g.st.classe,nex:g.st.nex,atr:g.st.atr,trilha:g.perfil,personalidade:g.pers,aparencia:g.apar,objetivo:g.mot,notas:'Segredo: '+g.seg});sh.pv=opMax(sh,'pv');sh.pe=opMax(sh,'pe');sh.san=opMax(sh,'san');sh._mx={pv:sh.pv,pe:sh.pe,san:sh.san};}
+  else if(c.sys==='sacra'){Object.assign(sh,{nivel:g.st.nivel,atr:g.st.atr,ant:Object.assign(sh.ant,g.st.ant),defesa:g.st.defesa,itens:g.st.itens||[],conceito:g.perfil+'. '+g.pers+'.',aparencia:g.apar,objetivo:g.mot,anotacoes:'Segredo: '+g.seg});if(g.st.montaria)Object.assign(sh.montaria,g.st.montaria);}
   else Object.assign(sh,{nivel:g.st.nivel,atr:g.st.atr,complex:g.st.complex,basico:g.perfil+'. '+g.pers+'.',aparencia:g.apar,futuro:g.mot,pontos:'Segredo: '+g.seg});
   return sh;}
 function addNpc(c,sh){sh.id=uid();sh.camp=c.id;sh.kind='npc';sh.createdAt=Date.now();delete sh.owner;delete sh.tipo;delete sh.convite;delete sh.criacao;delete sh.pendentes;S.npcs[sh.id]=sh;logBase[sh.id]=clone(sh);queueSave(sh);location.hash='ficha-'+sh.id;}
@@ -902,7 +979,7 @@ function viewInvite(app,id){crumbs([['Convite','#convite-'+id]]);
     app.innerHTML=box(esc(c.nome),mine?'Você já usou este convite.':'Este convite já foi usado. Para criar uma ficha, peça um novo convite ao mestre.',sh?`<div class="row" style="justify-content:center;margin-top:12px"><a class="btn primary" href="#ficha-${sh.id}">Abrir minha ficha</a></div>`:'');return;}
   const can=canCreate()&&!S.master;const npc=v.tipo==='npc';
   const why=!S.uid?'Esta página não conseguiu identificar sua conta. Abra o link logado no claude.ai, com o e-mail que o mestre convidou.':S.canWrite===false?'Você pode abrir esta mesa, mas ainda não pode criar fichas. Peça ao mestre para te convidar como Editor no menu Compartilhar.':'';
-  const ph=npc?'Ex.: Velho Corvo, o taberneiro':({dnd:'Ex.: Thorin Escudo-de-Carvalho',op:'Ex.: Arthur Cervero',etmos:'Ex.: Lina Vasconcelos'}[c.sys]||'Nome');
+  const ph=npc?'Ex.: Velho Corvo, o taberneiro':({dnd:'Ex.: Thorin Escudo-de-Carvalho',op:'Ex.: Arthur Cervero',etmos:'Ex.: Lina Vasconcelos',sacra:'Ex.: Jesse Calloway'}[c.sys]||'Nome');
   app.innerHTML=`<div class="join">${S.master?'<div class="banner">Prévia: é assim que a pessoa vê este convite. Você não pode usá-lo pela sua conta.</div>':''}
     <p class="lbl-join">${npc?'O mestre pediu que você crie um NPC para a mesa':'Você foi convidado para a mesa'}</p><span class="badge ${c.sys}">${esc(SYS[c.sys].n)}</span><h1 class="view">${esc(c.nome)}</h1>${c.desc?`<p class="lead">${esc(c.desc)}</p>`:''}
     ${why?`<div class="banner">${esc(why)}</div>`:''}
@@ -931,7 +1008,7 @@ const same=(a,b)=>JSON.stringify(a)===JSON.stringify(b);
 function flatLog(o,pre,out){for(const [k,v] of Object.entries(o||{})){if(!pre&&LOG_SKIP.has(k))continue;const p=pre?pre+'.'+k:k;
     if(Array.isArray(v)&&v.every(x=>x==null||typeof x!=='object'))out[p]=v.slice();else if(v&&typeof v==='object')flatLog(v,p,out);else out[p]=v;}return out;}
 const fmtV=v=>Array.isArray(v)?(v.length?fmtV(v.join(', ')):'—'):v===true?'sim':v===false?'não':v==null||v===''?'—':String(v).length>90?String(v).slice(0,88)+'…':String(v);
-const LBL={nome:'Nome',jogador:'Jogador',classe:'Classe',subclasse:'Subclasse',nivel:'Nível',especie:'Espécie',antecedente:'Antecedente',alinhamento:'Alinhamento',xp:'XP',cor:'Cor',
+const LBL={vidaMarc:'Vida marcada',dorMarc:'Dor marcada',vidaExtra:'Vida extra',dorExtra:'Dor extra',movBase:'Movimento base',movExtra:'Movimento extra',acoesBase:'Ações de combate base',acoesExtra:'Ações de combate extras',sina:'Cartas de Sina',recompensa:'Recompensa',defesa:'Defesa',dinheiro:'Dinheiro',conceito:'Conceito',passado:'Passado',objetivo:'Objetivo',anotacoes:'Anotações',nome:'Nome',jogador:'Jogador',classe:'Classe',subclasse:'Subclasse',nivel:'Nível',especie:'Espécie',antecedente:'Antecedente',alinhamento:'Alinhamento',xp:'XP',cor:'Cor',
   inspiracao:'Inspiração',ca:'CA',iniB:'Bônus de iniciativa',desloc:'Deslocamento',pvMax:'PV máximo',pv:'PV',pvTemp:'PV temporários',dv:'Dados de vida',dvUsados:'Dados de vida usados',conjAtr:'Atributo de conjuração',
   tracos:'Características e talentos',profs:'Proficiências e idiomas',personalidade:'Personalidade',ideais:'Ideais',vinculos:'Vínculos',defeitos:'Defeitos',aparencia:'Aparência',historia:'História',notas:'Notas',cond:'Condições',
   origem:'Origem',trilha:'Trilha',nex:'NEX',patente:'Patente',pp:'Pontos de prestígio',afinidade:'Afinidade',pvAj:'Ajuste de PV',peAj:'Ajuste de PE',sanAj:'Ajuste de SAN',defB:'Bônus de defesa',resist:'Resistências',pe:'PE',san:'SAN',historico:'Histórico',objetivo:'Objetivo',
@@ -943,11 +1020,14 @@ function labelFor(sh,path){const sys=SYS[sh.sys]||DND;const ps=path.split('.');c
   if(a==='per'){const sk=(sys.skills||[]).find(x=>x[0]===b);const n=sk?sk[1]:b;return sh.sys==='op'?`${n} (${c==='g'?'grau':'outros bônus'})`:`${n} (proficiência)`;}
   if(a==='salv'){const at=DND.atrs.find(x=>x[0]===b);return 'Salvaguarda de '+(at?at[1]:b);}
   if(a==='parts')return 'Partícula '+etSil(b);
+  if(a==='ant'){const at=SACRA.ants.find(x=>x[0]===b);return 'Antecedente '+(at?at[1]:b);}
+  if(a==='montaria')return 'Montaria · '+({nome:'nome',especie:'espécie',fidelidade:'Fidelidade',vidaMarc:'Vida marcada',dorMarc:'Dor marcada',vidaExtra:'Vida extra',dorExtra:'Dor extra',potencia:'Potência',resistencia:'Resistência',equip:'equipamento',notas:'notas'}[b]||b);
+  if(a==='redencao')return 'Redenção'+(b==='passos'?` · passo ${num(c)+1}`:b==='titulo'?' · caminho':'');
   if(a==='moedas')return 'Moedas ('+String(b).toUpperCase()+')';
   if(/^\d+$/.test(b||''))return `${LBL[a]||a} ${num(b)+1}${c?' · '+(SUB[c]||c):''}`;
   return (LBL[a]||a)+(b?' · '+(SUB[b]||b):'');}
 /* fields a player changes only with the master's approval (campaign setting, on by default) */
-const PROT={dnd:/^(atr\.|nivel$|classe$|subclasse$|pvMax$|ca$|xp$|salv\.|per\.)/,op:/^(atr\.|nex$|classe$|trilha$|patente$|per\.|pvAj$|peAj$|sanAj$|defB$)/,etmos:/^(atr\.|nivel$|parts\.|complex$|marcos\.)/};
+const PROT={dnd:/^(atr\.|nivel$|classe$|subclasse$|pvMax$|ca$|xp$|salv\.|per\.)/,op:/^(atr\.|nex$|classe$|trilha$|patente$|per\.|pvAj$|peAj$|sanAj$|defB$)/,etmos:/^(atr\.|nivel$|parts\.|complex$|marcos\.)/,sacra:/^(atr\.|nivel$|ant\.|defesa$|montaria\.(potencia|resistencia)$)/};
 function isProt(sh,k){if(S.master||S.mode!=='cloud'||sh.owner!==S.uid||sh.criacao==='rascunho')return false;const c=S.camps[sh.camp];if(c&&c.aprovacao===false)return false;return !!(PROT[sh.sys]&&PROT[sh.sys].test(k));}
 let propToast=0;
 function propose(sh,k,val){const old=getP(sh,k);sh.pendentes=sh.pendentes||{};if(same(val,old))delete sh.pendentes[k];else sh.pendentes[k]={de:old===undefined?null:old,para:val,t:Date.now()};
@@ -1809,8 +1889,8 @@ function portraitEditor(sh){const cur=sh.retrato||null;const curSpec=cur&&cur.ti
 /* ================= SHEET VIEW ================= */
 const F=(k,label,o={})=>`<label class="${o.cls||''}" style="display:flex;flex-direction:column;gap:2px;min-width:0"><span class="lbl">${label}</span>${o.sel?`<select data-k="${k}">${o.sel.map(v=>Array.isArray(v)?`<option value="${esc(v[0])}">${esc(v[1])}</option>`:`<option>${esc(v)}</option>`).join('')}</select>`:`<input data-k="${k}"${o.n?` type="number" data-t="n"${o.min!=null?` min="${o.min}"`:''}${o.max!=null?` max="${o.max}"`:''}`:''} placeholder="${esc(o.ph||'')}">`}</label>`;
 function viewSheet(app,sh){const camp=S.camps[sh.camp];crumbs([['Campanhas','#inicio']].concat(camp?[[camp.nome,'#campanha-'+camp.id]]:[]).concat([[sh.nome||'Ficha','#ficha-'+sh.id]]));
-  const ro=!canEdit(sh);if(!S.master&&sh.owner!==S.uid){app.innerHTML='<div class="empty">Esta ficha não é sua.</div>';crumbs([['Campanhas','#inicio']]);return;}const tab=ui.sheetTab[sh.id]||(sh.sys==='etmos'?'personagem':'principal');const sc=HOST.scrollTop;
-  const body=sh.sys==='op'?opSheet(sh,tab):sh.sys==='etmos'?etSheet(sh,tab):dndSheet(sh,tab);
+  const ro=!canEdit(sh);if(!S.master&&sh.owner!==S.uid){app.innerHTML='<div class="empty">Esta ficha não é sua.</div>';crumbs([['Campanhas','#inicio']]);return;}const tab=ui.sheetTab[sh.id]||(sh.sys==='etmos'||sh.sys==='sacra'?'personagem':'principal');const sc=HOST.scrollTop;
+  const body=sh.sys==='op'?opSheet(sh,tab):sh.sys==='etmos'?etSheet(sh,tab):sh.sys==='sacra'?sacSheet(sh,tab):dndSheet(sh,tab);
   app.innerHTML=`${S.readOnlyMsg?`<div class="banner">${esc(S.readOnlyMsg)}</div>`:''}<div id="sheetRoot" class="sheet ${sh.sys}">${pendList(sh,S.master)}${sh.criacao==='rascunho'?(sh.owner===S.uid&&!S.master?`<div class="draftbar"><span><b>Ficha em criação.</b> Preencha com calma. Quando terminar, conclua: a partir daí o mestre acompanha cada alteração no registro.</span><button type="button" class="btn small" id="shDone">Concluir criação</button></div>`:'<div class="draftbar"><span><b>Em criação.</b> O jogador ainda não concluiu esta ficha.</span></div>'):''}${ro?'<div class="ro-note">Somente leitura: esta ficha é de outro jogador.</div>':''}<fieldset ${ro?'disabled':''}>${body}</fieldset>
     <div class="tools"><span class="note" style="margin-right:auto;color:var(--sm)">${sh.kind==='npc'?(sh.owner&&sh.owner!==S.uid?'NPC criado por convite · visível para você e para quem o criou':'NPC · visível só para o mestre'):''}</span>${window.Atlas&&Atlas.hasToken(sh.id)?'<button class="btn small" id="shMap">Mostrar no mapa</button>':''}${S.master&&sh.kind==='npc'?'<button class="btn small" id="shBest">Salvar no bestiário</button>':''}<button class="btn small" id="shLink">Copiar link da ficha</button>${canEdit(sh)?'<button class="btn small danger" id="shDel">Apagar ficha</button>':''}</div></div>`;
   HOST.scrollTop=sc;bindSheet($('#sheetRoot'),sh);}
@@ -1843,6 +1923,7 @@ function afterSet(sh,k,val,old){let m;if(sh.sys==='op'&&(m=k.match(/^rituais\.(\
       if(om!=null&&mx!==om)sh[s]=clamp(num(sh[s])+(mx-om),0,mx);else if(sh[s]==null||num(sh[s])>mx)sh[s]=mx;sh._mx[s]=mx;}return /^(classe|nex)$/.test(k);}
   return false;}
 function calcVal(sh,name){const [f,a]=name.split(':');
+  if(sh.sys==='sacra')return f==='sac'?sacV(sh,a):0;
   if(sh.sys==='etmos'){if(f==='limf')return etLimF(sh);if(f==='lime')return etLimE(sh);return 0;}
   if(sh.sys==='op'){switch(f){case 'max':return opMax(sh,a);case 'per':return opSkill(sh,a);case 'def':return opDef(sh);case 'carga':return opCarga(sh);case 'esp':return opEsp(sh);case 'lim':return opLvl(sh);}return 0;}
   switch(f){case 'mod':return dMod(sh.atr[a]);case 'save':return dSave(sh,a);case 'per':return dSkill(sh,a);case 'prof':return dProf(sh);case 'ini':return dIni(sh);case 'pp':return 10+dSkill(sh,'percepcao');case 'dc':return dDC(sh);case 'atk':return dAtk(sh);case 'peso':return dWeight(sh);case 'cap':return dCap(sh);}return 0;}
@@ -1850,6 +1931,11 @@ function calc(root,sh){for(const el of root.querySelectorAll('[data-c]')){const 
   for(const el of root.querySelectorAll('[data-meter]')){const [cur,mx]=el.dataset.meter.split('|');const m=calcVal(sh,mx),f=m>0?clamp(num(getP(sh,cur))/m,0,1):0;el.firstElementChild.style.width=(f*100)+'%';}
   const cg=root.querySelector('[data-carga]');if(cg){const over=sh.sys==='op'?opEsp(sh)>opCarga(sh):dWeight(sh)>dCap(sh);cg.style.color=over?'var(--sa)':'';cg.textContent=over?'Sobrecarregado':'';}}
 function doRoll(sh,spec){rollSheet=sh;const [f,a,b]=spec.split(':');const who=sh.nome||'Ficha';
+  if(sh.sys==='sacra'){const d=rnd(6);const R=(label,bn,na)=>pushRoll({label,total:d+bn,detail:`1d6: ${d} ${bn>=0?'+':'−'} ${Math.abs(bn)}${na?` · alvo ${na}: ${d+bn>=na?'sucesso':'falha'}`:''}`,crit:d===6,fail:d===1});
+    if(f==='atr'){const at=SACRA.atrs.find(x=>x[0]===a);return R(`${who} · ${at?at[1]:a}`,num((sh.atr||{})[a]));}
+    if(f==='ant'){const at=SACRA.ants.find(x=>x[0]===a);return R(`${who} · ${at?at[1]:a}`,num((sh.ant||{})[a]));}
+    if(f==='mont'){const m=sh.montaria||{};return R(`${m.nome||'Montaria'} · desafio (Potência + Montaria)`,num(m.potencia)+num((sh.ant||{}).montaria),6);}
+    if(f==='dmg'){const it=(sh.itens||[])[num(a)];return rollExpr(`${who} · dano de ${it&&it.nome||'arma'}`,it&&it.dano);}return;}
   if(sh.sys==='op'){if(f==='atr')return rollOp(`${who} · ${OP.atrs.find(x=>x[0]===a)[1]}`,num(sh.atr[a]),0);if(f==='per'){const sk=OP.skills.find(x=>x[0]===a);return rollOp(`${who} · ${sk[1]}`,num(sh.atr[sk[2]]),opSkill(sh,a));}
     if(f==='atk'){const at=sh.ataques[num(a)];const sk=OP.skills.find(x=>x[0]===(at.per||'luta'))||OP.skills[15];return rollOp(`${who} · ${at.nome||'Ataque'}`,num(sh.atr[sk[2]]),opSkill(sh,sk[0])+num(at.bonus));}
     if(f==='dmg'){const at=sh.ataques[num(a)];return rollExpr(`${who} · dano de ${at.nome||'ataque'}`,at.dano);}return;}
@@ -1860,6 +1946,59 @@ function doRoll(sh,spec){rollSheet=sh;const [f,a,b]=spec.split(':');const who=sh
 const stabs=(sh,tab,list)=>`<nav class="stabs" role="tablist">${list.map(t=>`<button role="tab" data-t="${t[0]}" aria-selected="${tab===t[0]}">${t[1]}</button>`).join('')}</nav>`;
 const condBox=(sh,list)=>`<div class="conds">${list.map(c=>`<button type="button" data-cond="${esc(c)}" aria-pressed="${(sh.cond||[]).includes(c)}">${esc(c)}</button>`).join('')}</div>`;
 
+
+/* ---------- Sacramento: personagem e montaria na mesma página ---------- */
+const sacCircles=(k,total,marc,lbl)=>`<span class="scirc" role="group" aria-label="${esc(lbl)}">${Array.from({length:clamp(total,0,24)},(_,i)=>`<button type="button" class="sc${marc>=i+1?' on':''}" data-pip="${k}" data-i="${i+1}" aria-label="${esc(lbl)} ${i+1}"></button>`).join('')}</span>`;
+const sacDots=(k,n,cur,lbl)=>`<span class="sdots" role="group" aria-label="${esc(lbl)}">${Array.from({length:n},(_,i)=>`<button type="button" class="sdot${cur>=i+1?' on':''}" data-pip="${k}" data-i="${i+1}" aria-label="${esc(lbl)} ${i+1}"></button>`).join('')}</span>`;
+const sacNum=(k,lbl,re)=>`<label class="snum"><span class="lbl">${lbl}</span><input type="number" data-t="n" data-k="${k}"${re?' data-re="1"':''}></label>`;
+function sacSheet(sh,tab){const m=sh.montaria=sh.montaria||{};sh.ant=sh.ant||{};sh.atr=sh.atr||{};
+  const head=`<header class="shead"><div class="sname pname">${portraitCell(sh)}<div class="pn"><span class="lbl">${sh.kind==='npc'?'Nome do NPC':'Nome do personagem'}</span><input data-k="nome" placeholder="Nome" aria-label="Nome"></div></div>
+    <div class="smeta">${F('jogador','Jogador')}${F('nivel','Nível',{n:1,min:1,max:6})}${F('xp','XP',{n:1,min:0})}${F('recompensa','Recompensa ($)',{n:1,min:0})}${F('defesa','Defesa',{n:1,min:0})}</div>
+    <div class="slogo" aria-hidden="true">Sacramento<small>RPG</small></div></header>`;
+  const tabs=stabs(sh,tab,[['personagem','Personagem e montaria'],['habilidades','Habilidades e redenção'],['equipamento','Equipamento'],['descricao','Descrição']]);let b='';
+  if(tab==='personagem'){const vt=sacV(sh,'vida'),dt=sacV(sh,'dor'),mv=sacV(sh,'mvida'),md=sacV(sh,'mdor');
+    b=`<div class="smain">
+      <div class="box"><h4>Vida e Dor</h4>
+        <div class="strack"><span class="n">Vida</span>${sacCircles('vidaMarc',vt,num(sh.vidaMarc),'Vida marcada')}<b class="num">${vt-num(sh.vidaMarc)}/${vt}</b></div>
+        <div class="strack"><span class="n">Dor</span>${sacCircles('dorMarc',dt,num(sh.dorMarc),'Dor marcada')}<b class="num">${dt-num(sh.dorMarc)}/${dt}</b></div>
+        <div class="sstats"><div><span class="lbl">Movimento</span><b data-c="sac:mov"></b></div><div><span class="lbl">Ações de combate</span><b data-c="sac:acoes"></b></div>
+          <div><span class="lbl">Cartas de Sina</span><span class="sstep"><button type="button" class="btn small" data-step="sina" data-d="-1" data-floor="0" aria-label="Menos uma carta">−</button><input type="number" data-t="n" data-k="sina" aria-label="Cartas de Sina"><button type="button" class="btn small" data-step="sina" data-d="1" aria-label="Mais uma carta">+</button></span></div></div>
+        <details class="sextra"><summary>Ajustes de círculos, movimento e ações</summary><div class="sgrid">${sacNum('vidaExtra','Vida extra',1)}${sacNum('dorExtra','Dor extra',1)}${sacNum('movBase','Movimento base')}${sacNum('movExtra','Movimento extra')}${sacNum('acoesBase','Ações base')}${sacNum('acoesExtra','Ações extras')}</div></details>
+        <p class="note">Clique num círculo para marcar dano ou dor; clique de novo no último marcado para desmarcar.</p></div>
+      <div class="box"><h4>Atributos</h4>${SACRA.atrs.map(([k,n,d])=>`<div class="srow" data-roll="atr:${k}" tabindex="0" title="Rolar 1d6 + ${n}"><span class="n">${n}</span>${sacDots('atr.'+k,5,num(sh.atr[k]),n)}<b class="num">${num(sh.atr[k])}</b><small>${d}</small></div>`).join('')}
+        <p class="note">Na criação: 4 pontos, no máximo 2 em cada. Clique no nome para rolar 1d6 + atributo.</p></div>
+      <div class="box"><h4>Antecedentes <small class="spts"><span data-c="sac:antuso"></span> de <span data-c="sac:antpts"></span> pontos</small></h4>
+        <div class="sants">${SACRA.ants.map(([k,n])=>`<div class="srow" data-roll="ant:${k}" tabindex="0" title="Rolar 1d6 + ${n}"><span class="n">${n}</span>${sacDots('ant.'+k,5,num(sh.ant[k]),n)}<b class="num">${num(sh.ant[k])}</b></div>`).join('')}</div>
+        <p class="note">Teste: 1d6 + antecedente. Pontos: 4 + Intelecto. Clique no nome para rolar.</p></div>
+      <div class="box"><h4>Condições</h4>${condBox(sh,SACRA.conds)}</div>
+      <section class="box wide smount" aria-label="Ficha da montaria"><h4>Montaria</h4>
+        <div class="smhead">${F('montaria.nome','Nome da montaria',{ph:'Ex.: Tordilho'})}${F('montaria.especie','Espécie e pelagem',{ph:'Cavalo baio'})}<div class="srow"><span class="n">Fidelidade</span>${sacDots('montaria.fidelidade',5,num(m.fidelidade),'Fidelidade')}<b class="num">${num(m.fidelidade)}</b></div></div>
+        <div class="smgrid"><div>
+          <div class="strack"><span class="n">Vida</span>${sacCircles('montaria.vidaMarc',mv,num(m.vidaMarc),'Vida da montaria')}<b class="num">${mv-num(m.vidaMarc)}/${mv}</b></div>
+          <div class="strack"><span class="n">Dor</span>${sacCircles('montaria.dorMarc',md,num(m.dorMarc),'Dor da montaria')}<b class="num">${md-num(m.dorMarc)}/${md}</b></div>
+          <div class="srow"><span class="n">Potência</span>${sacDots('montaria.potencia',5,num(m.potencia),'Potência')}<b class="num">${num(m.potencia)}</b></div>
+          <div class="srow"><span class="n">Resistência</span>${sacDots('montaria.resistencia',5,num(m.resistencia),'Resistência')}<b class="num">${num(m.resistencia)}</b></div>
+          <p class="note">Na criação: 3 pontos entre Potência e Resistência (usados: <span data-c="sac:mpts"></span>).</p>
+          <button type="button" class="btn small primary" data-roll="mont">Desafio da montaria: 1d6 + Potência + Montaria (alvo 6)</button>
+          <details class="sextra"><summary>Círculos extras da montaria</summary><div class="sgrid">${sacNum('montaria.vidaExtra','Vida extra',1)}${sacNum('montaria.dorExtra','Dor extra',1)}</div></details></div>
+        <div><label class="sfield"><span class="lbl">Arreios, alforjes e carga</span><textarea data-k="montaria.equip" rows="4" placeholder="Sela, alforjes com mantimentos, corda…"></textarea></label>
+          <label class="sfield"><span class="lbl">Notas da montaria</span><textarea data-k="montaria.notas" rows="3" placeholder="Temperamento, manias, de onde veio…"></textarea></label></div></div></section>
+    </div>`;}
+  else if(tab==='habilidades'){const H=sh.habilidades=sh.habilidades||[];const rd=sh.redencao=sh.redencao||{titulo:'',desc:'',passos:[]};while((rd.passos||(rd.passos=[])).length<6)rd.passos.push({t:'',ok:false});
+    b=`<div class="smain"><div class="box wide"><h4>Habilidades</h4><p class="note">No nível 1, escolha 2 entre Combate e Profissão.</p>
+      ${H.map((h,i)=>`<div class="shab"><input data-k="habilidades.${i}.nome" placeholder="Nome da habilidade" aria-label="Nome da habilidade"><select data-k="habilidades.${i}.tipo" aria-label="Tipo">${SACRA.tiposHab.map(t=>`<option>${t}</option>`).join('')}</select><button type="button" class="btn small danger" data-del="habilidades|${i}" aria-label="Remover habilidade">✕</button><textarea data-k="habilidades.${i}.desc" rows="2" placeholder="O que ela faz"></textarea></div>`).join('')||'<p class="note">Nenhuma habilidade ainda.</p>'}
+      <button type="button" class="btn small" data-add="habilidades" data-tpl='{"nome":"","tipo":"Combate","desc":""}'>+ Habilidade</button></div>
+      <div class="box wide"><h4>Redenção</h4>${F('redencao.titulo','Caminho de redenção',{ph:'Ex.: Pagar pelo que fiz em Red Rock'})}
+        <label class="sfield"><span class="lbl">O que o personagem busca</span><textarea data-k="redencao.desc" rows="2"></textarea></label>
+        <ol class="spassos">${rd.passos.slice(0,6).map((p,i)=>`<li><label class="check-line"><input type="checkbox" data-k="redencao.passos.${i}.ok" aria-label="Passo ${i+1} concluído"></label><input data-k="redencao.passos.${i}.t" placeholder="Passo ${i+1}" aria-label="Passo ${i+1}"></li>`).join('')}</ol></div></div>`;}
+  else if(tab==='equipamento'){const I=sh.itens=sh.itens||[];
+    b=`<div class="box">${F('dinheiro','Dinheiro',{ph:'$ 0'})}</div><div class="box" style="margin-top:12px"><h4>Armas e itens</h4>
+      <div class="sitens"><div class="sihead"><span>Item</span><span>Dano</span><span>Munição</span><span>Redução</span><span>Peso</span><span></span></div>
+      ${I.map((it,i)=>`<div class="sit"><input data-k="itens.${i}.nome" placeholder="Revólver, corda, lampião…" aria-label="Item"><span class="sdmg"><input data-k="itens.${i}.dano" placeholder="1d6" aria-label="Dano">${it.dano?`<button type="button" class="btn small" data-roll="dmg:${i}" aria-label="Rolar dano">🎲</button>`:''}</span><input data-k="itens.${i}.municao" aria-label="Munição"><input data-k="itens.${i}.reducao" aria-label="Redução"><input data-k="itens.${i}.peso" aria-label="Peso"><button type="button" class="btn small danger" data-del="itens|${i}" aria-label="Remover item">✕</button><input class="snotes" data-k="itens.${i}.notas" placeholder="Notas" aria-label="Notas"></div>`).join('')||'<p class="note">Nenhum item ainda.</p>'}</div>
+      <button type="button" class="btn small" data-add="itens" data-tpl='{"nome":"","dano":"","municao":"","reducao":"","peso":"","notas":""}'>+ Item</button>
+      <p class="note">O dano corpo a corpo aumenta +1 por ponto de Físico; some quando for o caso.</p></div>`;}
+  else b=`<div class="smain">${[['conceito','Conceito','Quem é você em uma frase'],['aparencia','Aparência',''],['passado','Passado',''],['objetivo','Objetivo',''],['anotacoes','Anotações','']].map(([k,n,ph])=>`<label class="box sfield"><span class="lbl">${n}</span><textarea data-k="${k}" rows="5" placeholder="${ph}"></textarea></label>`).join('')}</div>`;
+  return head+tabs+`<div class="sbody">${b}</div>`;}
 
 /* ---------- Etmos: the grimoire of particles ---------- */
 const etPips=(k,n,cur,lbl)=>`<span class="epips" role="group" aria-label="${esc(lbl)}">${Array.from({length:n},(_,i)=>`<button type="button" class="epip${cur>=i+1?' on':''}" data-pip="${k}" data-i="${i+1}" aria-label="${esc(lbl)} ${i+1}"></button>`).join('')}</span>`;

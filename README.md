@@ -5,7 +5,7 @@
 
 **[Versão com mesa ao vivo e fichas compartilhadas](https://claude.ai/artifact/1wUYbQ513Syib6KfoBeN8k)** · no claude.ai, só para quem o mestre convidar.
 
-<sub>Última atualização: 18/11/2026 às 16:07 (horário de Brasília). O GitHub Pages publica a versão nova poucos minutos depois de cada envio.</sub>
+<sub>Última atualização: 18/11/2026 às 16:15 (horário de Brasília). O GitHub Pages publica a versão nova poucos minutos depois de cada envio.</sub>
 <!-- LINKS:FIM -->
 
 Mapas e fichas de RPG de mesa numa página só. O botão **Mapa | Fichas** no topo troca de seção sem sair da página, e as duas partes conversam entre si.
@@ -32,6 +32,7 @@ Mapas e fichas de RPG de mesa numa página só. O botão **Mapa | Fichas** no to
 - **Condições no token:** as condições marcadas na ficha aparecem como ícones em volta do token, também para os jogadores na mesa ao vivo.
 - **Ligação com o mapa:** um token pode ser ligado a uma ficha. A vida do token segue a ficha, o dano aplicado no mapa muda a ficha, e “Mostrar no mapa” leva ao token.
 - **Mesa ao vivo:** em “Mesa dos jogadores”, o mestre escolhe a campanha. Os jogadores dela veem o mapa ao vivo ao clicar em **Mapa** e abrem a própria ficha clicando no token.
+- **Sacramento RPG:** ficha de velho oeste com Físico, Velocidade, Intelecto e Coragem, Círculos de Vida e Dor clicáveis, Movimento e Ações de Combate calculados, Cartas de Sina, os 8 antecedentes com rolagem 1d6 + antecedente, habilidades, caminho de redenção, armas com dano rolável e descrição. A **montaria** fica na mesma página do personagem ou NPC: nome, espécie, Fidelidade, Vida, Dor, Potência, Resistência, arreios e o desafio 1d6 + Potência + Montaria contra 6. O gerador de NPCs tem perfis do oeste (peão, pistoleiro, xerife, fora-da-lei, pregador, comerciante), cada um com sua montaria.
 - **Mapas da campanha:** na aba **Mapas** da campanha, o mestre escolhe quais mapas pertencem a ela. Nenhum vai para os jogadores até o mestre clicar em **Transmitir para a mesa**; a mesa mostra um mapa por vez, o transmitido continua atualizando ao vivo enquanto é editado, e **Tirar da mesa** para de enviar mudanças.
 - **Convites de uso único:** cada link cria uma ficha (de jogador ou de NPC); o jogador só enxerga as fichas dele.
 - **Aprovação e registro:** mudanças importantes do jogador esperam a aprovação do mestre; as outras vão para um registro que o mestre lê e pode desfazer item por item.
