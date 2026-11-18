@@ -2143,9 +2143,183 @@ for(const [id,n] of TAVERN_PRESETS2){URB_DEFS.push([id,n,'taverna34','*']);ICONS
 for(const [id,n] of HOUSE_PRESETS3){URB_DEFS.push([id,n,'casa34','*']);ICONS[id]=n;}
 {const old=Object.assign({},URB_CATS);for(const k of Object.keys(URB_CATS))delete URB_CATS[k];Object.assign(URB_CATS,{casa34:old.casa34,loja34:old.loja34,taverna34:old.taverna34,castelo34:old.castelo34,edif34:old.edif34,praca34:'Praças e mobiliário (3/4)'},old);}
 
+/* ===== 3/4 relief: mountains, dunes, waterfalls and landforms, lit like the rest of the 3/4 pieces ===== */
+function reliefKit(c,P,Q){
+  const R={},si=sIdx(),lit=Q.lx<=0,TAU2=Math.PI*2,ink=P.ink;
+  R.c={rock:P.mtn||'#cfba92',snow:P.snow||'#fbf6ea',sand:TERR[7].c[si],grass:P.grass||TERR[5].c[si],canyon:TERR[20].c[si],water:P.waterFill||'#b9cfc8',deep:P.water||'#2f5e6e',
+    lava:P.lava||'#d2552c',smoke:P.smoke||'#e8e2d2',tree:P.tree||'#a9b77c',crystal:P.crystal||'#9ad7e6',magic:P.magic||'#6b4fa0',paper:P.paper||'#f2e7c9'};
+  const path=pts=>{c.beginPath();c.moveTo(pts[0][0],pts[0][1]);for(let i=1;i<pts.length;i++)c.lineTo(pts[i][0],pts[i][1]);c.closePath();};
+  const vgrad=(y0,y1,a,b)=>{const g=c.createLinearGradient(0,y0,0,y1);g.addColorStop(0,a);g.addColorStop(1,b);return g;};
+  const hgrad=(x0,x1,a,b)=>{const g=c.createLinearGradient(x0,0,x1,0);g.addColorStop(0,a);g.addColorStop(1,b);return g;};
+  R.mix=(a,b,t)=>{const p=x=>[1,3,5].map(i=>parseInt(x.slice(i,i+2),16));if(!/^#[0-9a-f]{6}$/i.test(a)||!/^#[0-9a-f]{6}$/i.test(b))return a;const A=p(a),B=p(b);return '#'+A.map((v,i)=>Math.round(v+(B[i]-v)*t).toString(16).padStart(2,'0')).join('');};
+  /* points between a and b, pushed sideways a little: rocky edges */
+  R.jag=(a,b,n,amp,seed)=>{const out=[],dx=b[0]-a[0],dy=b[1]-a[1],l=Math.hypot(dx,dy)||1;for(let i=1;i<n;i++){const t=i/n,j=(hash(i,seed,301)-.5)*2*amp;out.push([a[0]+dx*t-dy/l*j,a[1]+dy*t+dx/l*j]);}return out;};
+  R.ground=(cx,cy,rx,ry,col,a)=>{c.save();c.globalAlpha=a==null?.35:a;c.fillStyle=col;c.beginPath();c.ellipse(cx,cy,rx,ry,0,0,TAU2);c.fill();c.restore();};
+  R.withClip=(pts,fn)=>{c.save();path(pts);c.clip();fn();c.restore();};
+  R.lines=(segs,col,lw)=>{c.strokeStyle=col;c.lineWidth=lw;c.beginPath();for(const s of segs){c.moveTo(s[0],s[1]);c.lineTo(s[2],s[3]);}c.stroke();};
+  /* a mountain seen in 3/4: two faces split by the ridge; the face toward the light is bright */
+  R.peak=(cx,by,w,h,col,o={})=>{const seed=o.seed||1,off=o.off||0,pk=[cx+off*w,by-h],rb=[cx+w*(o.rb==null?.14:o.rb),by],L=[cx-w,by],Rt=[cx+w,by];
+    const amp=o.rocky?w*.09:o.round?0:w*.035,n=o.rocky?6:4;
+    const le=o.round?[[cx-w*.72,by-h*.42],[cx-w*.38,by-h*.86]]:R.jag(L,pk,n,amp,seed),re=o.round?[[pk[0]+w*.38,by-h*.86],[cx+w*.72,by-h*.42]]:R.jag(pk,Rt,n,amp,seed+7),ri=R.jag(pk,rb,4,o.rocky?w*.05:w*.02,seed+3);
+    const top=o.trunc?[[pk[0]-w*o.trunc,pk[1]+h*o.trunc*.9],[pk[0]+w*o.trunc,pk[1]+h*o.trunc*.9]]:[pk];
+    const left=[L,...le.filter(p=>p[1]>top[0][1]),...top.slice(0,1),...[...ri].reverse(),rb],right=[top[top.length-1],...re.filter(p=>p[1]>top[top.length-1][1]),Rt,rb,...ri];
+    const lc=shade(col,.2),dc=shade(col,-.32);
+    path(left);c.fillStyle=vgrad(pk[1],by,lit?shade(lc,.08):dc,lit?shade(lc,-.14):shade(dc,-.14));c.fill();
+    path(right);c.fillStyle=vgrad(pk[1],by,lit?dc:shade(lc,.08),lit?shade(dc,-.14):shade(lc,-.14));c.fill();
+    /* spurs and gullies give the slopes volume */
+    R.withClip(left,()=>{c.fillStyle=lit?shade(lc,-.08):shade(dc,.1);c.beginPath();c.moveTo(cx-w*.8,by);c.lineTo(cx-w*.48,by-h*.4);c.lineTo(cx-w*.2,by);c.fill();
+      R.lines([[pk[0]-w*.12,pk[1]+h*.3,cx-w*.42,by-h*.1],[pk[0]-w*.04,pk[1]+h*.55,cx-w*.12,by-h*.06]],'rgba(0,0,0,.18)',.6);});
+    R.withClip(right,()=>{c.fillStyle=lit?shade(dc,.08):shade(lc,-.06);c.beginPath();c.moveTo(cx+w*.38,by);c.lineTo(cx+w*.62,by-h*.36);c.lineTo(cx+w*.88,by);c.fill();
+      R.lines([[pk[0]+w*.2,pk[1]+h*.34,cx+w*.5,by-h*.1],[pk[0]+w*.08,pk[1]+h*.6,cx+w*.26,by-h*.05]],'rgba(0,0,0,.2)',.6);});
+    if(o.snow){const t=o.snow,sn=R.c.snow,cut=(a,b,k)=>[a[0]+(b[0]-a[0])*k,a[1]+(b[1]-a[1])*k];const sl=cut(pk,L,t),sr=cut(pk,Rt,t),sm=cut(pk,rb,t*1.15);
+      const poly=[pk,sl,...R.jag(sl,sm,4,w*.06,seed+11),sm,...R.jag(sm,sr,4,w*.06,seed+13),sr];
+      R.withClip(left,()=>{path(poly);c.fillStyle=lit?sn:shade(sn,-.16);c.fill();});R.withClip(right,()=>{path(poly);c.fillStyle=lit?shade(sn,-.16):sn;c.fill();});}
+    if(o.trees){const tc=o.treeCol||R.c.tree;for(let i=0;i<o.trees;i++){const u=hash(i,seed,311),v=hash(i,seed,312),x=cx-w*.8+u*w*1.6,maxY=by-1,y=by-h*(.08+v*.38);
+      const edge=x<pk[0]?by-(x-L[0])/(pk[0]-L[0])*h:by-(Rt[0]-x)/(Rt[0]-pk[0])*h;if(y<edge+2.5||y>maxY)continue;R.pine(x,y,1.6+v*1.2,tc);}}
+    c.strokeStyle=ink;c.lineWidth=.9;c.lineJoin='round';c.beginPath();c.moveTo(L[0],L[1]);for(const p of left.slice(1,left.indexOf(top[0])+1))c.lineTo(p[0],p[1]);
+    for(const p of right.slice(1,right.indexOf(Rt)+1))c.lineTo(p[0],p[1]);c.stroke();
+    c.lineWidth=.7;c.beginPath();c.moveTo(top[0][0],top[0][1]);for(const p of ri)c.lineTo(p[0],p[1]);c.lineTo(rb[0],rb[1]);c.stroke();
+    return {pk,top};};
+  R.pine=(x,y,r,col)=>{c.fillStyle='#6b4a2e';c.fillRect(x-r*.12,y-r*.25,r*.24,r*.35);for(let i=0;i<2;i++){const yy=y-r*.2-i*r*.55,ww=r*(.7-i*.2);c.beginPath();c.moveTo(x-ww,yy);c.lineTo(x,yy-r*1.05);c.lineTo(x+ww,yy);c.closePath();
+      c.fillStyle=hgrad(x-ww,x+ww,shade(col,lit?.12:-.25),shade(col,lit?-.25:.12));c.fill();c.strokeStyle=ink;c.lineWidth=.35;c.stroke();}};
+  R.bush=(x,y,r,col)=>{c.beginPath();c.arc(x-r*.45,y,r*.62,0,TAU2);c.arc(x+r*.45,y,r*.62,0,TAU2);c.arc(x,y-r*.4,r*.72,0,TAU2);const g=c.createRadialGradient(x+(lit?-r*.4:r*.4),y-r*.7,r*.1,x,y,r*1.3);
+    g.addColorStop(0,shade(col,.25));g.addColorStop(1,shade(col,-.3));c.strokeStyle=ink;c.lineWidth=.8;c.stroke();c.fillStyle=g;c.fill();};
+  /* rounded hill with grass */
+  R.hill=(cx,by,w,h,col,o={})=>{c.beginPath();c.moveTo(cx-w,by);c.bezierCurveTo(cx-w*.62,by-h*1.32,cx+w*.62,by-h*1.32,cx+w,by);c.closePath();
+    c.fillStyle=hgrad(cx-w,cx+w,shade(col,lit?.2:-.24),shade(col,lit?-.24:.2));c.fill();c.strokeStyle=ink;c.lineWidth=.8;c.stroke();
+    c.save();c.clip();c.fillStyle='rgba(255,255,255,.14)';c.beginPath();c.ellipse(cx+(lit?-w*.25:w*.25),by-h*.75,w*.45,h*.25,0,0,TAU2);c.fill();c.restore();
+    const seed=o.seed||5;R.lines(Array.from({length:Math.round(w/3)},(_,i)=>{const x=cx-w*.7+hash(i,seed,321)*w*1.4,y=by-h*(.15+hash(i,seed,322)*.55);return [x,y,x+.6,y-1.6];}),shade(col,-.4),.5);
+    for(let i=0;i<(o.bushes||0);i++)R.bush(cx-w*.5+hash(i,seed,323)*w,by-h*(.15+hash(i,seed,324)*.35),1.8,R.c.tree);};
+  /* a block of rock with a flat top and a sheer front face (cliffs, plateaus, waterfalls) */
+  R.block=(x0,x1,ty,by,o={})=>{const seed=o.seed||9,dep=o.depth==null?6:o.depth,face=o.face||R.c.rock,top=o.top||R.c.grass;
+    const front=[[x0,ty],...R.jag([x0,ty],[x1,ty],8,.9,seed),[x1,ty],[x1+1,by],...R.jag([x1+1,by],[x0-1,by],8,1.1,seed+1),[x0-1,by]];
+    const back=[[x0,ty],[x0+2,ty-dep*.7],...R.jag([x0+2,ty-dep*.7],[x1-2,ty-dep],6,1,seed+2),[x1-2,ty-dep],[x1,ty]];
+    path(front);c.fillStyle=vgrad(ty,by,shade(face,lit?.02:-.06),shade(face,-.3));c.fill();
+    R.withClip(front,()=>{c.strokeStyle='rgba(0,0,0,.2)';c.lineWidth=.5;for(let yy=ty+3;yy<by;yy+=o.strata||3.2){c.beginPath();c.moveTo(x0-2,yy);for(let xx=x0;xx<=x1+2;xx+=3)c.lineTo(xx,yy+(hash(xx|0,yy|0,331)-.5)*1.2);c.stroke();}
+      if(o.bands){for(let k=0;k<o.bands.length;k++){c.fillStyle=o.bands[k];c.globalAlpha=.55;c.fillRect(x0-2,ty+(by-ty)*k/o.bands.length,x1-x0+4,(by-ty)/o.bands.length*.55);}c.globalAlpha=1;}
+      R.lines(Array.from({length:Math.round((x1-x0)/5)},(_,i)=>{const x=x0+3+hash(i,seed,332)*(x1-x0-6);return [x,ty+1,x+(hash(i,seed,333)-.5)*2,ty+(by-ty)*(.4+hash(i,seed,334)*.5)];}),'rgba(0,0,0,.22)',.5);
+      c.fillStyle=lit?'rgba(0,0,0,.18)':'rgba(255,255,255,.08)';c.fillRect(x1-3,ty,4,by-ty);c.fillStyle=lit?'rgba(255,255,255,.1)':'rgba(0,0,0,.15)';c.fillRect(x0-1,ty,3,by-ty);});
+    path(back);c.fillStyle=vgrad(ty-dep,ty,shade(top,-.06),shade(top,.12));c.fill();
+    c.strokeStyle=ink;c.lineWidth=.8;path(front);c.stroke();path(back);c.stroke();
+    return {front,back};};
+  R.boulder=(x,y,r,col)=>{const pts=[];for(let i=0;i<7;i++){const a=i/7*TAU2,k=.78+hash(i,x*7+y|0,341)*.32;pts.push([x+Math.cos(a)*r*k,y+Math.sin(a)*r*k*.72]);}
+    c.beginPath();c.moveTo((pts[0][0]+pts[6][0])/2,(pts[0][1]+pts[6][1])/2);for(let i=0;i<7;i++){const p=pts[i],q=pts[(i+1)%7];c.quadraticCurveTo(p[0],p[1],(p[0]+q[0])/2,(p[1]+q[1])/2);}c.closePath();
+    const g=c.createRadialGradient(x+(lit?-r*.4:r*.4),y-r*.45,r*.1,x,y,r*1.2);g.addColorStop(0,shade(col,.28));g.addColorStop(1,shade(col,-.32));c.fillStyle=g;c.fill();c.strokeStyle=ink;c.lineWidth=.6;c.stroke();};
+  /* falling water on a cliff face, from the lip (x, y0) to the pool (y1) */
+  R.fall=(x,w,y0,y1)=>{c.fillStyle=vgrad(y0,y1,shade(R.c.water,.05),shade(R.c.water,.35));c.beginPath();c.moveTo(x-w/2,y0);c.bezierCurveTo(x-w/2-.6,y0+(y1-y0)*.4,x-w/2-1.2,y1-2,x-w/2-1.4,y1);c.lineTo(x+w/2+1.4,y1);c.bezierCurveTo(x+w/2+1.2,y1-2,x+w/2+.6,y0+(y1-y0)*.4,x+w/2,y0);c.closePath();c.fill();
+    c.save();c.clip();c.strokeStyle='rgba(255,255,255,.7)';c.lineWidth=.45;for(let i=0;i<Math.max(3,w*1.2);i++){const xx=x-w/2+hash(i,x|0,351)*w,ya=y0+hash(i,2,352)*(y1-y0)*.3;c.beginPath();c.moveTo(xx,ya);c.lineTo(xx+(hash(i,3,353)-.5)*.8,ya+(y1-y0)*(.4+hash(i,4,354)*.5));c.stroke();}
+    c.fillStyle='rgba(30,70,90,.18)';c.fillRect(x-w/2-2,y0,w*.22,y1-y0);c.restore();c.strokeStyle=shade(R.c.deep,.1);c.lineWidth=.5;c.beginPath();c.moveTo(x-w/2,y0);c.lineTo(x-w/2-1.4,y1);c.moveTo(x+w/2,y0);c.lineTo(x+w/2+1.4,y1);c.stroke();};
+  R.pool=(x,y,rx,ry,fx,fw)=>{c.beginPath();c.ellipse(x,y,rx,ry,0,0,TAU2);c.fillStyle=vgrad(y-ry,y+ry,shade(R.c.water,-.12),shade(R.c.water,.12));c.fill();c.strokeStyle=ink;c.lineWidth=.7;c.stroke();
+    c.save();c.beginPath();c.ellipse(x,y,rx,ry,0,0,TAU2);c.clip();c.strokeStyle='rgba(255,255,255,.55)';c.lineWidth=.45;for(let k=1;k<4;k++){c.beginPath();c.ellipse(fx,y-ry*.5,fw*.4+k*2.2,k*1.1,0,0,Math.PI);c.stroke();}c.restore();
+    c.fillStyle='rgba(255,255,255,.85)';for(let i=0;i<7;i++){c.beginPath();c.arc(fx+(hash(i,7,361)-.5)*fw*1.2,y-ry*.55+hash(i,8,362)*1.6,.7+hash(i,9,363)*.9,0,TAU2);c.fill();}
+    c.fillStyle='rgba(255,255,255,.28)';for(let i=0;i<4;i++){c.beginPath();c.arc(fx+(hash(i,1,364)-.5)*fw*1.6,y-ry*.9-hash(i,2,365)*3,1.6+hash(i,3,366)*1.4,0,TAU2);c.fill();}};
+  /* crescent dune: long bright windward slope, dark slip face; mirrored so the slip face looks away from the light */
+  R.dune=(cx,by,w,h,o={})=>{const sand=o.col||R.c.sand;c.save();if(!lit){c.translate(cx,0);c.scale(-1,1);c.translate(-cx,0);}const C=[cx+w*.18,by-h];
+    c.beginPath();c.moveTo(cx-w,by);c.quadraticCurveTo(cx-w*.4,by-h*1.06,C[0],C[1]);c.quadraticCurveTo(cx+w*.66,by-h*.62,cx+w,by+h*.05);c.quadraticCurveTo(cx,by+h*.16,cx-w,by);c.closePath();
+    c.fillStyle=hgrad(cx-w,cx+w*.3,shade(sand,.1),shade(sand,.22));c.fill();c.strokeStyle=ink;c.lineWidth=.75;c.stroke();
+    c.beginPath();c.moveTo(C[0],C[1]);c.quadraticCurveTo(cx+w*.66,by-h*.62,cx+w,by+h*.05);c.quadraticCurveTo(cx+w*.42,by-h*.08,cx-w*.02,by+h*.04);c.quadraticCurveTo(cx+w*.14,by-h*.55,C[0],C[1]);c.closePath();
+    c.fillStyle=vgrad(C[1],by,shade(sand,-.42),shade(sand,-.24));c.fill();
+    c.strokeStyle=shade(sand,-.45);c.lineWidth=.7;c.beginPath();c.moveTo(cx-w*.35,by-h*.66);c.quadraticCurveTo(cx-w*.05,by-h*.98,C[0],C[1]);c.quadraticCurveTo(cx+w*.14,by-h*.55,cx-w*.02,by+h*.04);c.stroke();
+    c.strokeStyle='rgba(0,0,0,.14)';c.lineWidth=.45;for(let k=1;k<5;k++){const t=k/5;c.beginPath();c.moveTo(cx-w*(.92-t*.25),by-h*t*.32);c.quadraticCurveTo(cx-w*(.5-t*.3),by-h*(.25+t*.55),cx-w*(.05-t*.18),by-h*(t*.72));c.stroke();}
+    c.restore();};
+  R.vgrad=vgrad;R.hgrad=hgrad;R.lit=lit;
+  return R;
+}
+const RELEVO_DEFS=[
+  ['q_mont_pico','Montanha','relevo34','*'],['q_mont_nevada','Montanha nevada','relevo34','*'],['q_mont_rochosa','Pico rochoso','relevo34','*'],['q_mont_dupla','Montanha de dois picos','relevo34','*'],
+  ['q_cordilheira34','Cordilheira','relevo34','*'],['q_mont_verde','Montanha arborizada','relevo34','*'],['q_vulcao34','Vulcão ativo','relevo34','*'],['q_vulcao_extinto','Vulcão extinto com lago','relevo34','*'],
+  ['q_mont_cristal','Montanha de cristal','relevo34','*'],
+  ['q_duna','Duna','relevo34','*'],['q_dunas','Campo de dunas','relevo34','*'],['q_duna_alta','Duna alta','relevo34','*'],
+  ['q_cachoeira34','Cachoeira','relevo34','*'],['q_cachoeira_alta','Cachoeira alta','relevo34','*'],['q_cascata','Cascata em degraus','relevo34','*'],['q_cachoeira_larga','Cachoeira larga (véu)','relevo34','*'],
+  ['q_colina34','Colina','relevo34','*'],['q_colinas34','Colinas','relevo34','*'],['q_plato','Platô','relevo34','*'],['q_escarpa','Escarpa','relevo34','*'],['q_canion','Cânion','relevo34','*'],
+  ['q_arco_pedra','Arco de pedra','relevo34','*'],['q_agulha','Agulha de pedra','relevo34','*'],['q_rochedos','Rochedos','relevo34','*'],['q_cratera','Cratera','relevo34','*'],['q_caverna34','Entrada de caverna','relevo34','*'],
+];
+Object.assign(Q_TALL,{q_mont_pico:.09,q_mont_nevada:.1,q_mont_rochosa:.1,q_mont_dupla:.09,q_cordilheira34:.08,q_mont_verde:.08,q_vulcao34:.09,q_vulcao_extinto:.08,q_mont_cristal:.09,
+  q_duna:.03,q_dunas:.03,q_duna_alta:.04,q_cachoeira34:.07,q_cachoeira_alta:.09,q_cascata:.07,q_cachoeira_larga:.07,q_colina34:.04,q_colinas34:.04,q_plato:.07,q_escarpa:.05,q_canion:.015,
+  q_arco_pedra:.07,q_agulha:.11,q_rochedos:.03,q_cratera:.012,q_caverna34:.06});
+Object.assign(Q_FN,{
+  q_mont_pico(c,P,Q){const R=reliefKit(c,P,Q);R.ground(0,12,20,4,shade(R.c.rock,-.2),.2);R.peak(0,12,17,28,R.c.rock,{seed:3,off:-.05});},
+  q_mont_nevada(c,P,Q){const R=reliefKit(c,P,Q);R.ground(0,12,20,4,shade(R.c.rock,-.2),.2);R.peak(0,12,17,31,shade(R.c.rock,-.05),{seed:5,snow:.42});},
+  q_mont_rochosa(c,P,Q){const R=reliefKit(c,P,Q);R.ground(0,12,20,4,shade(R.c.rock,-.25),.2);R.peak(1,12,16,30,shade(R.c.rock,-.12),{seed:8,rocky:true,off:.12,snow:.18});
+    for(const [x,y,r] of[[-13,11,2.2],[-9,12.5,1.6],[12,11.5,2],[15,12.6,1.3]])R.boulder(x,y,r,shade(R.c.rock,-.1));},
+  q_mont_dupla(c,P,Q){const R=reliefKit(c,P,Q);R.ground(0,12,22,4,shade(R.c.rock,-.2),.2);R.peak(7,9,13,26,shade(R.c.rock,.04),{seed:12,snow:.3});R.peak(-6,12,14,22,R.c.rock,{seed:14,off:-.08});},
+  q_cordilheira34(c,P,Q){const R=reliefKit(c,P,Q);const far=R.mix(R.c.rock,R.c.paper,.35);R.ground(0,12,22,5,shade(R.c.rock,-.2),.2);
+    R.peak(-9,4,10,20,far,{seed:21,snow:.35});R.peak(10,4,11,23,far,{seed:22,snow:.38});R.peak(-14,12,9,18,R.c.rock,{seed:23});R.peak(1,12,12,27,R.c.rock,{seed:24,snow:.36});R.peak(15,12,8,15,R.c.rock,{seed:25,off:.1});},
+  q_mont_verde(c,P,Q){const R=reliefKit(c,P,Q);const col=R.mix(R.c.rock,R.c.grass,.55);R.ground(0,12,20,4,shade(R.c.grass,-.2),.22);R.peak(0,12,18,24,col,{seed:31,round:true,trees:16,treeCol:shade(R.c.tree,-.08)});},
+  q_vulcao34(c,P,Q){const R=reliefKit(c,P,Q);const col=R.mix(R.c.rock,'#4a3a34',.45);R.ground(0,12,21,4,'#3a2a26',.25);const r=R.peak(0,12,18,26,col,{seed:41,trunc:.2,rb:.08});
+    const [a,b]=r.top,cx=(a[0]+b[0])/2,cy=a[1];c.beginPath();c.ellipse(cx,cy,(b[0]-a[0])/2,1.6,0,0,Math.PI*2);c.fillStyle='#2a1a16';c.fill();c.strokeStyle=P.ink;c.lineWidth=.6;c.stroke();
+    Q.glow(cx,cy,7,'rgba(255,120,40,.6)');c.fillStyle=R.c.lava;c.beginPath();c.ellipse(cx,cy+.2,(b[0]-a[0])/2-1,1,0,0,Math.PI*2);c.fill();
+    c.strokeStyle=R.c.lava;c.lineWidth=1.1;c.lineCap='round';for(const [dx,len,sd] of[[-2,15,1],[1.5,19,2],[3.5,11,3]]){c.beginPath();c.moveTo(cx+dx,cy+1);for(let k=1;k<=6;k++)c.lineTo(cx+dx+(hash(k,sd,371)-.5)*2.2+k*dx*.25,cy+1+len*k/6);c.stroke();}
+    c.fillStyle='rgba(255,200,120,.5)';for(let i=0;i<5;i++){c.beginPath();c.arc(cx+(hash(i,1,372)-.5)*5,cy-2-hash(i,2,373)*3,.5,0,Math.PI*2);c.fill();}
+    for(let i=0;i<5;i++){const x=cx+(i%2?2:-1)+i*.8,y=cy-5-i*3.6,rr=2.6+i*.9;const g=c.createRadialGradient(x-1,y-1,.4,x,y,rr);g.addColorStop(0,shade(R.c.smoke,.1));g.addColorStop(1,shade(R.c.smoke,-.25));c.fillStyle=g;c.globalAlpha=.88-i*.1;c.beginPath();c.arc(x,y,rr,0,Math.PI*2);c.fill();}c.globalAlpha=1;},
+  q_vulcao_extinto(c,P,Q){const R=reliefKit(c,P,Q);const col=R.mix(R.c.rock,R.c.grass,.3);R.ground(0,12,21,4,shade(R.c.grass,-.2),.22);const r=R.peak(0,12,19,20,col,{seed:45,trunc:.32,rb:.06,round:true});
+    const [a,b]=r.top,cx=(a[0]+b[0])/2,cy=a[1];c.beginPath();c.ellipse(cx,cy,(b[0]-a[0])/2,2.2,0,0,Math.PI*2);c.fillStyle=shade(col,-.3);c.fill();c.strokeStyle=P.ink;c.lineWidth=.6;c.stroke();
+    c.beginPath();c.ellipse(cx,cy+.5,(b[0]-a[0])/2-1.4,1.3,0,0,Math.PI*2);c.fillStyle=R.c.water;c.fill();c.strokeStyle='rgba(255,255,255,.6)';c.lineWidth=.4;c.beginPath();c.moveTo(cx-2,cy+.4);c.lineTo(cx+1,cy+.4);c.stroke();
+    for(let i=0;i<5;i++)R.bush(cx-10+i*5+hash(i,1,375)*2,cy+5+hash(i,2,376)*7,1.4,R.c.tree);},
+  q_mont_cristal(c,P,Q){const R=reliefKit(c,P,Q);const col=R.mix(R.c.rock,R.c.magic,.25);R.ground(0,12,20,4,R.c.magic,.18);R.peak(0,12,17,26,col,{seed:51,rocky:true});
+    for(const [x,y,h,a] of[[-7,10,9,-.25],[-3,11,13,-.08],[2,11,15,.05],[7,10,10,.22],[11,11.5,6,.35],[-11,11.5,6,-.4]]){c.save();c.translate(x,y);c.rotate(a);const w=h*.18;
+      c.beginPath();c.moveTo(-w,0);c.lineTo(-w,-h*.75);c.lineTo(0,-h);c.lineTo(w,-h*.75);c.lineTo(w,0);c.closePath();const g=c.createLinearGradient(-w,0,w,0);g.addColorStop(0,shade(R.c.crystal,.3));g.addColorStop(.5,R.c.crystal);g.addColorStop(1,shade(R.c.crystal,-.3));
+      c.fillStyle=g;c.fill();c.strokeStyle=P.ink;c.lineWidth=.45;c.stroke();c.strokeStyle='rgba(255,255,255,.7)';c.beginPath();c.moveTo(-w*.4,-h*.15);c.lineTo(-w*.4,-h*.7);c.stroke();c.restore();}
+    Q.glow(0,4,14,'rgba(150,220,255,.25)');},
+  q_duna(c,P,Q){const R=reliefKit(c,P,Q);R.ground(0,12,19,4,shade(R.c.sand,-.2),.2);R.dune(0,11,17,11);},
+  q_dunas(c,P,Q){const R=reliefKit(c,P,Q);R.ground(0,10,21,6,shade(R.c.sand,-.2),.2);R.dune(-7,2,10,7);R.dune(9,5,9,6,{col:shade(R.c.sand,.03)});R.dune(-1,13,13,8);},
+  q_duna_alta(c,P,Q){const R=reliefKit(c,P,Q);R.ground(0,12,21,4,shade(R.c.sand,-.2),.2);R.dune(4,9,14,12,{col:shade(R.c.sand,-.03)});R.dune(-3,12,19,18);},
+  q_cachoeira34(c,P,Q){const R=reliefKit(c,P,Q);R.block(-15,15,-9,7,{seed:61,face:R.c.rock,top:R.c.grass,depth:7});
+    c.fillStyle=R.c.water;c.beginPath();c.moveTo(-2.5,-9);c.lineTo(-1.8,-15.5);c.lineTo(1.8,-16);c.lineTo(2.5,-9);c.closePath();c.fill();c.strokeStyle=P.ink;c.lineWidth=.5;c.stroke();
+    R.fall(0,5,-9,9);R.pool(0,11,14,4.2,0,5);for(const [x,y] of[[-11,-11],[-7,-13],[9,-12],[12,-10.5]])R.bush(x,y,1.7,R.c.tree);R.boulder(-12,10,1.8,R.c.rock);R.boulder(11.5,10.5,1.5,R.c.rock);},
+  q_cachoeira_alta(c,P,Q){const R=reliefKit(c,P,Q);R.block(-10,10,-22,7,{seed:63,face:shade(R.c.rock,-.04),top:R.c.grass,depth:5,strata:3.6});
+    c.fillStyle=R.c.water;c.beginPath();c.moveTo(-1.6,-22);c.lineTo(-1.2,-26.5);c.lineTo(1.2,-26.8);c.lineTo(1.6,-22);c.closePath();c.fill();c.strokeStyle=P.ink;c.lineWidth=.5;c.stroke();
+    R.fall(0,3.2,-22,9);R.pool(0,11,11,3.6,0,4);R.pine(-7,-23,2.4,R.c.tree);R.pine(6.5,-24,2.2,R.c.tree);R.pine(-14,10,2.6,R.c.tree);R.pine(14,10.5,2.4,R.c.tree);},
+  q_cascata(c,P,Q){const R=reliefKit(c,P,Q);R.block(-9,9,-17,-8,{seed:65,depth:5});R.block(-13,13,-8,1,{seed:66,depth:4,top:shade(R.c.rock,.1)});R.block(-16,16,1,8,{seed:67,depth:4,top:shade(R.c.rock,.1)});
+    c.fillStyle=R.c.water;c.fillRect(-1.6,-21,3.2,4);R.fall(0,3.4,-17,-8);R.fall(1,4.4,-8,1);R.fall(0,5.6,1,9);R.pool(0,11,13,3.8,0,6);
+    for(const [x,y] of[[-6,-19],[5,-19.5],[-12,-10],[11,-10]])R.bush(x,y,1.5,R.c.tree);},
+  q_cachoeira_larga(c,P,Q){const R=reliefKit(c,P,Q);R.block(-19,19,-8,6,{seed:69,depth:6});c.fillStyle=R.c.water;c.beginPath();c.moveTo(-14,-8);c.lineTo(-12,-13);c.lineTo(12,-13.5);c.lineTo(14,-8);c.closePath();c.fill();c.strokeStyle=P.ink;c.lineWidth=.5;c.stroke();
+    for(const [x,w] of[[-9.5,7],[-1,6.5],[8,8]])R.fall(x,w,-8,8);R.pool(0,11,19,4.4,0,24);for(const [x,y] of[[-17,-10],[16,-10.5]])R.bush(x,y,1.8,R.c.tree);},
+  q_colina34(c,P,Q){const R=reliefKit(c,P,Q);R.ground(0,12,19,3.5,shade(R.c.grass,-.2),.2);R.hill(0,12,17,13,R.c.grass,{seed:71,bushes:2});},
+  q_colinas34(c,P,Q){const R=reliefKit(c,P,Q);R.ground(0,11,21,5,shade(R.c.grass,-.2),.2);R.hill(-7,4,11,9,shade(R.c.grass,.04),{seed:72});R.hill(9,6,10,8,shade(R.c.grass,.02),{seed:73,bushes:1});R.hill(-1,13,14,10,R.c.grass,{seed:74,bushes:2});},
+  q_plato(c,P,Q){const R=reliefKit(c,P,Q);R.ground(0,11,21,4,shade(R.c.canyon,-.2),.22);const top=R.mix(R.c.canyon,R.c.sand,.5);
+    R.block(-17,17,-6,10,{seed:81,face:R.c.canyon,top,depth:9,strata:2.6,bands:[shade(R.c.canyon,.15),shade(R.c.canyon,-.1),shade(R.c.canyon,.08),shade(R.c.canyon,-.15)]});
+    for(const [x,y,r] of[[-16,11.5,2],[-12,12.5,1.4],[15,11.8,1.8]])R.boulder(x,y,r,R.c.canyon);for(const [x,y] of[[-6,-11],[7,-12]])R.bush(x,y,1.3,shade(R.c.tree,-.1));},
+  q_escarpa(c,P,Q){const R=reliefKit(c,P,Q);R.block(-20,20,-2,9,{seed:85,face:shade(R.c.rock,-.05),depth:6,strata:2.4});for(const [x,y,r] of[[-15,10.5,1.6],[-4,11,2.1],[3,10.4,1.3],[13,11,1.9],[18,10.2,1.2]])R.boulder(x,y,r,R.c.rock);
+    for(const [x,y] of[[-13,-5],[-6,-6],[6,-6.5],[14,-5.5]])R.pine(x,y,2,R.c.tree);},
+  q_canion(c,P,Q){const R=reliefKit(c,P,Q);const col=R.c.canyon,top=R.mix(col,R.c.sand,.4);
+    const slab=[[-20,0],[-15,-9],[0,-12],[15,-9],[20,-1],[16,8],[0,12],[-16,8]];c.beginPath();c.moveTo(-20,0);for(const p of slab.slice(1))c.lineTo(p[0],p[1]);c.closePath();c.fillStyle=R.vgrad(-12,12,shade(top,.08),shade(top,-.06));c.fill();
+    c.fillStyle=shade(col,-.25);c.beginPath();c.moveTo(-16,8);c.lineTo(0,12);c.lineTo(16,8);c.lineTo(16,11);c.lineTo(0,15);c.lineTo(-16,11);c.closePath();c.fill();c.strokeStyle=P.ink;c.lineWidth=.7;c.stroke();
+    const A=[[-18,-6],[-9,-4],[-3,-7],[4,-2],[10,-3],[18,2]],B=A.map(([x,y],i)=>[x+1.2,y+6.5+(i%2)*1.2]);
+    c.beginPath();c.moveTo(A[0][0],A[0][1]);for(const p of A.slice(1))c.lineTo(p[0],p[1]);for(const p of[...B].reverse())c.lineTo(p[0],p[1]);c.closePath();c.fillStyle=R.vgrad(-7,9,shade(col,.1),shade(col,-.5));c.fill();
+    c.save();c.clip();c.strokeStyle='rgba(0,0,0,.25)';c.lineWidth=.45;for(let k=1;k<4;k++){c.beginPath();c.moveTo(A[0][0],A[0][1]+k*1.5);for(const p of A.slice(1))c.lineTo(p[0],p[1]+k*1.5);c.stroke();}
+    c.strokeStyle=R.c.water;c.lineWidth=1.2;c.beginPath();c.moveTo(B[0][0],B[0][1]-.8);for(const p of B.slice(1))c.lineTo(p[0],p[1]-.8);c.stroke();c.restore();
+    c.strokeStyle=P.ink;c.lineWidth=.7;c.beginPath();c.moveTo(A[0][0],A[0][1]);for(const p of A.slice(1))c.lineTo(p[0],p[1]);c.moveTo(B[0][0],B[0][1]);for(const p of B.slice(1))c.lineTo(p[0],p[1]);c.stroke();
+    c.beginPath();c.moveTo(-20,0);for(const p of slab.slice(1))c.lineTo(p[0],p[1]);c.closePath();c.stroke();for(const [x,y] of[[-12,-7],[8,-8],[-6,7],[11,6]])R.bush(x,y,1.2,shade(R.c.tree,-.1));},
+  q_arco_pedra(c,P,Q){const R=reliefKit(c,P,Q);const col=R.c.canyon;R.ground(0,12,19,4,shade(col,-.2),.22);
+    c.beginPath();c.moveTo(-16,12);c.lineTo(-15,-2);c.bezierCurveTo(-14,-17,14,-17,15,-2);c.lineTo(16,12);c.lineTo(8,12);c.lineTo(7,2);c.bezierCurveTo(6,-8,-6,-8,-7,2);c.lineTo(-8,12);c.closePath();
+    c.fillStyle=R.hgrad(-16,16,shade(col,R.lit?.15:-.25),shade(col,R.lit?-.25:.15));c.fill('evenodd');c.save();c.clip();
+    c.strokeStyle='rgba(0,0,0,.2)';c.lineWidth=.5;for(let k=0;k<6;k++){c.beginPath();c.moveTo(-17,-12+k*4.2);c.quadraticCurveTo(0,-14+k*4.2,17,-12+k*4.2);c.stroke();}c.restore();
+    c.strokeStyle=shade(col,-.45);c.lineWidth=1.8;c.beginPath();c.moveTo(-7,12);c.lineTo(-7,2);c.bezierCurveTo(-6,-8,6,-8,7,2);c.lineTo(7,12);c.stroke();
+    c.strokeStyle=P.ink;c.lineWidth=.8;c.beginPath();c.moveTo(-16,12);c.lineTo(-15,-2);c.bezierCurveTo(-14,-17,14,-17,15,-2);c.lineTo(16,12);c.moveTo(-8,12);c.lineTo(-7,2);c.bezierCurveTo(-6,-8,6,-8,7,2);c.lineTo(8,12);c.stroke();
+    R.boulder(-13,12.5,1.6,col);R.boulder(12,12.8,1.3,col);},
+  q_agulha(c,P,Q){const R=reliefKit(c,P,Q);const col=shade(R.c.rock,-.08);R.ground(0,12,12,3,shade(col,-.2),.22);const L=[-6,12],T=[.5,-27],Rt=[6,12],m=[1.2,12];
+    const le=R.jag(L,T,7,1.4,91),re=R.jag(T,Rt,7,1.4,92),left=[L,...le,T,m],right=[T,...re,Rt,m];
+    c.beginPath();c.moveTo(L[0],L[1]);for(const p of[...le,T,m])c.lineTo(p[0],p[1]);c.closePath();c.fillStyle=R.vgrad(-27,12,shade(col,R.lit?.22:-.25),shade(col,R.lit?.02:-.35));c.fill();
+    c.beginPath();c.moveTo(T[0],T[1]);for(const p of[...re,Rt,m])c.lineTo(p[0],p[1]);c.closePath();c.fillStyle=R.vgrad(-27,12,shade(col,R.lit?-.25:.22),shade(col,R.lit?-.35:.02));c.fill();
+    c.strokeStyle='rgba(0,0,0,.22)';c.lineWidth=.5;for(let k=0;k<6;k++){const y=-20+k*5.4;c.beginPath();c.moveTo(-5+k*.15,y);c.lineTo(5-k*.1,y+.8);c.stroke();}
+    c.strokeStyle=P.ink;c.lineWidth=.8;c.beginPath();c.moveTo(L[0],L[1]);for(const p of[...le,T,...re,Rt])c.lineTo(p[0],p[1]);c.stroke();c.lineWidth=.6;c.beginPath();c.moveTo(T[0],T[1]);c.lineTo(m[0],m[1]);c.stroke();
+    for(const [x,y,r] of[[-9,12,2],[8.5,12.4,1.6],[-4,13.4,1.1]])R.boulder(x,y,r,col);},
+  q_rochedos(c,P,Q){const R=reliefKit(c,P,Q);R.ground(0,9,18,5,shade(R.c.rock,-.2),.2);for(const [x,y,r] of[[-6,3,6],[6,4,5],[0,8,7],[-12,9,3.6],[12,10,3.4],[4,12.5,2.4]])R.boulder(x,y,r,shade(R.c.rock,-.06));},
+  q_cratera(c,P,Q){const R=reliefKit(c,P,Q);const col=R.mix(R.c.rock,R.c.sand,.3);c.beginPath();c.ellipse(0,3,19,9,0,0,Math.PI*2);c.fillStyle=R.vgrad(-6,12,shade(col,.14),shade(col,-.12));c.fill();c.strokeStyle=P.ink;c.lineWidth=.8;c.stroke();
+    c.beginPath();c.ellipse(0,3.4,12.5,5.4,0,0,Math.PI*2);c.fillStyle=R.vgrad(-2,9,shade(col,-.05),shade(col,-.55));c.fill();c.strokeStyle=shade(col,-.5);c.lineWidth=.7;c.stroke();
+    c.beginPath();c.ellipse(0,5,6,2,0,0,Math.PI*2);c.fillStyle=shade(col,-.4);c.fill();c.strokeStyle='rgba(255,255,255,.35)';c.lineWidth=.8;c.beginPath();c.ellipse(0,3,15.5,7,0,Math.PI*1.05,Math.PI*1.95);c.stroke();
+    c.fillStyle=shade(col,-.25);for(let i=0;i<14;i++){const a=hash(i,1,381)*Math.PI*2,r=20+hash(i,2,382)*4;c.beginPath();c.arc(Math.cos(a)*r,3+Math.sin(a)*r*.45,.5+hash(i,3,383)*.7,0,Math.PI*2);c.fill();}},
+  q_caverna34(c,P,Q){const R=reliefKit(c,P,Q);const col=shade(R.c.rock,-.1);R.ground(0,12,19,4,shade(col,-.2),.2);R.peak(0,12,18,20,col,{seed:95,round:true,rb:.3});
+    c.beginPath();c.moveTo(-6,12);c.bezierCurveTo(-6.5,1,6.5,1,6,12);c.closePath();const g=c.createRadialGradient(0,9,1,0,8,8);g.addColorStop(0,'#000');g.addColorStop(1,'#2a221c');c.fillStyle=g;c.fill();c.strokeStyle=P.ink;c.lineWidth=.9;c.stroke();
+    c.fillStyle=shade(col,-.2);for(const x of[-3.5,-1,1.5,3.8]){c.beginPath();c.moveTo(x-.8,4.2+Math.abs(x)*.3);c.lineTo(x,6.8+Math.abs(x)*.25);c.lineTo(x+.8,4.2+Math.abs(x)*.3);c.closePath();c.fill();}
+    R.boulder(-9,12,1.8,col);R.boulder(9,12.4,1.5,col);R.bush(-12,9,1.6,R.c.tree);},
+});
+for(const d of RELEVO_DEFS){URB_DEFS.push(d);ICONS[d[0]]=d[1];ICON_DEFS.push([d[0],d[1],'relevo',d[3]]);}
+URB_CATS.relevo34='Relevo e natureza (3/4)';CATS.relevo='Relevo em 3/4 (montanhas, dunas, cachoeiras)';
 const isQ=t=>t.startsWith('q_')||t.startsWith('h|')||t.startsWith('k|');
 /* ===== map view: 3/4 or top-down ===== */
-const V34_CATS=new Set(['casa34','loja34','taverna34','castelo34','edif34','praca34']);
+const V34_CATS=new Set(['casa34','loja34','taverna34','castelo34','edif34','praca34','relevo34']);
 const viewOf=()=>(map&&map.view)||'34';
 const mainCat=cat=>viewOf()==='34'?V34_CATS.has(cat):!V34_CATS.has(cat);
 const mainWall=id=>viewOf()==='34'?id.startsWith('w3_'):!id.startsWith('w3_');
@@ -2320,6 +2494,7 @@ function drawMap(ctx,opts){
     for(let ps=0;ps<2;ps++)for(const o of rivs)drawRiver(ctx,o,P,ps);for(const o of rest)drawLine(ctx,o,P);
     sts.sort((a,b)=>ST_RANK[a.type]-ST_RANK[b.type]);const dp=map.doorPaths!==false&&map.layers.icons,pl=!!opts.player;
     if(dp){drawDoorPaths(ctx,P,pl,0,false);drawDoorPaths(ctx,P,pl,0,true);}for(const o of sts)drawStreet(ctx,o,P,0);
+    if(viewOf()==='34')for(const o of sts)if(o.type!=='rua_terra')drawStreet(ctx,o,P,2);
     if(dp)drawDoorPaths(ctx,P,pl,1,false);for(const o of sts)if(o.type==='rua_terra')drawStreet(ctx,o,P,1);
     if(dp)drawDoorPaths(ctx,P,pl,1,true);for(const o of sts)if(o.type!=='rua_terra')drawStreet(ctx,o,P,1);
     for(const o of w3)drawWall3(ctx,o,P,'shadow');}
@@ -2512,15 +2687,47 @@ const STREETS=new Set(['rua_pedra','rua_terra','avenida','rua','estrada']);
 const PATHLIKE=new Set(['rua_pedra','rua_terra','avenida','rua','estrada','trilha']);
 const stPats={};
 /* one tiling texture per surface kind, anchored to the map: overlapping streets paint identical pixels, so they read as one piece */
-function streetPattern(ctx,kind){const key=map.style+'|'+kind;if(stPats[key])return stPats[key];const S=64,cv=document.createElement('canvas');cv.width=cv.height=S;const g=cv.getContext('2d'),si=sIdx();
+function streetPattern(ctx,kind){const v34=viewOf()==='34';const key=map.style+'|'+kind+'|'+(v34?'34':'top');if(stPats[key])return stPats[key];const S=64,cv=document.createElement('canvas');cv.width=cv.height=S;const g=cv.getContext('2d'),si=sIdx();
+  if(v34&&kind!=='terra'){
+    /* 3/4: each stone is a small raised block, lit from above, with a dark lower lip; the tile is squashed vertically on the map */
+    const flag=kind==='calcada',av=kind==='avenida';const base=flag?shade(P34().wall||'#cfc6b4',.06):av?(map.style==='blueprint'?'#2a5d96':map.style==='ink'?'#cfcfcb':shade(TERR[13].c[si],-.2)):shade(TERR[13].c[si],-.06);
+    const rh=flag?16:av?12:8,bw=flag?16:av?24:10;g.fillStyle=shade(base,-.35);g.fillRect(0,0,S,S);
+    for(let r=0;r<S/rh;r++)for(let k=-1;k<S/bw+1;k++){const x=k*bw+(r%2)*bw/2,y=r*rh,h=hash(k+(r%2?40:0),r,113),col=shade(base,(h-.5)*.16),gap=flag?1.2:1.4,rad=flag?1.2:av?2:3;
+      for(const dx of[0,S,-S]){const X=x+dx+gap/2,Y=y+gap/2,W=bw-gap,H=rh-gap;
+        g.fillStyle=shade(col,-.3);rrect(g,X,Y+1.2,W,H-.6,rad);g.fill();
+        g.fillStyle=col;rrect(g,X,Y,W,H-1.4,rad);g.fill();
+        g.fillStyle='rgba(255,255,255,.22)';rrect(g,X+1,Y+.6,W-2,Math.max(1,(H-1.4)*.35),rad*.6);g.fill();}}}
+  else
   if(kind==='terra'){const base=TERR[12].c[si];g.fillStyle=base;g.fillRect(0,0,S,S);for(let i=0;i<90;i++){const x=hash(i,1,111)*S,y=hash(i,2,111)*S,r=.6+hash(i,3,111)*1.6;g.fillStyle=hash(i,4,111)<.6?'rgba(60,40,20,.2)':'rgba(255,255,255,.14)';
       for(const dx of[0,S,-S])for(const dy of[0,S,-S]){g.beginPath();g.ellipse(x+dx,y+dy,r*1.4,r,0,0,TAU);g.fill();}}}
   else{const base=kind==='avenida'?(map.style==='blueprint'?'#2a5d96':map.style==='ink'?'#cfcfcb':shade(TERR[13].c[si],-.2)):shade(TERR[13].c[si],-.04);const rh=kind==='avenida'?16:8,bw=kind==='avenida'?32:16;g.fillStyle=base;g.fillRect(0,0,S,S);
     for(let r=0;r<S/rh;r++)for(let k=-1;k<S/bw+1;k++){const x=k*bw+(r%2)*bw/2,y=r*rh,h=hash(k+(r%2?40:0),r,112);g.fillStyle=h<.5?`rgba(0,0,0,${.03+h*.08})`:`rgba(255,255,255,${(h-.5)*.12})`;g.fillRect(x,y,bw,rh);
       for(const dx of[0,S,-S]){g.strokeStyle='rgba(0,0,0,.22)';g.lineWidth=1;g.strokeRect(x+dx+.5,y+.5,bw,rh);}}}
-  const pat=ctx.createPattern(cv,'repeat');try{pat.setTransform(new DOMMatrix().scale(.5,.5));}catch(e){}return stPats[key]=pat;}
+  const pat=ctx.createPattern(cv,'repeat');try{pat.setTransform(new DOMMatrix().scale(.5,v34?.34:.5));}catch(e){}return stPats[key]=pat;}
+function rrect(g,x,y,w,h,r){r=Math.min(r,w/2,h/2);g.beginPath();g.moveTo(x+r,y);g.arcTo(x+w,y,x+w,y+h,r);g.arcTo(x+w,y+h,x,y+h,r);g.arcTo(x,y+h,x,y,r);g.arcTo(x,y,x+w,y,r);g.closePath();}
+const P34=()=>PAL[map.style]||PAL.parchment;
 const ST_KIND={rua_pedra:'pedra',rua_terra:'terra',avenida:'avenida'},ST_RANK={rua_terra:0,rua_pedra:1,avenida:2};
-function drawStreet(ctx,o,P,pass){const w=o.w,sp=samplePath(o.pts),all=pass==null;ctx.save();ctx.lineCap='round';ctx.lineJoin='round';
+/* a polyline shifted sideways by d (positive = left of the direction of travel) */
+function offsetPoly(sp,d){const out=[];for(let i=0;i<sp.length;i++){const a=sp[Math.max(0,i-1)],b=sp[Math.min(sp.length-1,i+1)];let nx=-(b[1]-a[1]),ny=b[0]-a[0];const l=Math.hypot(nx,ny)||1;out.push([sp[i][0]+nx/l*d,sp[i][1]+ny/l*d]);}return out;}
+/* 3/4 streets. The road sits lower than the sidewalks: the surface is drawn shifted down by d and narrowed by 2d, which uncovers
+   the vertical face of the curb on the far (north) side of east-west streets and leaves a thin curb line along north-south ones. */
+function drawStreet34(ctx,o,P,pass){const w=o.w,sp=samplePath(o.pts),all=pass==null;ctx.save();ctx.lineCap='round';ctx.lineJoin='round';
+  const av=o.type==='avenida',dirt=o.type==='rua_terra',outer=av?w*3+2.4:w*2+2.6,road=av?w*2.1:w*1.4,d=clamp(w*.22,.8,2.6);
+  const shift=(pts,dy)=>pts.map(p=>[p[0],p[1]+dy]);
+  if(dirt){
+    if(all||pass===0){ctx.globalAlpha=.55;ctx.strokeStyle=TERR[12].c[sIdx()];ctx.lineWidth=w*2+3;strokePoly(ctx,sp);ctx.globalAlpha=1;}
+    if(all||pass===1){const e=TERR[12].c[sIdx()];ctx.strokeStyle=shade(e,-.32);ctx.lineWidth=w*2;strokePoly(ctx,sp);
+      const dd=Math.min(d,1.2),sd=shift(sp,dd);ctx.strokeStyle=streetPattern(ctx,'terra');ctx.lineWidth=w*2-dd*2;strokePoly(ctx,sd);
+      if(w>=2.2){ctx.strokeStyle='rgba(60,38,18,.28)';ctx.lineWidth=Math.max(.6,w*.18);for(const k of[-.42,.42])strokePoly(ctx,offsetPoly(sd,w*k));
+        ctx.strokeStyle='rgba(255,245,220,.18)';ctx.lineWidth=Math.max(.4,w*.1);for(const k of[-.42,.42])strokePoly(ctx,offsetPoly(sd,w*k-Math.max(.5,w*.12)));}}
+    ctx.restore();return;}
+  if(all||pass===0){ctx.strokeStyle=P.ink;ctx.lineWidth=outer;strokePoly(ctx,sp);ctx.strokeStyle=streetPattern(ctx,'calcada');ctx.lineWidth=outer-1.4;strokePoly(ctx,sp);
+    ctx.strokeStyle=shade(P.wall||'#bdb6a6',.12);ctx.lineWidth=road+2.4;strokePoly(ctx,sp);ctx.strokeStyle='rgba(0,0,0,.3)';ctx.lineWidth=road+.8;strokePoly(ctx,sp);}
+  if(all||pass===2){ctx.strokeStyle=shade(P.wall||'#bdb6a6',-.42);ctx.lineWidth=road;strokePoly(ctx,sp);}
+  if(all||pass===1){const sd=shift(sp,d);ctx.strokeStyle=streetPattern(ctx,av?'avenida':'pedra');ctx.lineWidth=road-2*d;strokePoly(ctx,sd);
+      ctx.strokeStyle='rgba(0,0,0,.16)';ctx.lineWidth=Math.max(.5,w*.12);strokePoly(ctx,offsetPoly(sd,(road/2-d)*.92));strokePoly(ctx,offsetPoly(sd,-(road/2-d)*.92));}
+  ctx.restore();}
+function drawStreet(ctx,o,P,pass){if(viewOf()==='34')return drawStreet34(ctx,o,P,pass);const w=o.w,sp=samplePath(o.pts),all=pass==null;ctx.save();ctx.lineCap='round';ctx.lineJoin='round';
   if(all||pass===0){if(o.type==='rua_terra'){ctx.globalAlpha=.55;ctx.strokeStyle=TERR[12].c[sIdx()];ctx.lineWidth=w*2+3;strokePoly(ctx,sp);ctx.globalAlpha=1;}
     else if(o.type==='rua_pedra'){ctx.strokeStyle=P.ink;ctx.lineWidth=w*2+2.6;strokePoly(ctx,sp);ctx.strokeStyle=P.wall;ctx.lineWidth=w*2+1.4;strokePoly(ctx,sp);}
     else{ctx.strokeStyle=P.ink;ctx.lineWidth=w*3+2.4;strokePoly(ctx,sp);ctx.strokeStyle=P.wall;ctx.lineWidth=w*3;strokePoly(ctx,sp);}}
