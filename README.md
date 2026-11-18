@@ -5,7 +5,7 @@
 
 **[Versão com mesa ao vivo e fichas compartilhadas](https://claude.ai/artifact/1wUYbQ513Syib6KfoBeN8k)** · no claude.ai, só para quem o mestre convidar.
 
-<sub>Última atualização: 18/11/2026 às 16:31 (horário de Brasília). O GitHub Pages publica a versão nova poucos minutos depois de cada envio.</sub>
+<sub>Última atualização: 18/11/2026 às 16:47 (horário de Brasília). O GitHub Pages publica a versão nova poucos minutos depois de cada envio.</sub>
 <!-- LINKS:FIM -->
 
 Mapas e fichas de RPG de mesa numa página só. O botão **Mapa | Fichas** no topo troca de seção sem sair da página, e as duas partes conversam entre si.
@@ -15,7 +15,8 @@ Mapas e fichas de RPG de mesa numa página só. O botão **Mapa | Fichas** no to
 - **Escalas:** mundo, continente, reino, cidade e interior/masmorra, em visão 3/4 ou vista de cima.
 - **Ferramentas:** pincel de terreno, ruas e rios interligados, ícones, peças urbanas, cercas e muralhas contínuas, tokens, régua, névoa de guerra, texto.
 - **Geradores:** continente, arquipélago, mundo, cidade, caverna e masmorra.
-- **Estéticas:** pergaminho, colorido, gravura vitoriana, steampunk, planta técnica e preto e branco.
+- **Estéticas:** pergaminho, colorido, gravura vitoriana, steampunk, planta técnica, preto e branco e **velho oeste** (papel queimado de sol, terra vermelha, cânions, moldura de madeira com estrelas de xerife e letras de cartaz).
+- **Velho oeste em 3/4:** categoria própria no Urbano com 36 peças: saloon, armazém geral, xerife e cadeia, banco, hotel com sacada, barbearia, ferreiro e estábulo, correio e diligências, telégrafo, capela de madeira, escola, cabana de toras, casa de rancho, casa e missão de adobe, estação com caixa-d'água, celeiro vermelho, mina, cemitério da colina, forca, curral, carroça coberta, diligência, cavalos no poste, moinho de bombear água, poço, tenda, postes de telégrafo, lampião, placa de boas-vindas, barris, saguaro, cactos, caveira de boi e arbusto rolante. A cidade gerada nessa estética vira uma cidade do oeste, com rua de terra, mina, cemitério, estação e cactos em volta.
 - **Relevo em 3/4:** montanhas (pico, nevada, rochosa, dois picos, cordilheira, arborizada, vulcões, cristal), dunas, cachoeiras e relevos (colinas, platô, escarpa, cânion, arco, agulha, rochedos, cratera, caverna), nas ferramentas Urbano e Ícone.
 - **Ruas em 3/4:** ferramenta Traçado › Rua de pedra, Avenida ou Rua de terra (mapas de cidade, reino e interior), com calçada, meio-fio e calçamento rebaixado com pedras em perspectiva; ruas de terra com sulcos.
 - **Casas de lado em 3/4:** presets "de lado" e a opção Orientação no Construtor de casas, com a empena estreita virada para quem olha.
