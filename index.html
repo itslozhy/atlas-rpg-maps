@@ -945,6 +945,9 @@ ul.rolls .t{color:var(--muted);font-variant-numeric:tabular-nums}ul.rolls .w{fon
 .mesabox{display:flex;gap:10px;align-items:center;flex-wrap:wrap;background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:10px 14px;margin:12px 0 0}
 .mesabox .dot{width:9px;height:9px;border-radius:50%;background:var(--ok);flex:0 0 auto}
 .mesabox .dot.off{background:var(--muted)}
+.maplist{display:flex;flex-direction:column;gap:8px}.mapcard{display:flex;gap:10px;align-items:center;justify-content:space-between;flex-wrap:wrap;background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:10px 14px}
+.mapcard.on{border-color:var(--ok);box-shadow:0 0 0 1px var(--ok)}.mapinfo{display:flex;gap:10px;align-items:baseline;flex-wrap:wrap;min-width:0}
+.mapcard .live{display:inline-flex;gap:6px;align-items:center;color:var(--ok);font-weight:600;font-size:13px}.mapcard .live .dot{width:8px;height:8px;border-radius:50%;background:var(--ok)}
 </style>
 
 <header class="top">
@@ -4177,8 +4180,20 @@ let mesaTimer=null;
 function playerSafe(m){const d=serialize(m);const hidden=o=>{if(o.secret)return true;if(!m.fogOn)return false;if(o.kind==='line')return !o.pts.some(p=>fogVisible(p[0],p[1]));return !fogVisible(o.x,o.y);};
   d.objects=m.objects.filter(o=>!hidden(o)).map(o=>{const n=JSON.parse(JSON.stringify(o));delete n.link;if(n.ficha){const f=window.Fichas&&Fichas.get(fichaId(n));if(!f||f.kind!=='pc')delete n.ficha;}if(n.note){const pub=n.note.publico;n.note=pub?{titulo:n.note.titulo||objName(o),publico:pub}:undefined;if(!n.note)delete n.note;}return n;});
   delete d.mesa;delete d.parent;return d;}
-function scheduleMesa(){if(playerMode||!map||!map.mesa||!map.mesa.on||!db)return;clearTimeout(mesaTimer);mesaTimer=setTimeout(pushMesa,1200);}
-async function pushMesa(){if(!map||!map.mesa||!map.mesa.on||!db)return;const data=playerSafe(map);const json=JSON.stringify(data);if(json.length>250000){$('mesaState').textContent='O mapa ficou grande demais para transmitir.';return;}
+/* a campaign table shows one map at a time: only the map last sent with "Transmitir para a mesa" keeps streaming */
+function mesaOwnerOk(m){const cc=window.Fichas&&Fichas.camps().find(c=>c.mesa===m.mesa.id);return !(cc&&cc.mapa!==m.id);}
+function scheduleMesa(){if(playerMode||!map||!map.mesa||!map.mesa.on||!db||!mesaOwnerOk(map))return;clearTimeout(mesaTimer);mesaTimer=setTimeout(pushMesa,1200);}
+async function mapRecord(id){if(map&&map.id===id)return serialize(map);let d=null;if(db&&uidUser){try{const s=await db.collection('data/users/'+uidUser).doc(id).get();if(s.exists)d=s.data();}catch(e){}}
+  if(!d){const raw=store.get('atlas.map.'+id);if(raw)try{d=JSON.parse(raw);}catch(e){}}return d;}
+async function transmitMap(id,mesaId){if(!db)return {ok:false,msg:'A transmissão precisa da conta (claude.ai ou o site com login).'};
+  let m=null;if(map&&map.id===id)m=map;else{const d=await mapRecord(id);if(!d)return {ok:false,msg:'Não encontrei esse mapa. Ele pode ter sido apagado.'};try{m=deserialize(d);}catch(e){return {ok:false,msg:'Não foi possível ler esse mapa.'};}}
+  const prev=map;let data;map=m;try{data=playerSafe(m);}finally{map=prev;}
+  if(JSON.stringify(data).length>250000)return {ok:false,msg:'O mapa ficou grande demais para transmitir.'};
+  try{await db.doc('mesas/'+mesaId).set({map:data,updatedAt:Date.now()});}catch(e){return {ok:false,msg:'Não foi possível atualizar a mesa agora.'};}
+  m.mesa={id:mesaId,on:true};if(m===map){changed(true);if(!$('mesaModal').hidden)renderMesa();}
+  else{const d=serialize(m);if(!db||!uidUser)store.set('atlas.map.'+m.id,JSON.stringify(d));else{try{await db.collection('data/users/'+uidUser).doc(m.id).set(d);}catch(e){}}}
+  return {ok:true,nome:m.name};}
+async function pushMesa(){if(!map||!map.mesa||!map.mesa.on||!db||!mesaOwnerOk(map))return;const data=playerSafe(map);const json=JSON.stringify(data);if(json.length>250000){$('mesaState').textContent='O mapa ficou grande demais para transmitir.';return;}
   try{await db.doc('mesas/'+map.mesa.id).set({map:data,updatedAt:Date.now()});$('mesaState').textContent='Transmitindo. Última atualização às '+new Date().toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'})+'.';}
   catch(e){$('mesaState').textContent='Não foi possível atualizar a mesa agora.';}}
 function mesaLink(){return map&&map.mesa?(window.MESA_URL||ARTIFACT_URL)+'#mesa-'+map.mesa.id:'';}
@@ -4352,6 +4367,9 @@ window.Atlas={
   hasToken:fid=>!!(map&&map.objects.some(o=>o.kind==='token'&&fichaId(o)===fid)),
   showToken(fid){const o=map&&map.objects.find(o=>o.kind==='token'&&fichaId(o)===fid);if(!o)return;Mesa.go('mapa');requestAnimationFrame(()=>{const r=stage.getBoundingClientRect();view.z=Math.max(view.z,1.4);view.x=r.width/2-o.x*view.z;view.y=r.height/2-o.y*view.z;if(!playerMode){setTool('select');setSel([o.id]);}requestDraw();});},
   openMap(id){if(!playerMode)openMapById(id);},
+  canTransmit:()=>!!db&&!playerMode,
+  async listMaps(){const l=await mapIndex();if(map&&!playerMode&&!l.some(x=>x.id===map.id))l.push({id:map.id,name:map.name,scale:map.scale});return l.filter(x=>x&&x.id).map(x=>({id:x.id,nome:String(x.name||'Mapa'),escala:(SCALES[x.scale]||{n:''}).n}));},
+  transmit:(id,mesaId)=>transmitMap(id,mesaId),
   sync:()=>syncTokens()
 };
 Mesa.onView(v=>{if(v!=='mapa')return;const m=(location.hash.match(/^#mesa-([A-Za-z0-9-]+)$/)||[])[1];
@@ -4683,13 +4701,14 @@ function viewCamp(app,c){lastCamp=c.id;try{sessionStorage.setItem('mesa.camp',c.
   resolveNames([...new Set(sheets.map(s=>s.owner).filter(o=>o&&o!==S.uid))]).then(()=>{if(!S.names.__done&&sheets.some(s=>s.owner&&s.owner!==S.uid)){S.names.__done=1;if(route().v==='camp')render();}});
   const nLog=S.master?campLogs(c.id).filter(l=>(l.fim||0)>seenLogs(c.id)).length+allSheets().filter(s=>s.camp===c.id&&s.owner).reduce((a,s)=>a+Object.keys(s.pendentes||{}).length,0):0;
   const nDoc=S.master?0:campDocs(c.id).filter(d=>(d.t||0)>num(store.get('mesa.docvisto.'+c.id))).length;
-  const tabs=S.master?[['grupo','Grupo'],['npcs','NPCs'],['diario','Diário'],['documentos','Documentos'],...(c.sys==='etmos'?[['particulas','Partículas']]:[]),['convites','Convites'],['registro','Registro'+(nLog?` <span class="cnt">${nLog}</span>`:'')],['notas','Notas do mestre']]:[['grupo','Minhas fichas'],['diario','Diário'],['documentos','Documentos'+(nDoc?` <span class="cnt">${nDoc}</span>`:'')]];if(!tabs.some(t=>t[0]===ui.campTab))ui.campTab='grupo';
+  const tabs=S.master?[['grupo','Grupo'],['mapas','Mapas'],['npcs','NPCs'],['diario','Diário'],['documentos','Documentos'],...(c.sys==='etmos'?[['particulas','Partículas']]:[]),['convites','Convites'],['registro','Registro'+(nLog?` <span class="cnt">${nLog}</span>`:'')],['notas','Notas do mestre']]:[['grupo','Minhas fichas'],['diario','Diário'],['documentos','Documentos'+(nDoc?` <span class="cnt">${nDoc}</span>`:'')]];if(!tabs.some(t=>t[0]===ui.campTab))ui.campTab='grupo';
   const banner=S.readOnlyMsg?`<div class="banner">${esc(S.readOnlyMsg)}</div>`:'';
   let body='';
   if(ui.campTab==='grupo')body=S.master?`<div class="row" style="margin-bottom:12px"><button class="btn primary" id="newPc">Nova ficha (sua)</button><button class="btn" data-newinv="pc">Convidar um jogador</button></div>
       ${pcs.length?`<div class="grid-cards">${pcs.map(s=>pcCard(s,c)).join('')}</div>`:'<div class="empty">Nenhum personagem ainda. Gere um convite para cada jogador na aba Convites.</div>'}`
     :`${pcs.length?`<div class="grid-cards">${pcs.map(s=>pcCard(s,c)).join('')}</div>`:'<div class="empty">Você ainda não tem fichas nesta mesa.</div>'}<p class="note" style="margin-top:12px">Para criar outra ficha, peça um novo convite ao mestre.</p>`;
   else if(ui.campTab==='npcs')body=`<div class="row" style="margin-bottom:12px"><button class="btn primary" id="newNpc">Novo NPC</button><button class="btn" id="genNpc">Gerar NPC</button><button class="btn" id="fromBest">Do bestiário</button><button class="btn" data-newinv="npc">Convite para criar um NPC</button><span class="note">NPCs que você cria só você vê; os criados por convite também ficam visíveis para quem os criou.</span></div>${npcs.length?`<div class="grid-cards">${npcs.map(s=>pcCard(s,c)).join('')}</div>`:'<div class="empty">Nenhum NPC ainda.</div>'}`;
+  else if(ui.campTab==='mapas'&&S.master)body=mapsView(c);
   else if(ui.campTab==='convites')body=invitesView(c);
   else if(ui.campTab==='particulas')body=partsView(c);
   else if(ui.campTab==='diario')body=diaryView(c);
@@ -4706,7 +4725,7 @@ function viewCamp(app,c){lastCamp=c.id;try{sessionStorage.setItem('mesa.camp',c.
   const np=$('#newPc');if(np)np.onclick=()=>createSheet(c,'pc');const nn=$('#newNpc');if(nn)nn.onclick=()=>createSheet(c,'npc');
   for(const b of app.querySelectorAll('[data-newinv]'))b.onclick=()=>inviteForm(c,b.dataset.newinv);
   const gn=$('#genNpc');if(gn)gn.onclick=()=>npcGenerator(c);const fb=$('#fromBest');if(fb)fb.onclick=()=>bestPicker(c);
-  bindInvites(app,c);bindLogs(app,c);bindParts(app,c);bindDiary(app,c);bindDocs(app,c);
+  bindMaps(app,c);bindInvites(app,c);bindLogs(app,c);bindParts(app,c);bindDiary(app,c);bindDocs(app,c);
   const mn=$('#mNotes');if(mn)mn.oninput=()=>{setStatus('Alterações não salvas');saveNote(c.id,mn.value);};
   for(const b of app.querySelectorAll('[data-hp]'))b.onclick=()=>{const sh=findSheet(b.dataset.hp);if(!sh||!canEdit(sh))return;const [pv,mx]=hpOf(sh);setHpVal(sh,pv+num(b.dataset.d));queueSave(sh);render();};}
 /* master: own sheets and private NPCs. Player: only through an invite (inv = {id, tipo}). */
@@ -5023,8 +5042,23 @@ function bindLogs(app,c){bindPend(app);const ap=app.querySelector('#aprOn');if(a
 /* ================= LINK WITH THE MAP ================= */
 let lastCamp=null;try{lastCamp=sessionStorage.getItem('mesa.camp');}catch(e){}
 function mesaBox(c){
-  if(!c.mesa)return S.master?`<div class="mesabox"><span class="dot off" aria-hidden="true"></span><span class="note">Nenhum mapa ligado a esta campanha. No Mapa, abra “Mesa dos jogadores” e escolha esta campanha para os jogadores verem o mapa ao vivo.</span></div>`:'';
+  if(!c.mesa||(S.master&&!c.mapa))return S.master?`<div class="mesabox"><span class="dot off" aria-hidden="true"></span><span class="note">Nada na mesa dos jogadores. Na aba <b>Mapas</b>, escolha os mapas da campanha e clique em <b>Transmitir para a mesa</b> no que eles devem ver.</span></div>`:'';
   return `<div class="mesabox"><span class="dot" aria-hidden="true"></span><span>Mesa ao vivo: <b>${esc(c.mesaNome||'mapa')}</b></span><button class="btn small primary" id="openMesa" style="margin-left:auto">${S.master?'Abrir o mapa':'Ver o mapa ao vivo'}</button></div>`;}
+/* the campaign's maps: chosen by the master, sent to the players only on demand */
+function mapsView(c){const list=c.mapas||[],live=c.mesa&&c.mapa;const can=window.Atlas&&Atlas.canTransmit&&Atlas.canTransmit();
+  return `<div class="row" style="margin-bottom:10px;align-items:center"><select id="mapAdd" style="min-width:240px"><option value="">Adicionar um mapa à campanha…</option></select><span class="note">Os mapas desta lista só chegam aos jogadores quando você clica em <b>Transmitir para a mesa</b>. A mesa mostra um mapa por vez.</span></div>
+    ${can?'':'<p class="note">Neste modo os mapas ficam só neste navegador: a transmissão funciona no claude.ai ou no site com login.</p>'}
+    ${list.length?`<div class="maplist">${list.map(m=>{const on=live&&c.mapa===m.id;return `<div class="mapcard${on?' on':''}"><div class="mapinfo"><b>${esc(m.nome)}</b><span class="note">${esc(m.escala||'')}</span>${on?'<span class="live"><span class="dot" aria-hidden="true"></span>Na mesa agora</span>':''}</div>
+      <div class="row"><button class="btn small" data-mopen="${esc(m.id)}">Abrir</button><button class="btn small${on?'':' primary'}" data-mtx="${esc(m.id)}" ${can?'':'disabled'}>${on?'Atualizar a mesa':'Transmitir para a mesa'}</button>${on?'<button class="btn small" data-mstop>Tirar da mesa</button>':''}<button class="btn small danger" data-mrm="${esc(m.id)}" aria-label="Remover ${esc(m.nome)} da campanha">Remover</button></div></div>`;}).join('')}</div>`
+      :'<div class="empty">Nenhum mapa nesta campanha ainda. Escolha um na lista acima: o reino, a cidade, a taverna, a masmorra…</div>'}`;}
+function bindMaps(app,c){const sel=app.querySelector('#mapAdd');if(!sel||!window.Atlas||!Atlas.listMaps)return;
+  Atlas.listMaps().then(all=>{const have=new Set((c.mapas||[]).map(m=>m.id));for(const m of all)if(!have.has(m.id))sel.add(new Option(`${m.nome}${m.escala?' ('+m.escala+')':''}`,m.id));if(sel.options.length===1)sel.options[0].textContent='Todos os seus mapas já estão aqui (crie outro no Mapa)';});
+  sel.onchange=async()=>{const id=sel.value;if(!id)return;const all=await Atlas.listMaps();const m=all.find(x=>x.id===id);if(!m)return;c.mapas=(c.mapas||[]).filter(x=>x.id!==id).concat({id:m.id,nome:m.nome,escala:m.escala});await saveCamp(c);toast('Mapa adicionado. Ele só vai para os jogadores quando você transmitir.');render();};
+  for(const b of app.querySelectorAll('[data-mopen]'))b.onclick=()=>{Atlas.openMap(b.dataset.mopen);Mesa.go('mapa');};
+  for(const b of app.querySelectorAll('[data-mtx]'))b.onclick=async()=>{b.disabled=true;const id=b.dataset.mtx;const mesa=c.mesa||(uid()+uid().slice(0,4));const r=await Atlas.transmit(id,mesa);
+    if(!r.ok){toast(r.msg);b.disabled=false;return;}c.mesa=mesa;c.mapa=id;c.mesaNome=r.nome;const it=(c.mapas||[]).find(x=>x.id===id);if(it)it.nome=r.nome;await saveCamp(c);notify();toast(`“${r.nome}” está na mesa dos jogadores.`);render();};
+  const st=app.querySelector('[data-mstop]');if(st)st.onclick=async()=>{delete c.mapa;delete c.mesaNome;await saveCamp(c);notify();toast('Mapa tirado da mesa. Os jogadores continuam vendo a última imagem até você transmitir outro.');render();};
+  for(const b of app.querySelectorAll('[data-mrm]'))b.onclick=async()=>{const id=b.dataset.mrm;c.mapas=(c.mapas||[]).filter(x=>x.id!==id);if(c.mapa===id){delete c.mapa;delete c.mesaNome;}await saveCamp(c);render();};}
 function openCampMap(c){if(S.master&&c.mapa){Atlas.openMap(c.mapa);Mesa.go('mapa');return;}if(c.mesa)Mesa.go('mapa','#mesa-'+c.mesa);}
 /* where the Mapa tab leads: players go to their campaign's live table */
 Mesa.mapTarget=()=>{if(S.master)return null;const c=S.camps[lastCamp]||Object.values(S.camps).find(x=>x.mesa&&allSheets().some(s=>s.camp===x.id&&s.owner===S.uid));return c&&c.mesa?'#mesa-'+c.mesa:null;};
@@ -5039,7 +5073,7 @@ window.Fichas={
   onChange:f=>{listeners.add(f);return ()=>listeners.delete(f);},
   setHp(id,pv){const sh=findSheet(id);if(!sh||!canEdit(sh))return false;setHpVal(sh,Math.round(num(pv)));queueSave(sh);if(Mesa.view()==='fichas')render();return true;},
   async linkMesa(cid,info){for(const c of Object.values(S.camps)){if(c.id!==cid&&c.mesa&&info&&c.mesa===info.mesa){delete c.mesa;delete c.mapa;delete c.mesaNome;await saveCamp(c);}}
-    const c=S.camps[cid];if(!c)return;if(info){c.mesa=info.mesa;c.mapa=info.mapa;c.mesaNome=info.nome;}else{delete c.mesa;delete c.mapa;delete c.mesaNome;}await saveCamp(c);notify();},
+    const c=S.camps[cid];if(!c)return;if(info){c.mesa=info.mesa;c.mapa=info.mapa;c.mesaNome=info.nome;if(info.mapa&&!(c.mapas||[]).some(x=>x.id===info.mapa))c.mapas=(c.mapas||[]).concat({id:info.mapa,nome:info.nome||'Mapa',escala:''});}else{delete c.mesa;delete c.mapa;delete c.mesaNome;}await saveCamp(c);notify();},
   open(id){Mesa.go('fichas','#ficha-'+id);},
   inviteLink,
   async newInvite(cid,tipo){const id=await newInvite(cid,tipo||'pc','');return id?inviteLink(id):null;}
