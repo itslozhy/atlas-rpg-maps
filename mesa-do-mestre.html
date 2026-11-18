@@ -2996,6 +2996,13 @@ function riverEnds(o,sp,cum){const key=geomVer+'|'+o.w+'|'+o.pts.length+'|r';con
     if(others.some(it=>{const r=nearestOnPath(it.sp,p);return r&&r.d<=Math.max(2,it.q.w+1.5);}))return {k:'none'};
     return {k:'free'};};
   const E={a:end(0),b:end(sp.length-1)};if(endCache.size>400)endCache.clear();endCache.set(o.id,{key,E});return E;}
+const riverColCache=new Map();
+/* a river piece near water: x > 0 on land (distance to the water ahead or behind), x < 0 in water (minus the distance to land).
+   The painted coastline sits a little beyond the last land cell, so the river stays solid past it (covering the line) before fading,
+   while its colour turns into the water's. */
+function riverWaterFx(x,w,pass){const fl=Math.max(10,w*3.6),keep=w*1.3+CP*1.9;
+  if(pass===0)return {a:clamp((x+keep*.8)/(w*.9),0,1),t:0};
+  return {a:x>=-keep?1:clamp(1-(-keep-x)/fl,0,1),t:clamp((w*4-x)/(w*4+keep+fl*.5),0,1)};}
 /* alpha and colour shift of a river piece at distance s from one end; w = local width */
 function riverEndFx(e,s,w,pass){if(!e||e.k==='none')return {a:1,t:0};
   if(e.k==='free'){const fl=Math.max(5,w*3);return {a:Math.min(1,s/fl),t:0};}
@@ -3013,9 +3020,24 @@ function drawRiver(ctx,o,P,pass){const w=o.w,all=pass==null;ctx.save();ctx.lineC
   if(E.a.k==='mouth'&&sp.length>1){sp=grow(sp[0],sp[1]).reverse().concat(sp);E.a=Object.assign({},E.a,{d:E.a.d+ext});}
   if(E.b.k==='mouth'&&sp.length>1){sp=sp.concat(grow(sp[sp.length-1],sp[sp.length-2]));E.b=Object.assign({},E.b,{d:E.b.d+ext});}
   sp=densify(sp,Math.max(2.5,w*.55));cum=cumLen(sp);const n=sp.length,L=cum[n-1];
+  /* every stretch over water (sea, lake, reef), not only the ends: x = distance to the nearest water along the river when on land,
+     minus the distance to the nearest land when in water. The river melts into each stretch and comes back out of it. */
+  const wet=sp.map(p=>WATER.has(terrAt(p[0],p[1]))),anyWet=wet.some(Boolean);let X=null,wcol=null;
+  if(anyWet){const dW=new Float64Array(n).fill(1e9),dL=new Float64Array(n).fill(1e9),cW=new Int32Array(n).fill(-1);
+    let lw_=-1e9,ll=-1e9,lwi=-1;for(let i=0;i<n;i++){if(wet[i]){lw_=cum[i];lwi=i;}else ll=cum[i];dW[i]=cum[i]-lw_;dL[i]=cum[i]-ll;cW[i]=lwi;}
+    lw_=1e9;ll=1e9;lwi=-1;for(let i=n-1;i>=0;i--){if(wet[i]){lw_=cum[i];lwi=i;}else ll=cum[i];if(lw_-cum[i]<dW[i]){dW[i]=lw_-cum[i];cW[i]=lwi;}dL[i]=Math.min(dL[i],ll-cum[i]);}
+    X=new Float64Array(n);for(let i=0;i<n;i++)X[i]=wet[i]?-Math.min(dL[i],1e6):Math.min(dW[i],1e6);
+    /* the colour each stretch really has on the map, sampled at its deepest point (cached until the map changes) */
+    const ck=geomVer+'|'+o.id+'|'+n;let cc=riverColCache.get(o.id);
+    if(!cc||cc.k!==ck){const byStretch=new Map();let i=0;while(i<n){if(!wet[i]){i++;continue;}let j=i,best=i;while(j<n&&wet[j]){if(dL[j]>dL[best])best=j;j++;}
+        const t=terrAt(sp[best][0],sp[best][1]),col=waterColorAt(sp[best][0],sp[best][1])||TERR[t].c[sIdx()];for(let k=i;k<j;k++)byStretch.set(k,col);i=j;}
+      cc={k:ck,cols:Array.from({length:n},(_,k)=>byStretch.get(cW[k]>=0?cW[k]:k)||null)};if(riverColCache.size>300)riverColCache.clear();riverColCache.set(o.id,cc);}
+    wcol=cc.cols;}
   for(let ps=0;ps<2;ps++){if(!all&&ps!==pass)continue;
-    for(let i=1;i<n;i++){const f=i/(n-1),lw=w*(.35+.65*f),sm=(cum[i-1]+cum[i])/2,fa=riverEndFx(E.a,sm,lw,ps),fb=riverEndFx(E.b,L-sm,lw,ps),al=Math.min(fa.a,fb.a);if(al<=.01)continue;
-      let col=ps?base:P.water;if(ps){const t=Math.max(fa.t,fb.t);if(t>0)col=mixHex(base,(fa.t>=fb.t?E.a.col:E.b.col)||base,t);}
+    for(let i=1;i<n;i++){const f=i/(n-1),lw=w*(.35+.65*f),sm=(cum[i-1]+cum[i])/2;
+      const fa=E.a.k==='free'?riverEndFx(E.a,sm,lw,ps):{a:1,t:0},fb=E.b.k==='free'?riverEndFx(E.b,L-sm,lw,ps):{a:1,t:0};
+      const fw=X?riverWaterFx((X[i-1]+X[i])/2,lw,ps):{a:1,t:0},al=Math.min(fa.a,fb.a,fw.a);if(al<=.01)continue;
+      let col=ps?base:P.water;if(ps&&fw.t>0)col=mixHex(base,wcol[i]||wcol[i-1]||base,fw.t);
       ctx.globalAlpha=al;ctx.lineCap=al<.999?'butt':'round';ctx.strokeStyle=col;ctx.lineWidth=lw+(ps?0:Math.max(1.2,w*.35));ctx.beginPath();ctx.moveTo(sp[i-1][0],sp[i-1][1]);ctx.lineTo(sp[i][0],sp[i][1]);ctx.stroke();}}
   ctx.restore();}
 function drawLine(ctx,o,P){
