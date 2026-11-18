@@ -5,7 +5,7 @@
 
 **[Versão com mesa ao vivo e fichas compartilhadas](https://claude.ai/artifact/1wUYbQ513Syib6KfoBeN8k)** · no claude.ai, só para quem o mestre convidar.
 
-<sub>Última atualização: 17/11/2026 às 23:01 (horário de Brasília). O GitHub Pages publica a versão nova poucos minutos depois de cada envio.</sub>
+<sub>Última atualização: 17/11/2026 às 23:19 (horário de Brasília). O GitHub Pages publica a versão nova poucos minutos depois de cada envio.</sub>
 <!-- LINKS:FIM -->
 
 Mapas e fichas de RPG de mesa numa página só. O botão **Mapa | Fichas** no topo troca de seção sem sair da página, e as duas partes conversam entre si.
@@ -28,7 +28,8 @@ Mapas e fichas de RPG de mesa numa página só. O botão **Mapa | Fichas** no to
 - **Acesso:** cada jogador edita só as próprias fichas; o mestre vê e edita todas, e tem NPCs e notas que só ele lê.
 - **Cálculos automáticos:** modificadores, perícias, salvaguardas, CD e ataque de magia (D&D); PV, PE e SAN por classe e NEX, defesa e carga (Ordem Paranormal).
 - **Dados:** clique em atributos, perícias e ataques para rolar; vantagem e desvantagem no D&D; regra de dados por atributo na Ordem.
-- **Retratos:** cada ficha pode ter um retrato, enviado como imagem ou montado na própria página (pele, cabelo, olhos, expressão, barba, orelhas, roupa, detalhes e fundo). Ele aparece na ficha, no cartão do grupo e dentro do token ligado no mapa.
+- **Retratos:** cada ficha pode ter um retrato enviado como imagem, um retrato clássico ou um personagem estilo chibi montado na página: formato do rosto, pele (inclusive tons fantasiosos), orelhas, olhos (11 estilos, heterocromia), cílios, sobrancelhas, bocas e expressões, franjas e penteados com degradê, itens de cabeça, roupas com três cores, acessórios de rosto e pescoço, brincos, asas e capas, cicatrizes, sardas, pinturas, maquiagem e fundos com padrões. Cada opção mostra uma miniatura ao vivo, há sorteio por aba e desfazer. O retrato aparece na ficha, no cartão do grupo e dentro do token ligado no mapa.
+- **Condições no token:** as condições marcadas na ficha aparecem como ícones em volta do token, também para os jogadores na mesa ao vivo.
 - **Ligação com o mapa:** um token pode ser ligado a uma ficha. A vida do token segue a ficha, o dano aplicado no mapa muda a ficha, e “Mostrar no mapa” leva ao token.
 - **Mesa ao vivo:** em “Mesa dos jogadores”, o mestre escolhe a campanha. Os jogadores dela veem o mapa ao vivo ao clicar em **Mapa** e abrem a própria ficha clicando no token.
 - **Convites de uso único:** cada link cria uma ficha (de jogador ou de NPC); o jogador só enxerga as fichas dele.
