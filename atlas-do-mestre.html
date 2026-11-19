@@ -3773,16 +3773,16 @@ function mesaOwnerOk(m){const cc=window.Fichas&&Fichas.camps().find(c=>c.mesa===
 function scheduleMesa(){if(playerMode||!map||!map.mesa||!map.mesa.on||!db||!mesaOwnerOk(map))return;clearTimeout(mesaTimer);mesaTimer=setTimeout(pushMesa,1200);}
 async function mapRecord(id){if(map&&map.id===id)return serialize(map);let d=null;if(db&&uidUser){try{const s=await db.collection('data/users/'+uidUser).doc(id).get();if(s.exists)d=s.data();}catch(e){}}
   if(!d){const raw=store.get('atlas.map.'+id);if(raw)try{d=JSON.parse(raw);}catch(e){}}return d;}
-async function transmitMap(id,mesaId){if(!db)return {ok:false,msg:'A transmissão precisa da conta (claude.ai ou o site com login).'};
+async function transmitMap(id,mesaId,camp){if(!db)return {ok:false,msg:'A transmissão precisa da conta (claude.ai ou o site com login).'};
   let m=null;if(map&&map.id===id)m=map;else{const d=await mapRecord(id);if(!d)return {ok:false,msg:'Não encontrei esse mapa. Ele pode ter sido apagado.'};try{m=deserialize(d);}catch(e){return {ok:false,msg:'Não foi possível ler esse mapa.'};}}
   const prev=map;let data;map=m;try{data=playerSafe(m);}finally{map=prev;}
   if(JSON.stringify(data).length>250000)return {ok:false,msg:'O mapa ficou grande demais para transmitir.'};
-  try{await db.doc('mesas/'+mesaId).set({map:data,updatedAt:Date.now()});}catch(e){return {ok:false,msg:'Não foi possível atualizar a mesa agora.'};}
+  const cc=camp||((window.Fichas&&Fichas.camps().find(c=>c.mesa===mesaId))||{}).id||'';try{await db.doc('mesas/'+mesaId).set(cc?{map:data,updatedAt:Date.now(),camp:cc}:{map:data,updatedAt:Date.now()});}catch(e){return {ok:false,msg:'Não foi possível atualizar a mesa agora.'};}
   m.mesa={id:mesaId,on:true};if(m===map){changed(true);if(!$('mesaModal').hidden)renderMesa();}
   else{const d=serialize(m);if(!db||!uidUser)store.set('atlas.map.'+m.id,JSON.stringify(d));else{try{await db.collection('data/users/'+uidUser).doc(m.id).set(d);}catch(e){}}}
   return {ok:true,nome:m.name};}
 async function pushMesa(){if(!map||!map.mesa||!map.mesa.on||!db||!mesaOwnerOk(map))return;const data=playerSafe(map);const json=JSON.stringify(data);if(json.length>250000){$('mesaState').textContent='O mapa ficou grande demais para transmitir.';return;}
-  try{await db.doc('mesas/'+map.mesa.id).set({map:data,updatedAt:Date.now()});$('mesaState').textContent='Transmitindo. Última atualização às '+new Date().toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'})+'.';}
+  const cc=((window.Fichas&&Fichas.camps().find(c=>c.mesa===map.mesa.id))||{}).id||'';try{await db.doc('mesas/'+map.mesa.id).set(cc?{map:data,updatedAt:Date.now(),camp:cc}:{map:data,updatedAt:Date.now()});$('mesaState').textContent='Transmitindo. Última atualização às '+new Date().toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'})+'.';}
   catch(e){$('mesaState').textContent='Não foi possível atualizar a mesa agora.';}}
 function mesaLink(){return map&&map.mesa?(window.MESA_URL||ARTIFACT_URL)+'#mesa-'+map.mesa.id:'';}
 function openMesa(){$('mesaModal').hidden=false;renderMesa();}
@@ -3796,7 +3796,7 @@ function wireMesa(){$('mesaBtn').onclick=openMesa;
   $('mesaInvNew').onclick=async()=>{const cur=window.Fichas&&map.mesa&&Fichas.camps().find(c=>c.mesa===map.mesa.id);if(!cur)return;const l=await Fichas.newInvite(cur.id,'pc');if(!l)return;$('mesaInv').value=l;$('mesaInvRow').hidden=false;$('mesaInv').select();};
   $('mesaInvCopy').onclick=()=>{const v=$('mesaInv').value;const ta=$('mesaInv');try{navigator.clipboard.writeText(v).then(()=>toast('Convite copiado.'),()=>{ta.select();toast('Selecione e copie o convite.');});}catch(e){ta.select();}};
   $('mesaCamp').onchange=async e=>{if(!window.Fichas||!map.mesa)return;const cid=e.target.value;const cur=Fichas.camps().find(c=>c.mesa===map.mesa.id);
-    if(cur&&cur.id!==cid)await Fichas.linkMesa(cur.id,null);if(cid){if(!map.mesa.on){map.mesa.on=true;changed();pushMesa();}await Fichas.linkMesa(cid,{mesa:map.mesa.id,mapa:map.id,nome:map.name});toast('Mesa ligada à campanha.');}renderMesa();};
+    if(cur&&cur.id!==cid)await Fichas.linkMesa(cur.id,null);if(cid){if(!map.mesa.on){map.mesa.on=true;changed();pushMesa();}await Fichas.linkMesa(cid,{mesa:map.mesa.id,mapa:map.id,nome:map.name});pushMesa();toast('Mesa ligada à campanha.');}renderMesa();};
   $('mesaNew').onclick=()=>{if(!db)return;const prev=map.mesa&&window.Fichas&&Fichas.camps().find(c=>c.mesa===map.mesa.id);map.mesa={id:uid()+uid().slice(0,4),on:true};if(prev)Fichas.linkMesa(prev.id,{mesa:map.mesa.id,mapa:map.id,nome:map.name});changed();renderMesa();pushMesa();toast('Novo link gerado. O link antigo deixa de receber atualizações.');};}
 /* player view */
 let mesaUnsub=null,mesaCur=null;
@@ -3957,7 +3957,7 @@ window.Atlas={
   openMap(id){if(!playerMode)openMapById(id);},
   canTransmit:()=>!!db&&!playerMode,
   async listMaps(){const l=await mapIndex();if(map&&!playerMode&&!l.some(x=>x.id===map.id))l.push({id:map.id,name:map.name,scale:map.scale});return l.filter(x=>x&&x.id).map(x=>({id:x.id,nome:String(x.name||'Mapa'),escala:(SCALES[x.scale]||{n:''}).n}));},
-  transmit:(id,mesaId)=>transmitMap(id,mesaId),
+  transmit:(id,mesaId,camp)=>transmitMap(id,mesaId,camp),
   sync:()=>syncTokens()
 };
 Mesa.onView(v=>{if(v!=='mapa')return;const m=(location.hash.match(/^#mesa-([A-Za-z0-9-]+)$/)||[])[1];

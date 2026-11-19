@@ -57,12 +57,14 @@ function makeDb(){const {F,fs}=state;
     onSnapshot(cb,onErr){return F.onSnapshot(ref,s=>cb(colSnap(s)),e=>onErr&&onErr(err(e)));}};};
   return Object.freeze({collection:colApi,doc:docApi,
     /* joining a table with an invite: the rules let a signed-in person become a member only with an unused invite */
-    async entrar(convite){const u=state.user;if(!u)throw err({code:'permission-denied'});if(state.space===u.uid)return;
-      try{const ref=F.doc(fs,P('membros/'+u.uid));const ja=await F.getDoc(ref);if(!ja.exists())await F.setDoc(ref,enc({convite,nome:(state.perfil&&state.perfil.nome)||'',em:Date.now()}));
-        await F.setDoc(F.doc(fs,'usuarios/'+u.uid+'/espacos/'+state.space),enc({em:Date.now()}));if(!state.spaces.includes(state.space))state.spaces.push(state.space);lsSet('mesa.espaco.'+u.uid,state.space);chip();}catch(e){throw err(e);}}});}
+    async entrar(convite,camp,campNome){const u=state.user;if(!u)throw err({code:'permission-denied'});if(state.space===u.uid)return;
+      try{const ref=F.doc(fs,P('membros/'+u.uid));const ja=await F.getDoc(ref);if(!ja.exists())await F.setDoc(ref,{convite,camp:camp||'',nome:(state.perfil&&state.perfil.nome)||'',em:Date.now()});
+        if(camp){const cr=F.doc(fs,P('membros/'+u.uid+'/campanhas/'+camp));if(!(await F.getDoc(cr)).exists())await F.setDoc(cr,{convite,em:Date.now()});
+          await F.setDoc(F.doc(fs,'usuarios/'+u.uid+'/campanhas/'+state.space+'~'+camp),{m:state.space,c:camp,nome:String(campNome||'').slice(0,80),em:Date.now()});lsSet('mesa.camp.'+u.uid,camp);}
+        await F.setDoc(F.doc(fs,'usuarios/'+u.uid+'/espacos/'+state.space),enc({em:Date.now()}));if(!state.spaces.includes(state.space))state.spaces.push(state.space);lsSet('mesa.espaco.'+u.uid,state.space);lsSet('mesa.papel.'+u.uid,'jogador');state.papel='jogador';chip();}catch(e){throw err(e);}}});}
 function makeUser(){const u=state.user;return Object.freeze({
   id:async()=>u?u.uid:null,
-  isOwner:async()=>!!(u&&state.space===u.uid),
+  isOwner:async()=>!!(u&&state.space===u.uid&&state.papel!=='jogador'),
   canEdit:async()=>!!(u&&state.space===u.uid),
   can:async()=>null,
   me:async()=>({id:u?u.uid:null,name:(state.perfil&&state.perfil.nome)||'',email:null}),
@@ -94,7 +96,8 @@ async function afterLogin(user){state.user=user;const {F,fs}=state;
   try{const q=await F.getDocs(F.collection(fs,'usuarios/'+user.uid+'/espacos'));state.spaces=q.docs.map(d=>d.id);}catch(e){state.spaces=[];}
   /* which master's tables to show: the one in an invite link, the last one used, a table already joined, or your own */
   const inv=(location.hash.match(/^#convite-([A-Za-z0-9_-]+)~/)||[])[1];const last=lsGet('mesa.espaco.'+user.uid);
-  state.space=inv||(last&&(last===user.uid||state.spaces.includes(last))?last:null)||state.spaces[0]||user.uid;
+  state.papel=inv?'jogador':lsGet('mesa.papel.'+user.uid)||null;
+  state.space=inv||(state.papel!=='jogador'?user.uid:(last&&(last===user.uid||state.spaces.includes(last))?last:user.uid));
   if(!inv)lsSet('mesa.espaco.'+user.uid,state.space);
   window.MESA_ESPACO=state.space;gate(null);chip();return true;}
 /* ---------- profile: unique user name + display name ----------
@@ -126,13 +129,53 @@ function profileForm(user,cur,first){return new Promise(res=>{const {F,fs}=state
     try{await b.commit();gate(null);res(novo);}catch(e){er.textContent=e&&e.code==='permission-denied'?'Esse nome de usuário acabou de ser pego por outra pessoa. Escolha outro.':'Não foi possível salvar agora. Tente de novo.';check();}};
   setTimeout(()=>(cur&&cur.user?ni:ui).focus(),30);});}
 async function chip(){const u=state.user;if(!u)return;let c=document.getElementById('nvChip');if(!c){c=document.createElement('div');c.id='nvChip';document.body.appendChild(c);}
-  const all=[u.uid].concat(state.spaces.filter(x=>x!==u.uid));if(state.space&&!all.includes(state.space))all.push(state.space);
-  const names={};await Promise.all(all.filter(x=>x!==u.uid).map(async id=>{try{const s=await state.F.getDoc(state.F.doc(state.fs,'perfis/'+id));const d=s.exists()?(dec(s.data())||{}):{};names[id]=d.nome||(d.user?'@'+d.user:'');}catch(e){}}));
-  const label=id=>id===u.uid?'Minhas campanhas (mestre)':'Mesas de '+((names[id]||'outro mestre').split(' ')[0]);
-  const pf=state.perfil||{};c.innerHTML=`<button type="button" id="nvPerfil" title="Editar perfil">${esc(pf.nome||'Conta')}${pf.user?` <small>@${esc(pf.user)}</small>`:''}</button>${all.length>1?`<select id="nvSpace" aria-label="De quem são as mesas">${all.map(id=>`<option value="${esc(id)}" ${id===state.space?'selected':''}>${esc(label(id))}</option>`).join('')}</select>`:`<span class="nvsp">${esc(label(state.space))}</span>`}<button type="button" id="nvOut">Sair</button>`;
-  const sel=document.getElementById('nvSpace');if(sel)sel.onchange=()=>{lsSet('mesa.espaco.'+u.uid,sel.value);location.hash='inicio';location.reload();};
+  const pf=state.perfil||{};const papel=state.papel==='jogador'?'Jogador':state.papel==='mestre'?'Mestre':'';
+  c.innerHTML=`<button type="button" id="nvPerfil" title="Editar perfil">${esc(pf.nome||'Conta')}${pf.user?` <small>@${esc(pf.user)}</small>`:''}</button>${papel?`<span class="nvsp">${esc(papel)}</span>`:''}<button type="button" id="nvHome" title="Tela inicial">Início</button><button type="button" id="nvOut">Sair</button>`;
+  document.getElementById('nvHome').onclick=()=>{if(window.Mesa)Mesa.go('fichas','#inicio');else location.hash='inicio';};
   document.getElementById('nvPerfil').onclick=async()=>{const n=await profileForm(u,state.perfil,false);if(n&&n!==state.perfil){state.perfil=n;chip();}};
   document.getElementById('nvOut').onclick=async()=>{await state.A.signOut(state.auth);location.reload();};}
+
+/* ---------- roles, campaign codes and passwords ----------
+   The password never leaves this page: it becomes a SHA-256 key (campaign + password), the id of a document only the
+   master can create. Joining writes a membership that names that key; the rules accept it only if the key exists for
+   that campaign, so a wrong password is refused by the server. Nobody can list the keys or the codes. */
+const raw={get:async p=>{const s=await state.F.getDoc(state.F.doc(state.fs,p));return s.exists()?s.data():null;},set:(p,d)=>state.F.setDoc(state.F.doc(state.fs,p),d),del:p=>state.F.deleteDoc(state.F.doc(state.fs,p))};
+async function sha256(t){const b=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(t));return [...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,'0')).join('');}
+const chaveDe=(c,senha)=>sha256('mesa-do-mestre|'+c+'|'+senha);
+const CODE_RE=/^[A-Z0-9]{4,12}$/;const limpaCodigo=s=>String(s||'').toUpperCase().replace(/[^A-Z0-9]/g,'').slice(0,12);
+const denied=e=>e&&(e.code==='permission-denied'||e.code==='invalid_argument');
+window.MESA_NUVEM=Object.freeze({kind:'firebase',limpaCodigo,
+  info:()=>({uid:state.user&&state.user.uid,space:state.space,papel:state.papel,proprio:!!(state.user&&state.space===state.user.uid),nome:(state.perfil&&state.perfil.nome)||''}),
+  /* choosing a role moves to the matching space: your own as master, or the table you were last at as player */
+  setPapel(p,hash){const u=state.user;if(!u)return;lsSet('mesa.papel.'+u.uid,p);if(p==='mestre')lsSet('mesa.espaco.'+u.uid,u.uid);else lsSet('mesa.espaco.'+u.uid,u.uid);location.hash=hash||'inicio';location.reload();},
+  entrarCampanha(m,c){const u=state.user;if(!u)return;lsSet('mesa.papel.'+u.uid,'jogador');lsSet('mesa.espaco.'+u.uid,m);lsSet('mesa.camp.'+u.uid,c);location.hash='campanha-'+c;location.reload();},
+  voltarAoInicio(){const u=state.user;if(!u)return;lsSet('mesa.espaco.'+u.uid,u.uid);location.hash='inicio';location.reload();},
+  async minhasCampanhas(){const u=state.user;if(!u)return [];let l=[];try{const q=await state.F.getDocs(state.F.collection(state.fs,'usuarios/'+u.uid+'/campanhas'));l=q.docs.map(d=>Object.assign({id:d.id},d.data())).filter(x=>x.m&&x.c);}catch(e){return [];}
+    const ms=[...new Set(l.map(x=>x.m))];const nm={};await Promise.all(ms.map(async id=>{try{const d=await raw.get('perfis/'+id);nm[id]=d&&(d.nome||(d.user?'@'+d.user:''))||'';}catch(e){}}));
+    return l.map(x=>Object.assign(x,{mestre:nm[x.m]||''})).sort((a,b)=>(b.em||0)-(a.em||0));},
+  /* campaigns of the current space this account has joined (a player reads them one by one, never as a list) */
+  async campanhasAqui(){const u=state.user;if(!u||state.space===u.uid)return [];try{const q=await state.F.getDocs(state.F.collection(state.fs,'mestres/'+state.space+'/membros/'+u.uid+'/campanhas'));return q.docs.map(d=>d.id);}catch(e){return [];}},
+  async entrarComCodigo(codigo,senha){const u=state.user;if(!u)throw new Error('login');const code=limpaCodigo(codigo);if(!CODE_RE.test(code))throw new Error('codigo');
+    let cd=null;try{cd=await raw.get('codigos/'+code);}catch(e){throw new Error('rede');}if(!cd||!cd.m||!cd.c)throw new Error('codigo');if(cd.m===u.uid)throw new Error('proprio');
+    const chave=await chaveDe(cd.c,String(senha||''));const base='mestres/'+cd.m+'/membros/'+u.uid;
+    try{const ja=await raw.get(base+'/campanhas/'+cd.c).catch(()=>null);if(!ja){const mb=await raw.get(base).catch(()=>null);if(!mb)await raw.set(base,{chave,c:cd.c,nome:(state.perfil&&state.perfil.nome)||'',em:Date.now()});await raw.set(base+'/campanhas/'+cd.c,{chave,em:Date.now()});}}
+    catch(e){throw new Error(denied(e)?'senha':'rede');}
+    try{await raw.set('usuarios/'+u.uid+'/campanhas/'+cd.m+'~'+cd.c,{m:cd.m,c:cd.c,nome:String(cd.nome||'').slice(0,80),em:Date.now()});await state.F.setDoc(state.F.doc(state.fs,'usuarios/'+u.uid+'/espacos/'+cd.m),enc({em:Date.now()}));}catch(e){}
+    return {m:cd.m,c:cd.c,nome:cd.nome||''};},
+  async sairDaCampanha(m,c){const u=state.user;if(!u)return;try{await raw.del('mestres/'+m+'/membros/'+u.uid+'/campanhas/'+c);}catch(e){}try{await raw.del('usuarios/'+u.uid+'/campanhas/'+m+'~'+c);}catch(e){}},
+  async acesso(c){const u=state.user;if(!u)return null;try{const a=await raw.get('mestres/'+u.uid+'/acesso/'+c);return a?{codigo:a.codigo||'',temSenha:!!a.chave}:{codigo:'',temSenha:false};}catch(e){return null;}},
+  /* the master sets or changes a campaign's code and password */
+  async definirAcesso(c,codigo,senha,nome){const u=state.user;if(!u)throw new Error('login');const code=limpaCodigo(codigo);if(!CODE_RE.test(code))throw new Error('codigo');
+    const base='mestres/'+u.uid;const old=await raw.get(base+'/acesso/'+c).catch(()=>null)||{};
+    if(senha!=null&&String(senha).length<4)throw new Error('senha');if(!old.chave&&(senha==null||senha===''))throw new Error('senha');
+    if(code!==old.codigo){const ex=await raw.get('codigos/'+code).catch(()=>null);if(ex&&(ex.m!==u.uid||ex.c!==c))throw new Error('em-uso');
+      try{await raw.set('codigos/'+code,{m:u.uid,c,nome:String(nome||'').slice(0,80),em:Date.now()});}catch(e){throw new Error(denied(e)?'em-uso':'rede');}
+      if(old.codigo){try{await raw.del('codigos/'+old.codigo);}catch(e){}}}
+    else{try{await raw.set('codigos/'+code,{m:u.uid,c,nome:String(nome||'').slice(0,80),em:Date.now()});}catch(e){}}
+    let chave=old.chave||'';if(senha){chave=await chaveDe(c,String(senha));await raw.set(base+'/chaves/'+chave,{c});if(old.chave&&old.chave!==chave){try{await raw.del(base+'/chaves/'+old.chave);}catch(e){}}}
+    await raw.set(base+'/acesso/'+c,{codigo:code,chave,em:Date.now()});return {codigo:code};},
+  async removerAcesso(c){const u=state.user;if(!u)return;const base='mestres/'+u.uid;const old=await raw.get(base+'/acesso/'+c).catch(()=>null);if(!old)return;
+    if(old.codigo){try{await raw.del('codigos/'+old.codigo);}catch(e){}}if(old.chave){try{await raw.del(base+'/chaves/'+old.chave);}catch(e){}}try{await raw.del(base+'/acesso/'+c);}catch(e){}}});
 
 state.ready=new Promise(res=>{const go=()=>boot().then(res,()=>res(false));if(document.body)go();else document.addEventListener('DOMContentLoaded',go);});
 window.claude={use:async name=>{const ok=await state.ready;if(!ok||!state.user)return null;if(name==='db')return makeDb();if(name==='user')return makeUser();return null;}};
@@ -1042,6 +1085,15 @@ ul.rolls .t{color:var(--muted);font-variant-numeric:tabular-nums}ul.rolls .w{fon
 .avsw .pick input{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%;border:0;padding:0}
 .cbchk{display:flex;gap:6px;align-items:center;margin:4px 0;font-size:14px}
 .avsw{display:flex;gap:5px;flex-wrap:wrap}.avsw button{width:24px;height:24px;border-radius:50%;border:2px solid var(--line);cursor:pointer;padding:0}.avsw button[aria-pressed="true"]{border-color:var(--fg);box-shadow:0 0 0 2px var(--accent)}
+.start{max-width:880px;margin:0 auto}.roles,.hub{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px;margin:18px 0}
+.hub{margin:6px 0 22px}
+.rolecard,.hubcard{display:flex;flex-direction:column;gap:6px;align-items:flex-start;text-align:left;padding:20px;border-radius:14px;border:1px solid var(--line);background:var(--panel);color:var(--fg);font:inherit;cursor:pointer;box-shadow:var(--shadow);transition:transform .12s,border-color .12s}
+.rolecard:hover,.hubcard:hover{transform:translateY(-2px);border-color:var(--accent)}.rolecard b{font-family:var(--f-title);font-weight:400;font-size:26px}.hubcard b{font-family:var(--f-title);font-weight:400;font-size:20px}
+.rolecard span:last-child,.hubcard span:last-child{color:var(--muted);font-size:14.5px;line-height:1.4}.ri{font-size:30px;line-height:1}.hubcard{padding:14px 16px;box-shadow:none}.hubcard .ri{font-size:22px}
+.rolebar{display:flex;gap:10px;align-items:center;flex-wrap:wrap;color:var(--muted);font-size:14px;margin-bottom:6px}
+.pblock{margin:18px 0 26px}.pblock h2{font-family:var(--f-title);font-weight:400;margin:0 0 4px}
+.joinform{display:flex;gap:10px;align-items:flex-end;flex-wrap:wrap;background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:12px 14px;margin-top:8px}.joinform .field{min-width:160px;flex:1 1 160px}
+.access{border:1px solid var(--line);border-radius:10px;padding:8px 12px;margin:10px 0}.access legend{font-weight:700;padding:0 4px}.mono{font-family:ui-monospace,"Courier Prime",monospace;letter-spacing:.06em}
 .mesabox{display:flex;gap:10px;align-items:center;flex-wrap:wrap;background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:10px 14px;margin:12px 0 0}
 .mesabox .dot{width:9px;height:9px;border-radius:50%;background:var(--ok);flex:0 0 auto}
 .mesabox .dot.off{background:var(--muted)}
@@ -4455,16 +4507,16 @@ function mesaOwnerOk(m){const cc=window.Fichas&&Fichas.camps().find(c=>c.mesa===
 function scheduleMesa(){if(playerMode||!map||!map.mesa||!map.mesa.on||!db||!mesaOwnerOk(map))return;clearTimeout(mesaTimer);mesaTimer=setTimeout(pushMesa,1200);}
 async function mapRecord(id){if(map&&map.id===id)return serialize(map);let d=null;if(db&&uidUser){try{const s=await db.collection('data/users/'+uidUser).doc(id).get();if(s.exists)d=s.data();}catch(e){}}
   if(!d){const raw=store.get('atlas.map.'+id);if(raw)try{d=JSON.parse(raw);}catch(e){}}return d;}
-async function transmitMap(id,mesaId){if(!db)return {ok:false,msg:'A transmissão precisa da conta (claude.ai ou o site com login).'};
+async function transmitMap(id,mesaId,camp){if(!db)return {ok:false,msg:'A transmissão precisa da conta (claude.ai ou o site com login).'};
   let m=null;if(map&&map.id===id)m=map;else{const d=await mapRecord(id);if(!d)return {ok:false,msg:'Não encontrei esse mapa. Ele pode ter sido apagado.'};try{m=deserialize(d);}catch(e){return {ok:false,msg:'Não foi possível ler esse mapa.'};}}
   const prev=map;let data;map=m;try{data=playerSafe(m);}finally{map=prev;}
   if(JSON.stringify(data).length>250000)return {ok:false,msg:'O mapa ficou grande demais para transmitir.'};
-  try{await db.doc('mesas/'+mesaId).set({map:data,updatedAt:Date.now()});}catch(e){return {ok:false,msg:'Não foi possível atualizar a mesa agora.'};}
+  const cc=camp||((window.Fichas&&Fichas.camps().find(c=>c.mesa===mesaId))||{}).id||'';try{await db.doc('mesas/'+mesaId).set(cc?{map:data,updatedAt:Date.now(),camp:cc}:{map:data,updatedAt:Date.now()});}catch(e){return {ok:false,msg:'Não foi possível atualizar a mesa agora.'};}
   m.mesa={id:mesaId,on:true};if(m===map){changed(true);if(!$('mesaModal').hidden)renderMesa();}
   else{const d=serialize(m);if(!db||!uidUser)store.set('atlas.map.'+m.id,JSON.stringify(d));else{try{await db.collection('data/users/'+uidUser).doc(m.id).set(d);}catch(e){}}}
   return {ok:true,nome:m.name};}
 async function pushMesa(){if(!map||!map.mesa||!map.mesa.on||!db||!mesaOwnerOk(map))return;const data=playerSafe(map);const json=JSON.stringify(data);if(json.length>250000){$('mesaState').textContent='O mapa ficou grande demais para transmitir.';return;}
-  try{await db.doc('mesas/'+map.mesa.id).set({map:data,updatedAt:Date.now()});$('mesaState').textContent='Transmitindo. Última atualização às '+new Date().toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'})+'.';}
+  const cc=((window.Fichas&&Fichas.camps().find(c=>c.mesa===map.mesa.id))||{}).id||'';try{await db.doc('mesas/'+map.mesa.id).set(cc?{map:data,updatedAt:Date.now(),camp:cc}:{map:data,updatedAt:Date.now()});$('mesaState').textContent='Transmitindo. Última atualização às '+new Date().toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'})+'.';}
   catch(e){$('mesaState').textContent='Não foi possível atualizar a mesa agora.';}}
 function mesaLink(){return map&&map.mesa?(window.MESA_URL||ARTIFACT_URL)+'#mesa-'+map.mesa.id:'';}
 function openMesa(){$('mesaModal').hidden=false;renderMesa();}
@@ -4478,7 +4530,7 @@ function wireMesa(){$('mesaBtn').onclick=openMesa;
   $('mesaInvNew').onclick=async()=>{const cur=window.Fichas&&map.mesa&&Fichas.camps().find(c=>c.mesa===map.mesa.id);if(!cur)return;const l=await Fichas.newInvite(cur.id,'pc');if(!l)return;$('mesaInv').value=l;$('mesaInvRow').hidden=false;$('mesaInv').select();};
   $('mesaInvCopy').onclick=()=>{const v=$('mesaInv').value;const ta=$('mesaInv');try{navigator.clipboard.writeText(v).then(()=>toast('Convite copiado.'),()=>{ta.select();toast('Selecione e copie o convite.');});}catch(e){ta.select();}};
   $('mesaCamp').onchange=async e=>{if(!window.Fichas||!map.mesa)return;const cid=e.target.value;const cur=Fichas.camps().find(c=>c.mesa===map.mesa.id);
-    if(cur&&cur.id!==cid)await Fichas.linkMesa(cur.id,null);if(cid){if(!map.mesa.on){map.mesa.on=true;changed();pushMesa();}await Fichas.linkMesa(cid,{mesa:map.mesa.id,mapa:map.id,nome:map.name});toast('Mesa ligada à campanha.');}renderMesa();};
+    if(cur&&cur.id!==cid)await Fichas.linkMesa(cur.id,null);if(cid){if(!map.mesa.on){map.mesa.on=true;changed();pushMesa();}await Fichas.linkMesa(cid,{mesa:map.mesa.id,mapa:map.id,nome:map.name});pushMesa();toast('Mesa ligada à campanha.');}renderMesa();};
   $('mesaNew').onclick=()=>{if(!db)return;const prev=map.mesa&&window.Fichas&&Fichas.camps().find(c=>c.mesa===map.mesa.id);map.mesa={id:uid()+uid().slice(0,4),on:true};if(prev)Fichas.linkMesa(prev.id,{mesa:map.mesa.id,mapa:map.id,nome:map.name});changed();renderMesa();pushMesa();toast('Novo link gerado. O link antigo deixa de receber atualizações.');};}
 /* player view */
 let mesaUnsub=null,mesaCur=null;
@@ -4639,7 +4691,7 @@ window.Atlas={
   openMap(id){if(!playerMode)openMapById(id);},
   canTransmit:()=>!!db&&!playerMode,
   async listMaps(){const l=await mapIndex();if(map&&!playerMode&&!l.some(x=>x.id===map.id))l.push({id:map.id,name:map.name,scale:map.scale});return l.filter(x=>x&&x.id).map(x=>({id:x.id,nome:String(x.name||'Mapa'),escala:(SCALES[x.scale]||{n:''}).n}));},
-  transmit:(id,mesaId)=>transmitMap(id,mesaId),
+  transmit:(id,mesaId,camp)=>transmitMap(id,mesaId,camp),
   sync:()=>syncTokens()
 };
 Mesa.onView(v=>{if(v!=='mapa')return;const m=(location.hash.match(/^#mesa-([A-Za-z0-9-]+)$/)||[])[1];
@@ -4857,35 +4909,54 @@ const opCarga=s=>num(s.atr.for)<=0?2:num(s.atr.for)*5;
 const opEsp=s=>(s.itens||[]).reduce((a,i)=>a+num(i.esp),0);
 
 /* ================= STORE ================= */
-const S={mode:'local',uid:'local',master:true,canWrite:null,convites:{},usados:{},logs:{},rolls:{},diario:{},resumos:{},docs:{},pdocs:{},bestiario:{},ready:false,camps:{},pcs:{},npcs:{},notes:{},names:{},readOnlyMsg:''};
+const S={joined:{},papel:null,owner:false,fb:false,proprio:true,mode:'local',uid:'local',master:true,canWrite:null,convites:{},usados:{},logs:{},rolls:{},diario:{},resumos:{},docs:{},pdocs:{},bestiario:{},ready:false,camps:{},pcs:{},npcs:{},notes:{},names:{},readOnlyMsg:''};
 let db=null,user=null;const unsub={};const pending=new Map();let saveTimer=null,parentDone=false;
 const LOCAL_KEY='grimorio.v1';
 function loadLocal(){try{const d=JSON.parse(store.get(LOCAL_KEY)||'{}');S.camps=d.camps||{};S.pcs=d.pcs||{};S.npcs=d.npcs||{};S.notes=d.notes||{};}catch(e){}}
 function saveLocal(){store.set(LOCAL_KEY,JSON.stringify({camps:S.camps,pcs:S.pcs,npcs:S.npcs,notes:S.notes}));}
 function setStatus(t,err){const el=$('#status');el.textContent=t;el.classList.toggle('err',!!err);}
+const NV=window.MESA_NUVEM||null;
 async function initStore(){
   let d=null,u=null;try{if(window.claude&&window.claude.use)[d,u]=await Promise.all([window.claude.use('db'),window.claude.use('user')]);}catch(e){}
   if(d&&u){let id=null;try{id=await u.id();}catch(e){}db=d;user=u;S.mode='cloud';S.uid=id;try{S.master=!!(await u.isOwner());}catch(e){S.master=false;}
+    /* role: on the Firebase site the account picks master or player (the adapter already answers isOwner for the role);
+       on claude.ai only the page's owner can be master, and may also play with free sheets */
+    if(NV){const i=NV.info();S.papel=i.papel||null;S.owner=true;S.fb=true;S.proprio=i.proprio;}
+    else{S.owner=S.master;S.papel=S.owner?(store.get('mesa.papel')||null):'jogador';S.master=S.owner&&S.papel!=='jogador';S.proprio=true;}
     try{S.canWrite=await u.can('data.write');}catch(e){S.canWrite=null;}subscribe();return;}
-  S.mode='local';loadLocal();S.ready=true;setStatus('Salvo neste navegador');render();}
+  S.mode='local';S.owner=true;S.proprio=true;S.papel=store.get('mesa.papel')||null;S.master=S.papel!=='jogador';loadLocal();S.ready=true;setStatus('Salvo neste navegador');render();}
 function subscribe(){
   setStatus('Carregando…');const to=setTimeout(()=>{if(!S.ready){setStatus('Sem resposta do servidor ainda',true);}},10000);
   const done=()=>{if(!S.ready){S.ready=true;clearTimeout(to);setStatus('Sincronizado');}onRemote();};
   const err=e=>{if(!S.ready)done();if(e&&e.code==='invalid_argument'){setStatus('Sem mesa ainda: use o convite do mestre');}else setStatus(e&&e.code==='revoked'?'Acesso revogado':'Não foi possível sincronizar',true);};
-  unsub.c=db.collection('campanhas').onSnapshot(s=>{S.camps={};for(const d of s.docs){const v=d.data();if(v)S.camps[d.id]=Object.assign({id:d.id},v);}done();},err);
-  watchPlayer(S.uid);
   const coll=(name,key,f)=>{unsub[key]=db.collection(name).onSnapshot(s=>{const m={};for(const d of s.docs){const v=d.data();if(v)m[d.id]=Object.assign({id:d.id},v);}S[f]=m;done();},()=>{});};
-  coll('resumos','rs','resumos');coll('documentos','dcs','docs');
+  if(S.fb&&!S.master){watchPlayer(S.uid);if(S.proprio){done();return;}
+    /* Firebase player in a master's space: each joined campaign, its documents and session summaries, by path */
+    NV.campanhasAqui().then(ids=>{if(!ids.length){done();return;}for(const id of ids){
+      unsub['c'+id]=db.doc('campanhas/'+id).onSnapshot(s=>{if(s.exists)S.camps[id]=Object.assign({id},s.data());else delete S.camps[id];done();},()=>{delete S.camps[id];done();});
+      for(const [k,f] of[['documentos','docs'],['resumos','resumos']])unsub[k+id]=db.collection('campanhas/'+id+'/'+k).onSnapshot(s=>{for(const x of Object.keys(S[f]))if(S[f][x].camp===id)delete S[f][x];for(const d of s.docs){const v=d.data();if(v)S[f][d.id]=Object.assign({id:d.id,camp:id},v);}done();},()=>{});}});
+    return;}
+  unsub.c=db.collection('campanhas').onSnapshot(s=>{S.camps={};for(const d of s.docs){const v=d.data();if(v)S.camps[d.id]=Object.assign({id:d.id},v);}if(S.fb&&S.master)campSubs();done();},err);
+  watchPlayer(S.uid);
+  if(S.fb&&S.master){unsub.leg=db.collection('documentos').onSnapshot(s=>migrateLegacy('documentos',s),()=>{});unsub.legr=db.collection('resumos').onSnapshot(s=>migrateLegacy('resumos',s),()=>{});}
+  else{coll('resumos','rs','resumos');coll('documentos','dcs','docs');}
   if(S.master){coll('diario','di','diario');coll('bestiario','be','bestiario');unsub.p=db.collection('pjs').onSnapshot(s=>{for(const d of s.docs)watchPlayer(d.id);done();},err);
     unsub.cv=db.collection('convites').onSnapshot(s=>{S.convites={};for(const d of s.docs){const v=d.data();if(v)S.convites[d.id]=Object.assign({id:d.id},v);}done();},err);
     unsub.us=db.collection('usados').onSnapshot(s=>{S.usados={};for(const d of s.docs){const v=d.data();if(v)S.usados[d.id]=v;}done();},err);unsub.n=db.collection('npcs').onSnapshot(s=>{S.npcs={};for(const d of s.docs){const v=d.data();if(v)S.npcs[d.id]=v;}done();},err);
     unsub.s=db.collection('segredos').onSnapshot(s=>{S.notes={};for(const d of s.docs){const v=d.data();if(v)S.notes[d.id]=v;}done();},err);}
 }
+/* Firebase master: documents and summaries live inside each campaign, so the rules can show them only to its players */
+function campSubs(){for(const id of Object.keys(S.camps))for(const [k,f] of[['documentos','docs'],['resumos','resumos']]){if(unsub[k+id])continue;
+  unsub[k+id]=db.collection('campanhas/'+id+'/'+k).onSnapshot(s=>{for(const x of Object.keys(S[f]))if(S[f][x].camp===id)delete S[f][x];for(const d of s.docs){const v=d.data();if(v)S[f][d.id]=Object.assign({id:d.id,camp:id},v);}onRemote();},()=>{});}}
+/* documents from before per-campaign access move into their campaign once */
+async function migrateLegacy(kind,snap){for(const d of snap.docs){const v=d.data();if(!v||!v.camp)continue;try{await db.doc('campanhas/'+v.camp+'/'+kind+'/'+d.id).set(v);await db.doc(kind+'/'+d.id).delete();}catch(e){}}}
+const dPath=(kind,camp,id)=>S.fb?'campanhas/'+camp+'/'+kind+'/'+id:kind+'/'+id;
 /* after joining a table (Firebase), listen again: the first listeners were refused before the membership existed */
 function resubscribe(){for(const k of Object.keys(unsub)){try{unsub[k]&&unsub[k]();}catch(e){}delete unsub[k];}subscribe();}
 function watchPlayer(pid){if(!pid||unsub['u'+pid])return;
   if(S.master)unsub['r'+pid]=db.collection('pjs/'+pid+'/rolagens').onSnapshot(s=>{const m={};for(const d of s.docs){const v=d.data();if(v)m[d.id]=Object.assign({id:d.id,pid},v);}S.rolls[pid]=m;onRemote();},()=>{});
   if(S.master&&pid!==S.uid)unsub['dc'+pid]=db.collection('pjs/'+pid+'/docs').onSnapshot(s=>{const m={};for(const d of s.docs){const v=d.data();if(v)m[d.id]=Object.assign({id:d.id,pid},v);}S.pdocs[pid]=m;onRemote();},()=>{});
+  if(!S.fb&&S.mode==='cloud'&&pid===S.uid)unsub['jn'+pid]=db.collection('pjs/'+pid+'/campanhas').onSnapshot(s=>{S.joined={};for(const d of s.docs)S.joined[d.id]=d.data()||{};onRemote();},()=>{});
   if(!S.master&&pid===S.uid)unsub['dc'+pid]=db.collection('pjs/'+pid+'/docs').onSnapshot(s=>{const m={};for(const d of s.docs){const v=d.data();if(v)m[d.id]=Object.assign({id:d.id,pid},v);}S.pdocs[pid]=m;onRemote();},()=>{});
   if(S.master&&pid!==S.uid)unsub['l'+pid]=db.collection('pjs/'+pid+'/logs').onSnapshot(s=>{const m={};for(const d of s.docs){const v=d.data();if(v)m[d.id]=Object.assign({id:d.id,pid},v);}S.logs[pid]=m;onRemote();},()=>{});
   unsub['u'+pid]=db.collection('pjs/'+pid+'/fichas').onSnapshot(s=>{const m={};for(const d of s.docs){const v=d.data();if(v)m[d.id]=Object.assign(v,{id:d.id,owner:pid});}
@@ -4944,34 +5015,90 @@ const ui={campTab:'grupo',sheetTab:{}};
 
 /* ================= VIEWS ================= */
 function crumbs(parts){$('#crumbs').innerHTML=parts.map((p,i)=>(i?'<span aria-hidden="true">›</span>':'')+`<a href="${p[1]}">${esc(p[0])}</a>`).join('');}
-function render(){rebuildCustom();const app=$('#app');const tb=$('.top');if(tb)HOST.style.setProperty('--toph',tb.offsetHeight+'px');$('#who').innerHTML=S.mode==='local'?'<b>Modo local</b>':S.master?'Você é o <b>mestre</b>':'Você é <b>jogador</b>';
+function render(){rebuildCustom();const app=$('#app');const tb=$('.top');if(tb)HOST.style.setProperty('--toph',tb.offsetHeight+'px');$('#who').innerHTML=!S.papel&&(S.owner||S.mode==='local')?(S.mode==='local'?'<b>Modo local</b>':''):(S.mode==='local'?'<b>Modo local</b> · ':'')+(S.master?'Você é o <b>mestre</b>':'Você é <b>jogador</b>');
   if(!S.ready){app.innerHTML='<p class="lead">Carregando as campanhas…</p>';return;}const r=route();
   if(r.v==='invite')return viewInvite(app,r.id);
   if(r.v==='oldjoin'){crumbs([['Campanhas','#inicio']]);app.innerHTML='<div class="join"><h1 class="view">Convite</h1><div class="empty">Este link de convite é antigo e não vale mais. Cada ficha agora tem o próprio convite: peça um novo ao mestre.</div></div>';return;}
   if(r.v==='camp'&&S.camps[r.id])return viewCamp(app,S.camps[r.id]);if(r.v==='ficha'){const sh=findSheet(r.id);if(sh)return viewSheet(app,sh);app.innerHTML='<div class="empty">Ficha não encontrada. Ela pode ter sido apagada ou ainda estar carregando.</div>';crumbs([['Campanhas','#inicio']]);return;}
+  if(r.v==='camp'&&!S.camps[r.id]&&!S.master){crumbs([['Início','#inicio']]);app.innerHTML='<div class="empty">Você não está nesta campanha. Peça o código e a senha ao mestre e entre pela tela inicial.</div>';return;}
   viewHome(app);}
 function campCount(cid){return allSheets().filter(s=>s.camp===cid&&s.kind==='pc').length;}
-function viewHome(app){crumbs([['Campanhas','#inicio']]);const camps=Object.values(S.camps).filter(c=>S.master||allSheets().some(s=>s.camp===c.id&&s.owner===S.uid)).sort((a,b)=>(b.createdAt||0)-(a.createdAt||0));
+/* ================= START SCREEN ================= */
+function joinedCamp(cid){if(S.master)return true;if(S.fb)return !!S.camps[cid];return !!S.joined[cid]||allSheets().some(s=>s.camp===cid&&s.owner===S.uid);}
+function setPapel(p){if(NV){NV.setPapel(p,'#inicio');return;}if(p)store.set('mesa.papel',p);else{try{localStorage.removeItem('mesa.papel');}catch(e){}}location.hash='inicio';location.reload();}
+function roleBar(){return `<div class="rolebar"><span>Você está como <b>${S.master?'mestre':'jogador'}</b>.</span>${S.owner||S.mode==='local'?'<button class="btn small" id="trocaPapel">Trocar de papel</button>':''}</div>`;}
+function bindRoleBar(app){const b=app.querySelector('#trocaPapel');if(b)b.onclick=()=>setPapel('');}
+function viewPicker(app){crumbs([['Início','#inicio']]);
+  app.innerHTML=`<div class="start"><h1 class="view">Mesa do Mestre</h1><p class="lead">Como você vai usar a mesa agora? Dá para trocar depois, pela tela inicial.</p>
+    <div class="roles"><button type="button" class="rolecard" data-papel="mestre"><span class="ri" aria-hidden="true">🗺️</span><b>Sou mestre</b><span>Crie mapas e campanhas, defina o código e a senha de cada mesa, cuide de NPCs, bestiário, diário e documentos, e transmita o mapa para os jogadores.</span></button>
+      <button type="button" class="rolecard" data-papel="jogador"><span class="ri" aria-hidden="true">🎲</span><b>Sou jogador</b><span>Entre numa campanha com o código e a senha que o mestre te passou, veja as campanhas em que já está ou crie fichas livres.</span></button></div>
+    ${S.mode==='local'?'<p class="note">Sem conta, tudo fica só neste navegador. Para jogar com outras pessoas, entre com a conta (no site) ou use a página pelo claude.ai.</p>':''}</div>`;
+  for(const b of app.querySelectorAll('[data-papel]'))b.onclick=()=>setPapel(b.dataset.papel);}
+function masterHub(){return `<div class="hub"><button type="button" class="hubcard" id="hubMapa"><span class="ri" aria-hidden="true">🗺️</span><b>Mapas</b><span>Criar e editar mapas, cidades e masmorras.</span></button>
+  <button type="button" class="hubcard" id="hubCamp"><span class="ri" aria-hidden="true">📜</span><b>Nova campanha</b><span>Sistema, código e senha para os jogadores.</span></button>
+  <button type="button" class="hubcard" id="hubBest"><span class="ri" aria-hidden="true">🐉</span><b>Bestiário</b><span>Criaturas e NPCs para reaproveitar.</span></button></div>`;}
+function viewPlayerHub(app){crumbs([['Início','#inicio']]);const livres=allSheets().filter(s=>s.owner===S.uid&&!s.camp);
+  const camps=S.fb?null:Object.values(S.camps).filter(c=>joinedCamp(c.id));
+  app.innerHTML=`${roleBar()}<h1 class="view">Jogador</h1>
+    <section class="pblock"><h2>Entrar numa campanha</h2><p class="note">Use o código e a senha que o mestre te passou. Depois da primeira vez, a campanha fica na sua lista.</p>
+      ${S.mode==='local'?'<div class="empty">Entrar em campanhas precisa de uma conta: abra o site e entre com o Google, ou use a página pelo claude.ai.</div>':`<form class="joinform" id="joinForm" autocomplete="off"><label class="field"><span>Código</span><input id="jCode" maxlength="14" placeholder="Ex.: VALD01" autocapitalize="characters" spellcheck="false"></label>
+        <label class="field"><span>Senha</span><input id="jPass" type="password" maxlength="60"></label><button class="btn primary" type="submit">Entrar</button><span class="note" id="jMsg" aria-live="polite"></span></form>`}</section>
+    <section class="pblock"><h2>Minhas campanhas</h2><div id="myCamps">${S.fb?'<p class="note">Carregando…</p>':camps.length?`<div class="grid-cards">${camps.map(c=>`<article class="card"><a class="cover" href="#campanha-${c.id}"><span class="badge ${c.sys}">${esc((SYS[c.sys]||DND).n)}</span><h3>${esc(c.nome)}</h3></a><div class="meta">Suas fichas: ${allSheets().filter(s=>s.camp===c.id&&s.owner===S.uid).length}</div><div class="row"><a class="btn small" href="#campanha-${c.id}">Abrir</a></div></article>`).join('')}</div>`:'<div class="empty">Você ainda não entrou em nenhuma campanha.</div>'}</div></section>
+    <section class="pblock"><h2>Fichas livres</h2><p class="note">Fichas que não pertencem a nenhuma campanha: para testar um sistema ou montar um personagem antes de entrar numa mesa. Só você vê.</p>
+      <div class="row" style="margin-bottom:10px">${Object.values(SYS).map(x=>`<button class="btn small" data-livre="${x.id}">+ ${esc(x.n)}</button>`).join('')}</div>
+      ${livres.length?`<div class="grid-cards">${livres.map(sh=>pcCard(sh,null)).join('')}</div>`:'<div class="empty">Nenhuma ficha livre ainda.</div>'}</section>`;
+  bindRoleBar(app);for(const b of app.querySelectorAll('[data-livre]'))b.onclick=()=>createSheet({id:'',sys:b.dataset.livre},'pc');
+  const f=app.querySelector('#joinForm');if(f)f.onsubmit=async e=>{e.preventDefault();const msg=$('#jMsg');const code=$('#jCode').value,senha=$('#jPass').value;if(!code.trim()||!senha){msg.textContent='Preencha o código e a senha.';return;}msg.textContent='Verificando…';
+    try{if(NV){const r=await NV.entrarComCodigo(code,senha);msg.textContent='Entrando em “'+(r.nome||'campanha')+'”…';NV.entrarCampanha(r.m,r.c);return;}
+      const cc=String(code).toUpperCase().replace(/[^A-Z0-9]/g,'');const c=Object.values(S.camps).find(x=>x.codigo===cc);const k=c&&await shaHex('mesa-do-mestre|'+c.id+'|'+senha);
+      if(!c||!c.chave||k!==c.chave){msg.textContent='Código ou senha incorretos.';return;}await db.doc('pjs/'+S.uid+'/campanhas/'+c.id).set({em:Date.now()});S.joined[c.id]={em:Date.now()};location.hash='campanha-'+c.id;render();}
+    catch(err){const m=err&&err.message;msg.textContent=m==='senha'||m==='codigo'?'Código ou senha incorretos.':m==='proprio'?'Esta campanha é sua: abra como mestre.':'Não foi possível entrar agora. Tente de novo.';}};
+  if(S.fb)NV.minhasCampanhas().then(l=>{const box=app.querySelector('#myCamps');if(!box)return;
+    box.innerHTML=l.length?`<div class="grid-cards">${l.map(x=>`<article class="card"><div class="cover"><h3>${esc(x.nome||'Campanha')}</h3></div><div class="meta">Mestre: ${esc(x.mestre||'—')}</div><div class="row"><button class="btn small primary" data-ent="${esc(x.m)}|${esc(x.c)}">Entrar</button><button class="btn small" data-sai="${esc(x.m)}|${esc(x.c)}">Sair da campanha</button></div></article>`).join('')}</div>`:'<div class="empty">Você ainda não entrou em nenhuma campanha.</div>';
+    for(const b of box.querySelectorAll('[data-ent]'))b.onclick=()=>{const [m,c]=b.dataset.ent.split('|');NV.entrarCampanha(m,c);};
+    for(const b of box.querySelectorAll('[data-sai]'))b.onclick=()=>confirmBox('Sair desta campanha? Você deixa de ver a campanha, o mapa e os documentos dela. Para voltar, use o código e a senha de novo.',async()=>{const [m,c]=b.dataset.sai.split('|');await NV.sairDaCampanha(m,c);render();});});}
+async function shaHex(t){const b=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(t));return [...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,'0')).join('');}
+function viewHome(app){
+  if(!S.papel&&(S.owner||S.mode==='local'))return viewPicker(app);
+  if(!S.master){if(S.fb&&!S.proprio){app.innerHTML='<p class="lead">Voltando à sua tela inicial…</p>';NV.voltarAoInicio();return;}return viewPlayerHub(app);}
+  crumbs([['Início','#inicio']]);const camps=Object.values(S.camps).filter(c=>S.master||allSheets().some(s=>s.camp===c.id&&s.owner===S.uid)).sort((a,b)=>(b.createdAt||0)-(a.createdAt||0));
   const banner=S.readOnlyMsg?`<div class="banner">${esc(S.readOnlyMsg)}</div>`:'';
   const intro=S.master?'Crie uma campanha, escolha o sistema e convide os jogadores. Cada um preenche a própria ficha; você vê e edita todas, além de NPCs e notas que só você enxerga.':'Aqui ficam as mesas onde você tem fichas. Para criar uma ficha, use o convite que o mestre te enviar.';
-  app.innerHTML=`${banner}<h1 class="view">Campanhas</h1><p class="lead">${intro}</p>
+  app.innerHTML=`${banner}${roleBar()}${masterHub()}<h1 class="view">Campanhas</h1><p class="lead">${intro}</p>
     ${S.master?'<div class="row" style="margin-bottom:14px"><button class="btn primary" id="newCamp">Nova campanha</button></div>':''}
     ${camps.length?`<div class="grid-cards">${camps.map(c=>`<article class="card"><a class="cover" href="#campanha-${c.id}"><span class="badge ${c.sys}">${esc(SYS[c.sys].n)}</span><h3>${esc(c.nome)}</h3></a>
-      <div class="meta">${esc(c.desc||'Sem descrição.')}</div><div class="meta">${S.master?campCount(c.id)+' ficha(s) de jogador':'Suas fichas: '+allSheets().filter(s=>s.camp===c.id&&s.owner===S.uid).length}</div><div class="row"><a class="btn small" href="#campanha-${c.id}">Abrir</a></div></article>`).join('')}</div>`
+      <div class="meta">${esc(c.desc||'Sem descrição.')}</div><div class="meta">${S.master&&c.codigo?'Código: <b class="mono">'+esc(c.codigo)+'</b> · ':''}${S.master?campCount(c.id)+' ficha(s) de jogador':'Suas fichas: '+allSheets().filter(s=>s.camp===c.id&&s.owner===S.uid).length}</div><div class="row"><a class="btn small" href="#campanha-${c.id}">Abrir</a></div></article>`).join('')}</div>`
       :`<div class="empty">${S.master?'Nenhuma campanha ainda. Comece em “Nova campanha”.':'Você ainda não tem fichas. Abra o convite que o mestre te enviou.'}</div>`}
-    ${S.mode==='cloud'&&S.master?`<h2 style="font-family:var(--f-title);font-weight:400;margin-top:30px">Como convidar os jogadores</h2><ol class="note" style="max-width:65ch;line-height:1.6"><li>No menu Compartilhar desta página, convide cada jogador pelo e-mail como <b>Editor</b>.</li><li>Na campanha, aba <b>Convites</b>, gere um link para cada ficha e envie. Cada link cria uma única ficha.</li><li>O jogador só enxerga as próprias fichas. Mudanças importantes chegam para você aprovar, e o resto fica na aba <b>Registro</b>.</li></ol>`:''}
+    ${S.mode==='cloud'&&S.master&&S.fb?`<h2 style="font-family:var(--f-title);font-weight:400;margin-top:30px">Como os jogadores entram</h2><ol class="note" style="max-width:65ch;line-height:1.6"><li>Mande o link do site para os jogadores. Eles entram com a conta Google e escolhem <b>Sou jogador</b>.</li><li>Passe o <b>código</b> e a <b>senha</b> da campanha. Eles só veem as campanhas em que entraram: as próprias fichas, os documentos e resumos que você publicar e o mapa que você transmitir.</li><li>Você também pode gerar um convite de uso único na aba <b>Convites</b> da campanha.</li></ol>`:''}
+    ${S.mode==='cloud'&&S.master&&!S.fb?`<h2 style="font-family:var(--f-title);font-weight:400;margin-top:30px">Como convidar os jogadores</h2><ol class="note" style="max-width:65ch;line-height:1.6"><li>No menu Compartilhar desta página, convide cada jogador pelo e-mail como <b>Editor</b>.</li><li>Na campanha, aba <b>Convites</b>, gere um link para cada ficha e envie. Cada link cria uma única ficha.</li><li>O jogador só enxerga as próprias fichas. Mudanças importantes chegam para você aprovar, e o resto fica na aba <b>Registro</b>.</li></ol>`:''}
     ${S.master?bestHome():''}
     ${S.mode==='local'?'<p class="note" style="margin-top:24px">Modo local: tudo fica salvo só neste navegador. Para jogadores e mestre compartilharem as fichas, abra esta página pelo claude.ai.</p>':''}`;
-  const nb=$('#newCamp');if(nb)nb.onclick=()=>campForm();if(S.master)bindBestHome(app);}
+  const nb=$('#newCamp');if(nb)nb.onclick=()=>campForm();if(S.master)bindBestHome(app);bindRoleBar(app);
+  const hm=$('#hubMapa');if(hm)hm.onclick=()=>Mesa.go('mapa');const hc=$('#hubCamp');if(hc)hc.onclick=()=>campForm();const hb=$('#hubBest');if(hb)hb.onclick=()=>{const t=app.querySelector('.besthome,#bestHome,[data-best]');(t||app.lastElementChild).scrollIntoView({behavior:'smooth'});};}
+function sugCodigo(nome){const b=String(nome||'MESA').normalize('NFD').replace(/[^A-Za-z0-9]/g,'').toUpperCase().slice(0,4)||'MESA';let r='';for(let i=0;i<4;i++)r+='ABCDEFGHJKMNPQRSTUVWXYZ23456789'[Math.floor(Math.random()*31)];return (b+r).slice(0,8);}
+/* code and password: on the Firebase site the server checks them (see firestore.rules); on claude.ai the page checks them */
+async function salvarAcesso(c,code,pass,er){
+  if(NV){try{await NV.definirAcesso(c.id,code,pass,c.nome);c.codigo=code;return true;}
+    catch(e){const m=e&&e.message;er.textContent=m==='em-uso'?'Esse código já é usado por outra campanha. Escolha outro.':m==='senha'?'Defina uma senha com pelo menos 4 caracteres.':'Não foi possível salvar o acesso agora. Tente de novo.';return false;}}
+  if(Object.values(S.camps).some(x=>x.id!==c.id&&x.codigo===code)){er.textContent='Esse código já é usado por outra campanha. Escolha outro.';return false;}
+  c.codigo=code;if(pass)c.chave=await shaHex('mesa-do-mestre|'+c.id+'|'+pass);return true;}
 function campForm(c){const isNew=!c;c=c||{id:uid(),nome:'',sys:'dnd',desc:'',createdAt:Date.now()};let sys=c.sys;
   openModal(`<h2>${isNew?'Nova campanha':'Editar campanha'}</h2><label class="field"><span>Nome</span><input id="cNome" value="${esc(c.nome)}" placeholder="Ex.: A Maldição de Valdren"></label>
     <div class="field"><span>Sistema</span><div class="choices" id="cSys">${Object.values(SYS).map(s=>`<button type="button" class="choice" data-s="${s.id}" aria-pressed="${s.id===sys}"><b>${esc(s.n)}</b><small>${{dnd:'Pergaminho, atributos, magias por nível.',op:'Dossiê da Ordem, NEX, rituais e sanidade.',etmos:'Grimório de partículas, fadiga e palavras mágicas.',sacra:'Velho oeste: 1d6 + antecedente, Vida e Dor, montaria na ficha.'}[s.id]}</small></button>`).join('')}</div>
     ${isNew?'':'<small class="note">Mudar o sistema não converte as fichas que já existem.</small>'}</div>
     <label class="field"><span>Descrição</span><textarea id="cDesc" rows="3">${esc(c.desc)}</textarea></label>
+    ${S.mode==='cloud'?`<fieldset class="access"><legend>Acesso dos jogadores</legend><p class="note">Os jogadores entram com este código e esta senha. ${isNew?'':'Deixe a senha em branco para manter a atual.'}</p>
+      <div class="row"><label class="field" style="flex:1"><span>Código (4 a 12 letras e números)</span><input id="cCode" maxlength="12" value="${esc(c.codigo||sugCodigo(c.nome))}" autocapitalize="characters" spellcheck="false"></label>
+      <label class="field" style="flex:1"><span>Senha${isNew||!c.codigo?'':' nova'} (mínimo 4)</span><input id="cPass" type="text" maxlength="60" autocomplete="off" placeholder="${isNew||!c.codigo?'':'manter a atual'}"></label></div><p class="err" id="cErr" aria-live="polite"></p></fieldset>`:''}
     <div class="row" style="justify-content:flex-end">${isNew?'':'<button class="btn danger" id="cDel">Apagar campanha</button>'}<button class="btn" data-close>Cancelar</button><button class="btn primary" id="cOk">${isNew?'Criar':'Salvar'}</button></div>`);
   for(const b of $('#cSys').children)b.onclick=()=>{sys=b.dataset.s;for(const x of $('#cSys').children)x.setAttribute('aria-pressed',String(x===b));};
-  $('#cOk').onclick=async()=>{const nome=$('#cNome').value.trim();if(!nome){$('#cNome').focus();return;}c.nome=nome;c.sys=sys;c.desc=$('#cDesc').value.trim();closeModal();await saveCamp(c);location.hash='campanha-'+c.id;render();};
-  const del=$('#cDel');if(del)del.onclick=()=>confirmBox(`Apagar “${c.nome}”? As fichas continuam guardadas, mas a campanha some da lista.`,async()=>{await removeCamp(c);location.hash='inicio';render();});}
+  $('#cOk').onclick=async()=>{const nome=$('#cNome').value.trim();if(!nome){$('#cNome').focus();return;}c.nome=nome;c.sys=sys;c.desc=$('#cDesc').value.trim();
+    if(S.mode==='cloud'){const er=$('#cErr'),code=String($('#cCode').value).toUpperCase().replace(/[^A-Z0-9]/g,''),pass=$('#cPass').value;er.textContent='';
+      if(!/^[A-Z0-9]{4,12}$/.test(code)){er.textContent='O código precisa de 4 a 12 letras ou números.';$('#cCode').focus();return;}
+      if((!c.codigo||isNew)&&pass.length<4){er.textContent='Defina uma senha com pelo menos 4 caracteres.';$('#cPass').focus();return;}if(pass&&pass.length<4){er.textContent='A senha precisa de pelo menos 4 caracteres.';return;}
+      const ok=await salvarAcesso(c,code,pass||null,er);if(!ok)return;}
+    closeModal();await saveCamp(c);location.hash='campanha-'+c.id;render();};
+  const del=$('#cDel');if(del)del.onclick=()=>confirmBox(`Apagar “${c.nome}”? As fichas continuam guardadas, mas a campanha some da lista.`,async()=>{if(NV)await NV.removerAcesso(c.id);await removeCamp(c);location.hash='inicio';render();});}
 function hpOf(sh){if(sh.sys==='sacra'){const t=sacV(sh,'vida');return [t-num(sh.vidaMarc),t];}if(sh.sys==='etmos'){const l=etLimF(sh);return [l-num(sh.ferimentos),l];}if(sh.sys==='op'){const mx=opMax(sh,'pv');return [num(sh.pv),mx];}return [num(sh.pv),num(sh.pvMax)];}
 function setHpVal(sh,v){const [,mx]=hpOf(sh);if(sh.sys==='sacra'){sh.vidaMarc=clamp(mx-v,0,mx);return;}if(sh.sys==='etmos')sh.ferimentos=clamp(mx-v,0,mx);else sh.pv=clamp(v,-mx,mx);}
 function barColor(f){return f>.5?'#3f9a5a':f>.25?'#d4a42c':'#c0392b';}
@@ -4995,7 +5122,7 @@ function viewCamp(app,c){lastCamp=c.id;try{sessionStorage.setItem('mesa.camp',c.
   let body='';
   if(ui.campTab==='grupo')body=S.master?`<div class="row" style="margin-bottom:12px"><button class="btn primary" id="newPc">Nova ficha (sua)</button><button class="btn" data-newinv="pc">Convidar um jogador</button></div>
       ${pcs.length?`<div class="grid-cards">${pcs.map(s=>pcCard(s,c)).join('')}</div>`:'<div class="empty">Nenhum personagem ainda. Gere um convite para cada jogador na aba Convites.</div>'}`
-    :`${pcs.length?`<div class="grid-cards">${pcs.map(s=>pcCard(s,c)).join('')}</div>`:'<div class="empty">Você ainda não tem fichas nesta mesa.</div>'}<p class="note" style="margin-top:12px">Para criar outra ficha, peça um novo convite ao mestre.</p>`;
+    :`<div class="row" style="margin-bottom:12px"><button class="btn primary" id="newPc">Nova ficha</button></div>${pcs.length?`<div class="grid-cards">${pcs.map(s=>pcCard(s,c)).join('')}</div>`:'<div class="empty">Você ainda não tem fichas nesta mesa. Comece em “Nova ficha”.</div>'}`;
   else if(ui.campTab==='npcs')body=`<div class="row" style="margin-bottom:12px"><button class="btn primary" id="newNpc">Novo NPC</button><button class="btn" id="genNpc">Gerar NPC</button><button class="btn" id="fromBest">Do bestiário</button><button class="btn" data-newinv="npc">Convite para criar um NPC</button><span class="note">NPCs que você cria só você vê; os criados por convite também ficam visíveis para quem os criou.</span></div>${npcs.length?`<div class="grid-cards">${npcs.map(s=>pcCard(s,c)).join('')}</div>`:'<div class="empty">Nenhum NPC ainda.</div>'}`;
   else if(ui.campTab==='mapas'&&S.master)body=mapsView(c);
   else if(ui.campTab==='convites')body=invitesView(c);
@@ -5005,7 +5132,7 @@ function viewCamp(app,c){lastCamp=c.id;try{sessionStorage.setItem('mesa.camp',c.
   else if(ui.campTab==='registro'){body=logsView(c);setSeenLogs(c.id);}
   else body=`<label class="field"><span>Anotações que só você lê: ganchos, segredos, cronologia da campanha.</span><textarea id="mNotes" rows="16" style="min-height:320px">${esc((S.notes[c.id]||{}).texto||'')}</textarea></label>`;
   app.innerHTML=`${banner}<span class="badge ${c.sys}">${esc(SYS[c.sys].n)}</span><h1 class="view">${esc(c.nome)}</h1>${c.desc?`<p class="lead">${esc(c.desc)}</p>`:''}
-    ${S.master?'<div class="row"><button class="btn small" id="editCamp">Editar campanha</button></div>':''}
+    ${S.master?`<div class="row"><button class="btn small" id="editCamp">Editar campanha</button>${S.mode==='cloud'?(c.codigo?`<span class="note">Código para os jogadores: <b class="mono">${esc(c.codigo)}</b> · a senha você define em Editar campanha</span>`:'<span class="note" style="color:var(--bad)">Esta campanha ainda não tem código e senha: defina em Editar campanha para os jogadores entrarem.</span>'):''}</div>`:''}
     ${mesaBox(c)}
     <div class="tabs" role="tablist">${tabs.map(t=>`<button role="tab" data-t="${t[0]}" aria-selected="${ui.campTab===t[0]}">${t[1]}</button>`).join('')}</div>${body}`;
   for(const b of app.querySelectorAll('.tabs button'))b.onclick=()=>{ui.campTab=b.dataset.t;render();};
@@ -5018,7 +5145,9 @@ function viewCamp(app,c){lastCamp=c.id;try{sessionStorage.setItem('mesa.camp',c.
   const mn=$('#mNotes');if(mn)mn.oninput=()=>{setStatus('Alterações não salvas');saveNote(c.id,mn.value);};
   for(const b of app.querySelectorAll('[data-hp]'))b.onclick=()=>{const sh=findSheet(b.dataset.hp);if(!sh||!canEdit(sh))return;const [pv,mx]=hpOf(sh);setHpVal(sh,pv+num(b.dataset.d));queueSave(sh);render();};}
 /* master: own sheets and private NPCs. Player: only through an invite (inv = {id, tipo}). */
-function createSheet(c,kind,nome,inv){if(!S.master&&!inv){toast('Para criar uma ficha, use um convite do mestre.');return null;}if(inv&&!canCreate()){toast('Você ainda não pode criar fichas aqui. Peça ao mestre para te convidar como Editor.');return null;}
+function createSheet(c,kind,nome,inv){const proprio=!S.master&&!inv&&(c.id===''||joinedCamp(c.id));if(!S.master&&!inv&&!proprio){toast('Para criar uma ficha aqui, entre na campanha com o código e a senha do mestre.');return null;}
+  if(proprio&&S.mode==='cloud'&&!S.fb&&S.canWrite===false){toast('Você ainda não pode criar fichas aqui. Peça ao dono da página para te convidar como Editor.');return null;}
+  if(proprio){const sh=newFor(c.sys);sh.id=uid();sh.camp=c.id;sh.kind='pc';sh.tipo='pc';sh.owner=S.uid;sh.createdAt=Date.now();sh.criacao=c.id?'rascunho':'pronta';if(nome)sh.nome=nome;(S.pcs[S.uid]=S.pcs[S.uid]||{})[sh.id]=sh;queueSave(sh);location.hash='ficha-'+sh.id;render();return sh;}if(inv&&!canCreate()){toast('Você ainda não pode criar fichas aqui. Peça ao mestre para te convidar como Editor.');return null;}
   const sh=newFor(c.sys);sh.id=uid();sh.camp=c.id;sh.kind=kind;sh.createdAt=Date.now();if(nome)sh.nome=nome;
   if(inv){sh.owner=S.uid;sh.tipo=kind;sh.convite=inv.id;sh.criacao='rascunho';(S.pcs[S.uid]=S.pcs[S.uid]||{})[sh.id]=sh;}
   else if(kind==='npc'){S.npcs[sh.id]=sh;sh.nome=nome||'Novo NPC';}else{sh.owner=S.uid;(S.pcs[S.uid]=S.pcs[S.uid]||{})[sh.id]=sh;}
@@ -5053,14 +5182,14 @@ function diaryView(c){
   return `<div class="row" style="margin-bottom:12px"><button class="btn primary" id="newSess">Nova sessão</button><span class="note">Notas por sessão, com as rolagens e as alterações das fichas do dia. O resumo pode ir para os jogadores.</span></div>
     ${l.length?l.map(item).join(''):'<div class="empty">Nenhuma sessão ainda. Comece com “Nova sessão”.</div>'}`;}
 async function saveSession(d){const data=Object.assign({},d);delete data.id;try{await db.doc('diario/'+d.id).set(data);
-    if(d.publicado)await db.doc('resumos/'+d.id).set({camp:d.camp,titulo:d.titulo||'',data:d.data||'',resumo:d.resumo||''});else await db.doc('resumos/'+d.id).delete();setStatus('Salvo');}catch(e){setStatus('Erro ao salvar o diário',true);}}
+    if(d.publicado)await db.doc(dPath('resumos',d.camp,d.id)).set({camp:d.camp,titulo:d.titulo||'',data:d.data||'',resumo:d.resumo||''});else await db.doc(dPath('resumos',d.camp,d.id)).delete();setStatus('Salvo');}catch(e){setStatus('Erro ao salvar o diário',true);}}
 function bindDiary(app,c){const nb=app.querySelector('#newSess');
   if(nb)nb.onclick=async()=>{if(S.mode!=='cloud'){toast('O diário precisa da página aberta pelo claude.ai.');return;}const n=Object.values(S.diario).filter(r=>r.camp===c.id).length+1;
     const d={id:uid(),camp:c.id,titulo:'Sessão '+n,data:ymd(Date.now()),notas:'',resumo:'',publicado:false,criadoEm:Date.now()};S.diario[d.id]=d;ui.openSess=d.id;await saveSession(d);render();};
   for(const box of app.querySelectorAll('details.sess[data-sid]')){const d=S.diario[box.dataset.sid];if(!d)continue;box.addEventListener('toggle',()=>{if(box.open)ui.openSess=d.id;});
     for(const el of box.querySelectorAll('[data-ds]'))el.addEventListener(el.type==='checkbox'||el.type==='date'?'change':'input',()=>{d[el.dataset.ds]=el.type==='checkbox'?el.checked:el.value;setStatus('Alterações não salvas');
       clearTimeout(diaryTimers[d.id]);diaryTimers[d.id]=setTimeout(()=>saveSession(d),el.type==='checkbox'?0:700);if(el.type==='checkbox'||el.type==='date')setTimeout(render,50);});}
-  for(const b of app.querySelectorAll('[data-sdel]'))b.onclick=()=>confirmBox('Apagar esta sessão do diário? As rolagens e o registro continuam guardados.',async()=>{const id=b.dataset.sdel;delete S.diario[id];render();try{await db.doc('diario/'+id).delete();await db.doc('resumos/'+id).delete();}catch(e){}});}
+  for(const b of app.querySelectorAll('[data-sdel]'))b.onclick=()=>confirmBox('Apagar esta sessão do diário? As rolagens e o registro continuam guardados.',async()=>{const id=b.dataset.sdel;const cm=(S.diario[id]||{}).camp||c.id;delete S.diario[id];render();try{await db.doc('diario/'+id).delete();await db.doc(dPath('resumos',cm,id)).delete();}catch(e){}});}
 
 /* ================= DOCUMENTS FOR PLAYERS ================= */
 function campDocs(cid){const out=Object.values(S.docs).filter(d=>d.camp===cid).map(d=>Object.assign({para:'todos'},d));for(const m of Object.values(S.pdocs))for(const d of Object.values(m||{}))if(d.camp===cid)out.push(d);return out.sort((a,b)=>(b.t||0)-(a.t||0));}
@@ -5084,8 +5213,8 @@ function bindDocs(app,c){const f=app.querySelector('#docForm');
     const d={camp:c.id,titulo:$('#dTit').value.trim(),texto:$('#dTxt').value.trim(),t:Date.now()};if(!d.titulo){$('#dTit').focus();return;}
     const file=$('#dImg').files[0];if(file){msg.textContent='Preparando a imagem…';try{d.img=await shrinkImage(file);}catch(err){msg.textContent='';toast('Não consegui usar essa imagem. Tente um JPG ou PNG menor.');return;}}
     const para=$('#dPara').value,id=uid();msg.textContent='Enviando…';
-    try{if(para==='todos')await db.doc('documentos/'+id).set(d);else{d.para=para;await db.doc('pjs/'+para+'/docs/'+id).set(d);}toast('Documento enviado.');render();}catch(err){msg.textContent='';toast('Não foi possível enviar agora.');}};
-  for(const b of app.querySelectorAll('[data-ddel]'))b.onclick=()=>confirmBox('Apagar este documento? Os jogadores deixam de vê-lo.',async()=>{const [pid,id]=b.dataset.ddel.split('|');try{if(pid){await db.doc('pjs/'+pid+'/docs/'+id).delete();delete (S.pdocs[pid]||{})[id];}else{await db.doc('documentos/'+id).delete();delete S.docs[id];}}catch(e){}render();});
+    try{if(para==='todos')await db.doc(dPath('documentos',c.id,id)).set(d);else{d.para=para;await db.doc('pjs/'+para+'/docs/'+id).set(d);}toast('Documento enviado.');render();}catch(err){msg.textContent='';toast('Não foi possível enviar agora.');}};
+  for(const b of app.querySelectorAll('[data-ddel]'))b.onclick=()=>confirmBox('Apagar este documento? Os jogadores deixam de vê-lo.',async()=>{const [pid,id]=b.dataset.ddel.split('|');try{if(pid){await db.doc('pjs/'+pid+'/docs/'+id).delete();delete (S.pdocs[pid]||{})[id];}else{await db.doc(dPath('documentos',(S.docs[id]||{}).camp||c.id,id)).delete();delete S.docs[id];}}catch(e){}render();});
   for(const b of app.querySelectorAll('[data-dimg]'))b.onclick=()=>{const img=b.querySelector('img');openModal(`<img src="${esc(img.src)}" alt="" style="width:100%;border-radius:8px"><div class="row" style="justify-content:flex-end"><button class="btn" data-close>Fechar</button></div>`);};}
 
 /* ================= BESTIARY AND NPC GENERATOR ================= */
@@ -5236,7 +5365,7 @@ function viewInvite(app,id){crumbs([['Convite','#convite-'+id]]);
     const fresh=await Promise.all([db.doc('usados/'+id).get(),db.doc('convites/'+id).get()]).catch(()=>null);
     if(fresh&&(fresh[0].exists||!fresh[1].exists)){st.uso=fresh[0].exists?fresh[0].data():null;if(!fresh[1].exists)st.state='missing';render();return;}
     /* outside claude.ai (Firebase) the person first becomes a member of the table with this invite */
-    if(db.entrar){try{await db.entrar(id);}catch(e){toast('Este convite não pôde ser usado. Peça um novo ao mestre.');return;}}
+    if(db.entrar){try{await db.entrar(id,c.id,c.nome);}catch(e){toast('Este convite não pôde ser usado. Peça um novo ao mestre.');return;}}
     st.uso={uid:S.uid,ficha:'',em:Date.now()};
     const sh=createSheet(c,v.tipo==='npc'?'npc':'pc',n,{id});if(!sh)return;st.uso.ficha=sh.id;
     try{await db.doc('usados/'+id).set(st.uso);}catch(e){}
@@ -5356,7 +5485,7 @@ function bindMaps(app,c){const sel=app.querySelector('#mapAdd');if(!sel||!window
   Atlas.listMaps().then(all=>{const have=new Set((c.mapas||[]).map(m=>m.id));for(const m of all)if(!have.has(m.id))sel.add(new Option(`${m.nome}${m.escala?' ('+m.escala+')':''}`,m.id));if(sel.options.length===1)sel.options[0].textContent='Todos os seus mapas já estão aqui (crie outro no Mapa)';});
   sel.onchange=async()=>{const id=sel.value;if(!id)return;const all=await Atlas.listMaps();const m=all.find(x=>x.id===id);if(!m)return;c.mapas=(c.mapas||[]).filter(x=>x.id!==id).concat({id:m.id,nome:m.nome,escala:m.escala});await saveCamp(c);toast('Mapa adicionado. Ele só vai para os jogadores quando você transmitir.');render();};
   for(const b of app.querySelectorAll('[data-mopen]'))b.onclick=()=>{Atlas.openMap(b.dataset.mopen);Mesa.go('mapa');};
-  for(const b of app.querySelectorAll('[data-mtx]'))b.onclick=async()=>{b.disabled=true;const id=b.dataset.mtx;const mesa=c.mesa||(uid()+uid().slice(0,4));const r=await Atlas.transmit(id,mesa);
+  for(const b of app.querySelectorAll('[data-mtx]'))b.onclick=async()=>{b.disabled=true;const id=b.dataset.mtx;const mesa=c.mesa||(uid()+uid().slice(0,4));const r=await Atlas.transmit(id,mesa,c.id);
     if(!r.ok){toast(r.msg);b.disabled=false;return;}c.mesa=mesa;c.mapa=id;c.mesaNome=r.nome;const it=(c.mapas||[]).find(x=>x.id===id);if(it)it.nome=r.nome;await saveCamp(c);notify();toast(`“${r.nome}” está na mesa dos jogadores.`);render();};
   const st=app.querySelector('[data-mstop]');if(st)st.onclick=async()=>{delete c.mapa;delete c.mesaNome;await saveCamp(c);notify();toast('Mapa tirado da mesa. Os jogadores continuam vendo a última imagem até você transmitir outro.');render();};
   for(const b of app.querySelectorAll('[data-mrm]'))b.onclick=async()=>{const id=b.dataset.mrm;c.mapas=(c.mapas||[]).filter(x=>x.id!==id);if(c.mapa===id){delete c.mapa;delete c.mesaNome;}await saveCamp(c);render();};}

@@ -5,7 +5,8 @@ rules_version = '2';
 // Cada conta é mestre do próprio espaço: mestres/<uid da conta>/...
 // Ali ficam as campanhas, NPCs, notas, diário, bestiário, convites, mesas ao vivo
 // e as pastas dos jogadores. Outro mestre não lê nem escreve nada disso.
-// Jogador: quem entrou com um convite daquele mestre (mestres/<mestre>/membros/<uid>).
+// Jogador: quem entrou com um convite ou com o código e a senha de uma campanha daquele mestre.
+// Ele só lê as campanhas em que entrou (mestres/<mestre>/membros/<uid>/campanhas/<campanha>).
 service cloud.firestore {
   match /databases/{database}/documents {
     function signedIn() { return request.auth != null; }
@@ -43,20 +44,60 @@ service cloud.firestore {
       allow delete: if false;
     }
 
+    // Código de campanha: o ID é o código que o mestre escolheu (único no site).
+    // Quem sabe o código descobre de qual mestre e campanha ele é; ninguém lista os códigos.
+    match /codigos/{code} {
+      allow get: if signedIn();
+      allow list: if false;
+      allow create: if signedIn() && code.matches('^[A-Z0-9]{4,12}$')
+        && request.resource.data.keys().hasOnly(['m', 'c', 'nome', 'em'])
+        && request.resource.data.m == me()
+        && request.resource.data.c is string && request.resource.data.c.size() <= 40;
+      allow update: if signedIn() && resource.data.m == me()
+        && request.resource.data.keys().hasOnly(['m', 'c', 'nome', 'em'])
+        && request.resource.data.m == me() && request.resource.data.c == resource.data.c;
+      allow delete: if signedIn() && resource.data.m == me();
+    }
+
     match /mestres/{m} {
       function dono() { return signedIn() && me() == m; }
       function membro() { return dono() || (signedIn() && exists(/databases/$(database)/documents/mestres/$(m)/membros/$(me()))); }
+      function naCampanha(c) { return dono() || (signedIn() && exists(/databases/$(database)/documents/mestres/$(m)/membros/$(me())/campanhas/$(c))); }
       function conviteExiste(c) { return exists(/databases/$(database)/documents/mestres/$(m)/convites/$(c)); }
       function conviteUsado(c) { return exists(/databases/$(database)/documents/mestres/$(m)/usados/$(c)); }
+      function chaveDe(k, c) { return k is string && k.matches('^[a-f0-9]{64}$')
+        && exists(/databases/$(database)/documents/mestres/$(m)/chaves/$(k))
+        && get(/databases/$(database)/documents/mestres/$(m)/chaves/$(k)).data.c == c; }
+      function conviteDe(v, c) { return v is string && conviteExiste(v) && !conviteUsado(v)
+        && get(/databases/$(database)/documents/mestres/$(m)/convites/$(v)).data.camp == c; }
 
-      // Entrar na mesa deste mestre: só com um convite dele que existe e ainda não foi usado.
+      // Senha da campanha: o ID é um resumo (SHA-256) de campanha + senha. Só quem sabe a senha
+      // chega ao documento certo; ninguém lista as chaves, e só o mestre cria ou apaga.
+      match /chaves/{k} {
+        allow get: if signedIn();
+        allow list: if false;
+        allow create, update: if dono() && k.matches('^[a-f0-9]{64}$')
+          && request.resource.data.keys().hasOnly(['c']) && request.resource.data.c is string;
+        allow delete: if dono();
+      }
+      // Código e chave atuais de cada campanha (para o mestre trocar ou apagar depois).
+      match /acesso/{c} { allow read, write: if dono(); }
+
+      // Entrar como jogador: com um convite que ainda vale ou com a senha da campanha.
       match /membros/{uid} {
         allow read: if dono() || (signedIn() && me() == uid);
         allow create: if signedIn() && me() == uid && !dono()
-          && request.resource.data.convite is string
-          && conviteExiste(request.resource.data.convite)
-          && !conviteUsado(request.resource.data.convite);
+          && (conviteDe(request.resource.data.convite, request.resource.data.camp)
+              || chaveDe(request.resource.data.chave, request.resource.data.c));
         allow update, delete: if dono();
+        // Cada campanha em que o jogador entrou. Sem este documento ele não vê a campanha.
+        match /campanhas/{c} {
+          allow read: if dono() || (signedIn() && me() == uid);
+          allow create: if signedIn() && me() == uid && !dono()
+            && (chaveDe(request.resource.data.chave, c) || conviteDe(request.resource.data.convite, c));
+          allow update: if false;
+          allow delete: if dono() || (signedIn() && me() == uid);
+        }
       }
       // Convites: quem tem o link lê aquele convite; só o mestre lista e cria.
       match /convites/{id} {
@@ -70,11 +111,24 @@ service cloud.firestore {
         allow create: if membro() && request.resource.data.uid == me() && conviteExiste(id);
         allow update, delete: if dono();
       }
-      // O que os jogadores deste mestre leem e só ele escreve.
-      match /campanhas/{id}  { allow read: if membro(); allow write: if dono(); }
-      match /mesas/{id}      { allow read: if membro(); allow write: if dono(); }
-      match /resumos/{id}    { allow read: if membro(); allow write: if dono(); }
-      match /documentos/{id} { allow read: if membro(); allow write: if dono(); }
+      // Campanha: o jogador só lê as campanhas em que entrou (uma por vez, sem listar as outras).
+      match /campanhas/{c} {
+        allow get: if naCampanha(c);
+        allow list: if dono();
+        allow write: if dono();
+        // O que o mestre distribui na campanha: documentos para todos e resumos de sessão.
+        match /documentos/{id} { allow read: if naCampanha(c); allow write: if dono(); }
+        match /resumos/{id}    { allow read: if naCampanha(c); allow write: if dono(); }
+      }
+      // Mapa transmitido: só os jogadores da campanha daquela mesa.
+      match /mesas/{id} {
+        allow get: if dono() || ('camp' in resource.data && naCampanha(resource.data.camp));
+        allow list: if dono();
+        allow write: if dono();
+      }
+      // Coleções antigas (antes do acesso por campanha): só o mestre; a página dele as move para as campanhas.
+      match /resumos/{id}    { allow read, write: if dono(); }
+      match /documentos/{id} { allow read, write: if dono(); }
       // Só o mestre.
       match /npcs/{id}       { allow read, write: if dono(); }
       match /segredos/{id}   { allow read, write: if dono(); }

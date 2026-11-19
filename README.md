@@ -5,7 +5,7 @@
 
 **[Versão com mesa ao vivo e fichas compartilhadas](https://claude.ai/artifact/1wUYbQ513Syib6KfoBeN8k)** · no claude.ai, só para quem o mestre convidar.
 
-<sub>Última atualização: 18/11/2026 às 18:18 (horário de Brasília). O GitHub Pages publica a versão nova poucos minutos depois de cada envio.</sub>
+<sub>Última atualização: 19/11/2026 às 14:06 (horário de Brasília). O GitHub Pages publica a versão nova poucos minutos depois de cada envio.</sub>
 <!-- LINKS:FIM -->
 
 Mapas e fichas de RPG de mesa numa página só. O botão **Mapa | Fichas** no topo troca de seção sem sair da página, e as duas partes conversam entre si.
@@ -26,6 +26,8 @@ Mapas e fichas de RPG de mesa numa página só. O botão **Mapa | Fichas** no to
 
 - **Sistemas:** D&D 5e (tema pergaminho), Ordem Paranormal (tema dossiê) e Etmos (caderno lavanda).
 - **Etmos no combate:** o jogador vê os símbolos das partículas que conhece, separados em funções, objetos, características e complementos, escolhe a ordem e confirma; a página mostra a palavra montada e os símbolos em sequência.
+- **Tela inicial:** depois do login, a pessoa escolhe **Sou mestre** (mapas, campanhas, bestiário, transmissão) ou **Sou jogador** (entrar com código e senha, as campanhas em que já está e fichas livres). Dá para trocar de papel pela tela inicial.
+- **Código e senha:** toda campanha tem um código e uma senha definidos pelo mestre. O jogador entra uma vez e a campanha fica na lista dele. Dentro dela, vê só as próprias fichas, os documentos e resumos que o mestre publicar e o mapa transmitido.
 - **Acesso:** cada jogador edita só as próprias fichas; o mestre vê e edita todas, e tem NPCs e notas que só ele lê.
 - **Cálculos automáticos:** modificadores, perícias, salvaguardas, CD e ataque de magia (D&D); PV, PE e SAN por classe e NEX, defesa e carga (Ordem Paranormal).
 - **Dados:** clique em atributos, perícias e ataques para rolar; vantagem e desvantagem no D&D; regra de dados por atributo na Ordem.
@@ -56,7 +58,7 @@ Configuração no console do Firebase (uma vez):
 
 No primeiro acesso, cada pessoa escolhe um nome de usuário (único no site, de 3 a 20 caracteres: a-z, 0-9, ponto e _) e um nome de exibição; dá para mudar depois clicando no nome, no canto da tela. As regras garantem no servidor que o nome de usuário não se repete, que só o dono mexe no próprio perfil e que os campos têm formato e tamanho fixos.
 
-Cada conta é mestre do próprio espaço: suas campanhas, NPCs, diário, bestiário, convites e mesas ficam em `mestres/<conta>/` e nenhum outro mestre os vê. Os jogadores entram pelos convites gerados na aba Convites da campanha: quem usa um convite vira membro só do espaço daquele mestre, enxerga as próprias fichas e a mesa ao vivo. Quem joga com mais de um mestre troca de mesa pelo seletor no canto da tela.
+Cada conta é mestre do próprio espaço: suas campanhas, NPCs, diário, bestiário, convites e mesas ficam em `mestres/<conta>/` e nenhum outro mestre os vê. Cada campanha tem um código (em `codigos/<CÓDIGO>`) e uma senha: a senha nunca é guardada, só um resumo SHA-256 dela com a campanha, usado como ID de um documento que só o mestre cria e que ninguém pode listar. Ao entrar, o jogador grava uma participação que cita esse resumo, e as regras só aceitam se ele existir para aquela campanha, então a senha errada é recusada pelo servidor. O jogador só lê as campanhas em que entrou, os documentos e resumos delas e o mapa transmitido para elas. Os convites de uso único continuam valendo e dão acesso só à campanha do convite. **Depois de atualizar o site, publique de novo o `firestore.rules` no console do Firebase.**
 
 ## Arquivos
 
