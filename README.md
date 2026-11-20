@@ -5,7 +5,7 @@
 
 **[Versão com mesa ao vivo e fichas compartilhadas](https://claude.ai/artifact/1wUYbQ513Syib6KfoBeN8k)** · no claude.ai, só para quem o mestre convidar.
 
-<sub>Última atualização: 19/11/2026 às 14:06 (horário de Brasília). O GitHub Pages publica a versão nova poucos minutos depois de cada envio.</sub>
+<sub>Última atualização: 20/11/2026 às 19:09 (horário de Brasília). O GitHub Pages publica a versão nova poucos minutos depois de cada envio.</sub>
 <!-- LINKS:FIM -->
 
 Mapas e fichas de RPG de mesa numa página só. O botão **Mapa | Fichas** no topo troca de seção sem sair da página, e as duas partes conversam entre si.
@@ -26,7 +26,7 @@ Mapas e fichas de RPG de mesa numa página só. O botão **Mapa | Fichas** no to
 
 - **Sistemas:** D&D 5e (tema pergaminho), Ordem Paranormal (tema dossiê) e Etmos (caderno lavanda).
 - **Etmos no combate:** o jogador vê os símbolos das partículas que conhece, separados em funções, objetos, características e complementos, escolhe a ordem e confirma; a página mostra a palavra montada e os símbolos em sequência.
-- **Tela inicial:** depois do login, a pessoa escolhe **Sou mestre** (mapas, campanhas, bestiário, transmissão) ou **Sou jogador** (entrar com código e senha, as campanhas em que já está e fichas livres). Dá para trocar de papel pela tela inicial.
+- **Tela inicial:** o endereço do site abre a escolha entre **Sou mestre** (mapas, campanhas, bestiário, transmissão), **Sou jogador** (entrar com código e senha, as campanhas em que já está e fichas livres) e **Só o mapa** (o editor de mapas direto). O botão **Início**, no topo, volta para ela de qualquer lugar.
 - **Código e senha:** toda campanha tem um código e uma senha definidos pelo mestre. O jogador entra uma vez e a campanha fica na lista dele. Dentro dela, vê só as próprias fichas, os documentos e resumos que o mestre publicar e o mapa transmitido.
 - **Acesso:** cada jogador edita só as próprias fichas; o mestre vê e edita todas, e tem NPCs e notas que só ele lê.
 - **Cálculos automáticos:** modificadores, perícias, salvaguardas, CD e ataque de magia (D&D); PV, PE e SAN por classe e NEX, defesa e carga (Ordem Paranormal).

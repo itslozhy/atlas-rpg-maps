@@ -148,7 +148,7 @@ window.MESA_NUVEM=Object.freeze({kind:'firebase',limpaCodigo,
   /* choosing a role moves to the matching space: your own as master, or the table you were last at as player */
   setPapel(p,hash){const u=state.user;if(!u)return;lsSet('mesa.papel.'+u.uid,p);if(p==='mestre')lsSet('mesa.espaco.'+u.uid,u.uid);else lsSet('mesa.espaco.'+u.uid,u.uid);location.hash=hash||'inicio';location.reload();},
   entrarCampanha(m,c){const u=state.user;if(!u)return;lsSet('mesa.papel.'+u.uid,'jogador');lsSet('mesa.espaco.'+u.uid,m);lsSet('mesa.camp.'+u.uid,c);location.hash='campanha-'+c;location.reload();},
-  voltarAoInicio(){const u=state.user;if(!u)return;lsSet('mesa.espaco.'+u.uid,u.uid);location.hash='inicio';location.reload();},
+  voltarAoInicio(h){const u=state.user;if(!u)return;lsSet('mesa.espaco.'+u.uid,u.uid);location.hash=h||'inicio';location.reload();},
   async minhasCampanhas(){const u=state.user;if(!u)return [];let l=[];try{const q=await state.F.getDocs(state.F.collection(state.fs,'usuarios/'+u.uid+'/campanhas'));l=q.docs.map(d=>Object.assign({id:d.id},d.data())).filter(x=>x.m&&x.c);}catch(e){return [];}
     const ms=[...new Set(l.map(x=>x.m))];const nm={};await Promise.all(ms.map(async id=>{try{const d=await raw.get('perfis/'+id);nm[id]=d&&(d.nome||(d.user?'@'+d.user:''))||'';}catch(e){}}));
     return l.map(x=>Object.assign(x,{mestre:nm[x.m]||''})).sort((a,b)=>(b.em||0)-(a.em||0));},

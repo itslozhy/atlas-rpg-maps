@@ -150,7 +150,7 @@ window.MESA_NUVEM=Object.freeze({kind:'firebase',limpaCodigo,
   /* choosing a role moves to the matching space: your own as master, or the table you were last at as player */
   setPapel(p,hash){const u=state.user;if(!u)return;lsSet('mesa.papel.'+u.uid,p);if(p==='mestre')lsSet('mesa.espaco.'+u.uid,u.uid);else lsSet('mesa.espaco.'+u.uid,u.uid);location.hash=hash||'inicio';location.reload();},
   entrarCampanha(m,c){const u=state.user;if(!u)return;lsSet('mesa.papel.'+u.uid,'jogador');lsSet('mesa.espaco.'+u.uid,m);lsSet('mesa.camp.'+u.uid,c);location.hash='campanha-'+c;location.reload();},
-  voltarAoInicio(){const u=state.user;if(!u)return;lsSet('mesa.espaco.'+u.uid,u.uid);location.hash='inicio';location.reload();},
+  voltarAoInicio(h){const u=state.user;if(!u)return;lsSet('mesa.espaco.'+u.uid,u.uid);location.hash=h||'inicio';location.reload();},
   async minhasCampanhas(){const u=state.user;if(!u)return [];let l=[];try{const q=await state.F.getDocs(state.F.collection(state.fs,'usuarios/'+u.uid+'/campanhas'));l=q.docs.map(d=>Object.assign({id:d.id},d.data())).filter(x=>x.m&&x.c);}catch(e){return [];}
     const ms=[...new Set(l.map(x=>x.m))];const nm={};await Promise.all(ms.map(async id=>{try{const d=await raw.get('perfis/'+id);nm[id]=d&&(d.nome||(d.user?'@'+d.user:''))||'';}catch(e){}}));
     return l.map(x=>Object.assign(x,{mestre:nm[x.m]||''})).sort((a,b)=>(b.em||0)-(a.em||0));},
@@ -347,7 +347,7 @@ ol.steps{margin:8px 0 0;padding-left:20px;font-size:14px;line-height:1.5;color:v
 <div class="app">
   <header class="top">
     <div class="brand">Atlas <b>do</b> Mestre</div>
-    <nav class="viewsw" aria-label="Seção"><button type="button" data-go="mapa" aria-pressed="true">Mapa</button><button type="button" data-go="fichas" aria-pressed="false">Fichas</button></nav>
+    <nav class="viewsw" aria-label="Seção"><button type="button" data-go="inicio" aria-pressed="false" title="Tela inicial: mestre, jogador ou mapa">Início</button><button type="button" data-go="mapa" aria-pressed="true">Mapa</button><button type="button" data-go="fichas" aria-pressed="false">Fichas</button></nav>
     <button class="btn" id="parentBtn" hidden title="Voltar ao mapa de cima"></button>
     <input id="mapName" type="text" aria-label="Nome do mapa" value="">
     <select id="scaleSel" aria-label="Escala do mapa">
@@ -1091,6 +1091,7 @@ ul.rolls .t{color:var(--muted);font-variant-numeric:tabular-nums}ul.rolls .w{fon
 .rolecard,.hubcard{display:flex;flex-direction:column;gap:6px;align-items:flex-start;text-align:left;padding:20px;border-radius:14px;border:1px solid var(--line);background:var(--panel);color:var(--fg);font:inherit;cursor:pointer;box-shadow:var(--shadow);transition:transform .12s,border-color .12s}
 .rolecard:hover,.hubcard:hover{transform:translateY(-2px);border-color:var(--accent)}.rolecard b{font-family:var(--f-title);font-weight:400;font-size:26px}.hubcard b{font-family:var(--f-title);font-weight:400;font-size:20px}
 .rolecard span:last-child,.hubcard span:last-child{color:var(--muted);font-size:14.5px;line-height:1.4}.ri{font-size:30px;line-height:1}.hubcard{padding:14px 16px;box-shadow:none}.hubcard .ri{font-size:22px}
+.rolecard:disabled{opacity:.55;cursor:not-allowed;transform:none}
 .rolebar{display:flex;gap:10px;align-items:center;flex-wrap:wrap;color:var(--muted);font-size:14px;margin-bottom:6px}
 .pblock{margin:18px 0 26px}.pblock h2{font-family:var(--f-title);font-weight:400;margin:0 0 4px}
 .joinform{display:flex;gap:10px;align-items:flex-end;flex-wrap:wrap;background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:12px 14px;margin-top:8px}.joinform .field{min-width:160px;flex:1 1 160px}
@@ -1105,7 +1106,7 @@ ul.rolls .t{color:var(--muted);font-variant-numeric:tabular-nums}ul.rolls .w{fon
 
 <header class="top">
   <a class="brand" href="#inicio">Grimório <b>do</b> Mestre</a>
-  <nav class="viewsw" aria-label="Seção"><button type="button" data-go="mapa" aria-pressed="false">Mapa</button><button type="button" data-go="fichas" aria-pressed="true">Fichas</button></nav>
+  <nav class="viewsw" aria-label="Seção"><button type="button" data-go="inicio" aria-pressed="false" title="Tela inicial: mestre, jogador ou mapa">Início</button><button type="button" data-go="mapa" aria-pressed="false">Mapa</button><button type="button" data-go="fichas" aria-pressed="true">Fichas</button></nav>
   <nav class="crumbs" id="crumbs" aria-label="Caminho"></nav>
   <span class="status" id="status">Conectando…</span>
   <span class="who" id="who"></span>
@@ -1125,17 +1126,18 @@ ul.rolls .t{color:var(--muted);font-variant-numeric:tabular-nums}ul.rolls .w{fon
 <script id="ponte">
 /* Bridge between the map and the sheets: one page, two sections, chosen by the address (#mapa, #mesa-…, #inicio, #campanha-…, #ficha-…). */
 (()=>{'use strict';
-const FICHAS=/^#(inicio|campanha-|ficha-|entrar-|convite-)/;
+const FICHAS=/^#(inicio|mestre|jogador|campanha-|ficha-|entrar-|convite-)/;
 const ss={get(k){try{return sessionStorage.getItem(k)}catch(e){return null}},set(k,v){try{sessionStorage.setItem(k,v)}catch(e){}}};
 const viewListeners=new Set(),roots=new Set([document]);
 let last=null,lastF=ss.get('mesa.lastF')||'#inicio',lastM=ss.get('mesa.lastM')||'#mapa';
-const view=()=>FICHAS.test(location.hash)?'fichas':'mapa';
-function mark(){const v=view();for(const r of roots)for(const b of r.querySelectorAll('.viewsw [data-go]'))b.setAttribute('aria-pressed',String(b.dataset.go===v));}
+const atStart=()=>!location.hash||location.hash==='#'||location.hash==='#inicio';
+const view=()=>atStart()||FICHAS.test(location.hash)?'fichas':'mapa';
+function mark(){const v=atStart()?'inicio':view();for(const r of roots)for(const b of r.querySelectorAll('.viewsw [data-go]'))b.setAttribute('aria-pressed',String(b.dataset.go===v));}
 function apply(){const v=view(),changed=v!==last;last=v;document.body.dataset.view=v;const h=document.getElementById('fichas');if(h)h.hidden=v!=='fichas';
-  if(v==='fichas'){lastF=location.hash;ss.set('mesa.lastF',lastF);}else{lastM=location.hash||'#mapa';ss.set('mesa.lastM',lastM);}
+  if(v==='fichas'){lastF=location.hash||'#inicio';ss.set('mesa.lastF',lastF);}else{lastM=location.hash||'#mapa';ss.set('mesa.lastM',lastM);}
   mark();for(const f of viewListeners)try{f(v,changed);}catch(e){console.error(e);}}
 const Mesa=window.Mesa={view,
-  go(v,hash){const t=hash||(v==='fichas'?lastF:(Mesa.mapTarget&&Mesa.mapTarget())||(/^#mesa-/.test(lastM)?'#mapa':lastM));if(location.hash===t){apply();return;}location.hash=t;},
+  go(v,hash){if(v==='inicio'){v='fichas';hash='#inicio';}const t=hash||(v==='fichas'?((lastF==='#inicio'&&Mesa.fichasHome&&Mesa.fichasHome())||lastF):(Mesa.mapTarget&&Mesa.mapTarget())||(/^#mesa-/.test(lastM)?'#mapa':lastM));if(location.hash===t){apply();return;}location.hash=t;},
   onView(f){viewListeners.add(f);},
   wire(root){roots.add(root);for(const b of root.querySelectorAll('.viewsw [data-go]'))b.onclick=()=>Mesa.go(b.dataset.go);mark();},
   mapTarget:null};
@@ -5010,7 +5012,7 @@ for(const b of $('#trayMode').children)b.onclick=()=>{trayMode=b.dataset.m;for(c
 for(const f of[4,6,8,10,12,20,100]){const b=document.createElement('button');b.textContent='d'+f;b.onclick=()=>rollExpr('d'+f,'1d'+f);$('#trayDice').appendChild(b);}
 
 /* ================= ROUTING ================= */
-function route(){const h=location.hash.slice(1);let m;if((m=h.match(/^entrar-([A-Za-z0-9-]+)$/)))return {v:'oldjoin',id:m[1]};if((m=h.match(/^convite-(?:[A-Za-z0-9_-]+~)?([A-Za-z0-9-]+)$/)))return {v:'invite',id:m[1]};if((m=h.match(/^campanha-([A-Za-z0-9-]+)$/)))return {v:'camp',id:m[1]};if((m=h.match(/^ficha-([A-Za-z0-9-]+)$/)))return {v:'ficha',id:m[1]};return {v:'home'};}
+function route(){const h=location.hash.slice(1);let m;if((m=h.match(/^entrar-([A-Za-z0-9-]+)$/)))return {v:'oldjoin',id:m[1]};if((m=h.match(/^convite-(?:[A-Za-z0-9_-]+~)?([A-Za-z0-9-]+)$/)))return {v:'invite',id:m[1]};if((m=h.match(/^campanha-([A-Za-z0-9-]+)$/)))return {v:'camp',id:m[1]};if((m=h.match(/^ficha-([A-Za-z0-9-]+)$/)))return {v:'ficha',id:m[1]};if(h==='mestre')return {v:'mestre'};if(h==='jogador')return {v:'jogador'};return {v:'home'};}
 Mesa.onView((v,changed)=>{if(v!=='fichas')return;if(changed)HOST.scrollTop=0;render();});
 const ui={campTab:'grupo',sheetTab:{}};
 
@@ -5019,26 +5021,34 @@ function crumbs(parts){$('#crumbs').innerHTML=parts.map((p,i)=>(i?'<span aria-hi
 function render(){rebuildCustom();const app=$('#app');const tb=$('.top');if(tb)HOST.style.setProperty('--toph',tb.offsetHeight+'px');$('#who').innerHTML=!S.papel&&(S.owner||S.mode==='local')?(S.mode==='local'?'<b>Modo local</b>':''):(S.mode==='local'?'<b>Modo local</b> · ':'')+(S.master?'Você é o <b>mestre</b>':'Você é <b>jogador</b>');
   if(!S.ready){app.innerHTML='<p class="lead">Carregando as campanhas…</p>';return;}const r=route();
   if(r.v==='invite')return viewInvite(app,r.id);
-  if(r.v==='oldjoin'){crumbs([['Campanhas','#inicio']]);app.innerHTML='<div class="join"><h1 class="view">Convite</h1><div class="empty">Este link de convite é antigo e não vale mais. Cada ficha agora tem o próprio convite: peça um novo ao mestre.</div></div>';return;}
-  if(r.v==='camp'&&S.camps[r.id])return viewCamp(app,S.camps[r.id]);if(r.v==='ficha'){const sh=findSheet(r.id);if(sh)return viewSheet(app,sh);app.innerHTML='<div class="empty">Ficha não encontrada. Ela pode ter sido apagada ou ainda estar carregando.</div>';crumbs([['Campanhas','#inicio']]);return;}
-  if(r.v==='camp'&&!S.camps[r.id]&&!S.master){crumbs([['Início','#inicio']]);app.innerHTML='<div class="empty">Você não está nesta campanha. Peça o código e a senha ao mestre e entre pela tela inicial.</div>';return;}
-  viewHome(app);}
+  if(r.v==='oldjoin'){crumbs([['Campanhas',HUB()]]);app.innerHTML='<div class="join"><h1 class="view">Convite</h1><div class="empty">Este link de convite é antigo e não vale mais. Cada ficha agora tem o próprio convite: peça um novo ao mestre.</div></div>';return;}
+  if(r.v==='camp'&&S.camps[r.id])return viewCamp(app,S.camps[r.id]);if(r.v==='ficha'){const sh=findSheet(r.id);if(sh)return viewSheet(app,sh);app.innerHTML='<div class="empty">Ficha não encontrada. Ela pode ter sido apagada ou ainda estar carregando.</div>';crumbs([['Campanhas',HUB()]]);return;}
+  if(r.v==='camp'&&!S.camps[r.id]&&!S.master){crumbs([['Início','#inicio'],['Jogador','#jogador']]);app.innerHTML='<div class="empty">Você não está nesta campanha. Peça o código e a senha ao mestre e entre pela área do jogador.</div>';return;}
+  if(r.v==='mestre')return viewMasterHome(app);if(r.v==='jogador')return viewJogador(app);
+  viewPicker(app);}
 function campCount(cid){return allSheets().filter(s=>s.camp===cid&&s.kind==='pc').length;}
 /* ================= START SCREEN ================= */
 function joinedCamp(cid){if(S.master)return true;if(S.fb)return !!S.camps[cid];return !!S.joined[cid]||allSheets().some(s=>s.camp===cid&&s.owner===S.uid);}
-function setPapel(p){if(NV){NV.setPapel(p,'#inicio');return;}if(p)store.set('mesa.papel',p);else{try{localStorage.removeItem('mesa.papel');}catch(e){}}location.hash='inicio';location.reload();}
-function roleBar(){return `<div class="rolebar"><span>Você está como <b>${S.master?'mestre':'jogador'}</b>.</span>${S.owner||S.mode==='local'?'<button class="btn small" id="trocaPapel">Trocar de papel</button>':''}</div>`;}
-function bindRoleBar(app){const b=app.querySelector('#trocaPapel');if(b)b.onclick=()=>setPapel('');}
-function viewPicker(app){crumbs([['Início','#inicio']]);
-  app.innerHTML=`<div class="start"><h1 class="view">Mesa do Mestre</h1><p class="lead">Como você vai usar a mesa agora? Dá para trocar depois, pela tela inicial.</p>
+const HUB=()=>S.master?'#mestre':'#jogador';
+Mesa.fichasHome=()=>S.papel?HUB():null;
+function setPapel(p,hash){hash=hash||'#inicio';if(NV){NV.setPapel(p,hash);return;}if(p)store.set('mesa.papel',p);else{try{localStorage.removeItem('mesa.papel');}catch(e){}}location.hash=hash.slice(1);location.reload();}
+/* open a role's area: switch role (and, on the site, space) only when needed */
+function abrirPapel(p){if(p==='mestre'){if(S.master&&S.papel==='mestre'){location.hash='mestre';return;}if(!S.owner&&S.mode!=='local'){toast('Aqui só o dono da página pode ser mestre.');return;}setPapel('mestre','#mestre');return;}
+  if(!S.master&&S.papel==='jogador'&&(!S.fb||S.proprio)){location.hash='jogador';return;}setPapel('jogador','#jogador');}
+function roleBar(){return `<div class="rolebar"><a class="btn small" href="#inicio">← Início</a><span>Você está como <b>${S.master?'mestre':'jogador'}</b>.</span></div>`;}
+function bindRoleBar(app){}
+function viewPicker(app){crumbs([['Início','#inicio']]);const podeMestre=S.owner||S.mode==='local';
+  app.innerHTML=`<div class="start"><h1 class="view">Mesa do Mestre</h1><p class="lead">Mapas, fichas e a mesa ao vivo num lugar só. Como você vai usar agora? Dá para voltar aqui pelo botão <b>Início</b>, no topo.</p>
     <div class="roles"><button type="button" class="rolecard" data-papel="mestre"><span class="ri" aria-hidden="true">🗺️</span><b>Sou mestre</b><span>Crie mapas e campanhas, defina o código e a senha de cada mesa, cuide de NPCs, bestiário, diário e documentos, e transmita o mapa para os jogadores.</span></button>
-      <button type="button" class="rolecard" data-papel="jogador"><span class="ri" aria-hidden="true">🎲</span><b>Sou jogador</b><span>Entre numa campanha com o código e a senha que o mestre te passou, veja as campanhas em que já está ou crie fichas livres.</span></button></div>
+      <button type="button" class="rolecard" data-papel="jogador"><span class="ri" aria-hidden="true">🎲</span><b>Sou jogador</b><span>Entre numa campanha com o código e a senha que o mestre te passou, veja as campanhas em que já está ou crie fichas livres.</span></button>
+      <button type="button" class="rolecard" data-papel="mapa"><span class="ri" aria-hidden="true">🧭</span><b>Só o mapa</b><span>Abra direto o editor de mapas, sem campanha: mundos, reinos, cidades e masmorras, em 3/4 ou vistos de cima.</span></button></div>
     ${S.mode==='local'?'<p class="note">Sem conta, tudo fica só neste navegador. Para jogar com outras pessoas, entre com a conta (no site) ou use a página pelo claude.ai.</p>':''}</div>`;
-  for(const b of app.querySelectorAll('[data-papel]'))b.onclick=()=>setPapel(b.dataset.papel);}
+  if(!podeMestre){const b=app.querySelector('[data-papel="mestre"]');b.disabled=true;b.querySelector('span:last-child').textContent='Nesta página só o dono é mestre. Você pode jogar ou usar o editor de mapas.';}
+  for(const b of app.querySelectorAll('[data-papel]'))b.onclick=()=>{const p=b.dataset.papel;if(p==='mapa'){Mesa.go('mapa','#mapa');return;}abrirPapel(p);};}
 function masterHub(){return `<div class="hub"><button type="button" class="hubcard" id="hubMapa"><span class="ri" aria-hidden="true">🗺️</span><b>Mapas</b><span>Criar e editar mapas, cidades e masmorras.</span></button>
   <button type="button" class="hubcard" id="hubCamp"><span class="ri" aria-hidden="true">📜</span><b>Nova campanha</b><span>Sistema, código e senha para os jogadores.</span></button>
   <button type="button" class="hubcard" id="hubBest"><span class="ri" aria-hidden="true">🐉</span><b>Bestiário</b><span>Criaturas e NPCs para reaproveitar.</span></button></div>`;}
-function viewPlayerHub(app){crumbs([['Início','#inicio']]);const livres=allSheets().filter(s=>s.owner===S.uid&&!s.camp);
+function viewPlayerHub(app){crumbs([['Início','#inicio'],['Jogador','#jogador']]);const livres=allSheets().filter(s=>s.owner===S.uid&&!s.camp);
   const camps=S.fb?null:Object.values(S.camps).filter(c=>joinedCamp(c.id));
   app.innerHTML=`${roleBar()}<h1 class="view">Jogador</h1>
     <section class="pblock"><h2>Entrar numa campanha</h2><p class="note">Use o código e a senha que o mestre te passou. Depois da primeira vez, a campanha fica na sua lista.</p>
@@ -5059,10 +5069,10 @@ function viewPlayerHub(app){crumbs([['Início','#inicio']]);const livres=allShee
     for(const b of box.querySelectorAll('[data-ent]'))b.onclick=()=>{const [m,c]=b.dataset.ent.split('|');NV.entrarCampanha(m,c);};
     for(const b of box.querySelectorAll('[data-sai]'))b.onclick=()=>confirmBox('Sair desta campanha? Você deixa de ver a campanha, o mapa e os documentos dela. Para voltar, use o código e a senha de novo.',async()=>{const [m,c]=b.dataset.sai.split('|');await NV.sairDaCampanha(m,c);render();});});}
 async function shaHex(t){const b=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(t));return [...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,'0')).join('');}
-function viewHome(app){
-  if(!S.papel&&(S.owner||S.mode==='local'))return viewPicker(app);
-  if(!S.master){if(S.fb&&!S.proprio){app.innerHTML='<p class="lead">Voltando à sua tela inicial…</p>';NV.voltarAoInicio();return;}return viewPlayerHub(app);}
-  crumbs([['Início','#inicio']]);const camps=Object.values(S.camps).filter(c=>S.master||allSheets().some(s=>s.camp===c.id&&s.owner===S.uid)).sort((a,b)=>(b.createdAt||0)-(a.createdAt||0));
+function viewJogador(app){if(S.master||(S.fb&&!S.proprio)){app.innerHTML='<p class="lead">Abrindo a área do jogador…</p>';if(S.master)setPapel('jogador','#jogador');else NV.voltarAoInicio('#jogador');return;}return viewPlayerHub(app);}
+function viewMasterHome(app){
+  if(!S.master){if(!S.owner&&S.mode!=='local'){viewPicker(app);return;}app.innerHTML='<p class="lead">Abrindo a área do mestre…</p>';setPapel('mestre','#mestre');return;}
+  crumbs([['Início','#inicio'],['Mestre','#mestre']]);const camps=Object.values(S.camps).filter(c=>S.master||allSheets().some(s=>s.camp===c.id&&s.owner===S.uid)).sort((a,b)=>(b.createdAt||0)-(a.createdAt||0));
   const banner=S.readOnlyMsg?`<div class="banner">${esc(S.readOnlyMsg)}</div>`:'';
   const intro=S.master?'Crie uma campanha, escolha o sistema e convide os jogadores. Cada um preenche a própria ficha; você vê e edita todas, além de NPCs e notas que só você enxerga.':'Aqui ficam as mesas onde você tem fichas. Para criar uma ficha, use o convite que o mestre te enviar.';
   app.innerHTML=`${banner}${roleBar()}${masterHub()}<h1 class="view">Campanhas</h1><p class="lead">${intro}</p>
@@ -5099,7 +5109,7 @@ function campForm(c){const isNew=!c;c=c||{id:uid(),nome:'',sys:'dnd',desc:'',cre
       if((!c.codigo||isNew)&&pass.length<4){er.textContent='Defina uma senha com pelo menos 4 caracteres.';$('#cPass').focus();return;}if(pass&&pass.length<4){er.textContent='A senha precisa de pelo menos 4 caracteres.';return;}
       const ok=await salvarAcesso(c,code,pass||null,er);if(!ok)return;}
     closeModal();await saveCamp(c);location.hash='campanha-'+c.id;render();};
-  const del=$('#cDel');if(del)del.onclick=()=>confirmBox(`Apagar “${c.nome}”? As fichas continuam guardadas, mas a campanha some da lista.`,async()=>{if(NV)await NV.removerAcesso(c.id);await removeCamp(c);location.hash='inicio';render();});}
+  const del=$('#cDel');if(del)del.onclick=()=>confirmBox(`Apagar “${c.nome}”? As fichas continuam guardadas, mas a campanha some da lista.`,async()=>{if(NV)await NV.removerAcesso(c.id);await removeCamp(c);location.hash='mestre';render();});}
 function hpOf(sh){if(sh.sys==='sacra'){const t=sacV(sh,'vida');return [t-num(sh.vidaMarc),t];}if(sh.sys==='etmos'){const l=etLimF(sh);return [l-num(sh.ferimentos),l];}if(sh.sys==='op'){const mx=opMax(sh,'pv');return [num(sh.pv),mx];}return [num(sh.pv),num(sh.pvMax)];}
 function setHpVal(sh,v){const [,mx]=hpOf(sh);if(sh.sys==='sacra'){sh.vidaMarc=clamp(mx-v,0,mx);return;}if(sh.sys==='etmos')sh.ferimentos=clamp(mx-v,0,mx);else sh.pv=clamp(v,-mx,mx);}
 function barColor(f){return f>.5?'#3f9a5a':f>.25?'#d4a42c':'#c0392b';}
@@ -5113,7 +5123,7 @@ function pcCard(sh,camp){const [pv,mx]=hpOf(sh),f=mx>0?clamp(pv/mx,0,1):0;const 
   return `<article class="card pc"><div class="hd"><span class="av${portraitThumb(sh)?' pic':''}" style="background:${safeColor(sh.cor)}">${portraitThumb(sh)?`<img src="${esc(portraitThumb(sh))}" alt="">`:esc(ini)}</span><div><h3>${esc(sh.nome||'Sem nome')}</h3>${sh.criacao==='rascunho'?'<span class="draft">Em criação</span>':''}<div class="meta">${esc(subOf(sh))}${owner?' · '+esc(owner):''}</div></div></div>
     <div><div class="row" style="justify-content:space-between;font-size:13px"><span>${sh.sys==='op'?'PV':sh.sys==='etmos'?'Ferimentos restantes':sh.sys==='sacra'?'Círculos de Vida':'Pontos de vida'}</span><b class="num">${pv} / ${mx}${num(sh.pvTemp)?` (+${num(sh.pvTemp)})`:''}</b></div><div class="bar"><i style="width:${f*100}%;background:${barColor(f)}"></i></div></div>
     <div class="stats">${stats}</div>${(sh.cond||[]).length?`<div class="chips">${sh.cond.map(c=>`<span class="chip">${esc(c)}</span>`).join('')}</div>`:''}${quick}</article>`;}
-function viewCamp(app,c){lastCamp=c.id;try{sessionStorage.setItem('mesa.camp',c.id);}catch(e){}crumbs([['Campanhas','#inicio'],[c.nome,'#campanha-'+c.id]]);
+function viewCamp(app,c){lastCamp=c.id;try{sessionStorage.setItem('mesa.camp',c.id);}catch(e){}crumbs([['Campanhas',HUB()],[c.nome,'#campanha-'+c.id]]);
   const sheets=allSheets().filter(s=>s.camp===c.id&&(S.master||s.owner===S.uid));const pcs=sheets.filter(s=>s.kind==='pc'),npcs=sheets.filter(s=>s.kind==='npc');
   resolveNames([...new Set(sheets.map(s=>s.owner).filter(o=>o&&o!==S.uid))]).then(()=>{if(!S.names.__done&&sheets.some(s=>s.owner&&s.owner!==S.uid)){S.names.__done=1;if(route().v==='camp')render();}});
   const nLog=S.master?campLogs(c.id).filter(l=>(l.fim||0)>seenLogs(c.id)).length+allSheets().filter(s=>s.camp===c.id&&s.owner).reduce((a,s)=>a+Object.keys(s.pendentes||{}).length,0):0;
@@ -6398,8 +6408,8 @@ function portraitEditor(sh){const cur=sh.retrato||null;const curSpec=cur&&cur.ti
 
 /* ================= SHEET VIEW ================= */
 const F=(k,label,o={})=>`<label class="${o.cls||''}" style="display:flex;flex-direction:column;gap:2px;min-width:0"><span class="lbl">${label}</span>${o.sel?`<select data-k="${k}">${o.sel.map(v=>Array.isArray(v)?`<option value="${esc(v[0])}">${esc(v[1])}</option>`:`<option>${esc(v)}</option>`).join('')}</select>`:`<input data-k="${k}"${o.n?` type="number" data-t="n"${o.min!=null?` min="${o.min}"`:''}${o.max!=null?` max="${o.max}"`:''}`:''} placeholder="${esc(o.ph||'')}">`}</label>`;
-function viewSheet(app,sh){const camp=S.camps[sh.camp];crumbs([['Campanhas','#inicio']].concat(camp?[[camp.nome,'#campanha-'+camp.id]]:[]).concat([[sh.nome||'Ficha','#ficha-'+sh.id]]));
-  const ro=!canEdit(sh);if(!S.master&&sh.owner!==S.uid){app.innerHTML='<div class="empty">Esta ficha não é sua.</div>';crumbs([['Campanhas','#inicio']]);return;}const tab=ui.sheetTab[sh.id]||(sh.sys==='etmos'||sh.sys==='sacra'?'personagem':'principal');const sc=HOST.scrollTop;
+function viewSheet(app,sh){const camp=S.camps[sh.camp];crumbs([['Campanhas',HUB()]].concat(camp?[[camp.nome,'#campanha-'+camp.id]]:[]).concat([[sh.nome||'Ficha','#ficha-'+sh.id]]));
+  const ro=!canEdit(sh);if(!S.master&&sh.owner!==S.uid){app.innerHTML='<div class="empty">Esta ficha não é sua.</div>';crumbs([['Campanhas',HUB()]]);return;}const tab=ui.sheetTab[sh.id]||(sh.sys==='etmos'||sh.sys==='sacra'?'personagem':'principal');const sc=HOST.scrollTop;
   const body=sh.sys==='op'?opSheet(sh,tab):sh.sys==='etmos'?etSheet(sh,tab):sh.sys==='sacra'?sacSheet(sh,tab):dndSheet(sh,tab);
   app.innerHTML=`${S.readOnlyMsg?`<div class="banner">${esc(S.readOnlyMsg)}</div>`:''}<div id="sheetRoot" class="sheet ${sh.sys}">${pendList(sh,S.master)}${sh.criacao==='rascunho'?(sh.owner===S.uid&&!S.master?`<div class="draftbar"><span><b>Ficha em criação.</b> Preencha com calma. Quando terminar, conclua: a partir daí o mestre acompanha cada alteração no registro.</span><button type="button" class="btn small" id="shDone">Concluir criação</button></div>`:'<div class="draftbar"><span><b>Em criação.</b> O jogador ainda não concluiu esta ficha.</span></div>'):''}${ro?'<div class="ro-note">Somente leitura: esta ficha é de outro jogador.</div>':''}<fieldset ${ro?'disabled':''}>${body}</fieldset>
     <div class="tools"><span class="note" style="margin-right:auto;color:var(--sm)">${sh.kind==='npc'?(sh.owner&&sh.owner!==S.uid?'NPC criado por convite · visível para você e para quem o criou':'NPC · visível só para o mestre'):''}</span>${window.Atlas&&Atlas.hasToken(sh.id)?'<button class="btn small" id="shMap">Mostrar no mapa</button>':''}${S.master&&sh.kind==='npc'?'<button class="btn small" id="shBest">Salvar no bestiário</button>':''}<button class="btn small" id="shLink">Copiar link da ficha</button>${canEdit(sh)?'<button class="btn small danger" id="shDel">Apagar ficha</button>':''}</div></div>`;
@@ -6422,7 +6432,7 @@ function bindSheet(root,sh){
   for(const b of root.querySelectorAll('[data-cast]'))b.onclick=()=>{const r=sh.rituais[num(b.dataset.cast)];const c=num(r.custo);if(num(sh.pe)<c){toast('PE insuficiente para conjurar.');return;}sh.pe=num(sh.pe)-c;queueSave(sh);toast(`${r.nome||'Ritual'} conjurado: −${c} PE.`);render();};
   const dn=$('#shDone');if(dn)dn.onclick=()=>{sh.criacao='pronta';sh.criadaEm=Date.now();logBase[sh.id]=clone(sh);queueSave(sh);writeLogNow(sh,[{k:'Ficha concluída',para:sh.nome||''}],'criada');toast('Ficha concluída. O mestre foi avisado.');render();};
   const sbb=$('#shBest');if(sbb)sbb.onclick=()=>saveToBest(sh);
-  $('#shLink').onclick=()=>copyText(APP_URL+'#ficha-'+sh.id);const sm=$('#shMap');if(sm)sm.onclick=()=>Atlas.showToken(sh.id);const d=$('#shDel');if(d)d.onclick=()=>confirmBox(`Apagar a ficha “${sh.nome||'sem nome'}”? Isso não pode ser desfeito.`,async()=>{const cid=sh.camp;await removeSheet(sh);location.hash=cid?'campanha-'+cid:'inicio';render();});
+  $('#shLink').onclick=()=>copyText(APP_URL+'#ficha-'+sh.id);const sm=$('#shMap');if(sm)sm.onclick=()=>Atlas.showToken(sh.id);const d=$('#shDel');if(d)d.onclick=()=>confirmBox(`Apagar a ficha “${sh.nome||'sem nome'}”? Isso não pode ser desfeito.`,async()=>{const cid=sh.camp;await removeSheet(sh);location.hash=cid?'campanha-'+cid:HUB().slice(1);render();});
   if(sh.sys==='etmos')bindEtmos(root,sh);
   const pt=$('#shPortrait');if(pt&&canEdit(sh))pt.onclick=()=>portraitEditor(sh);
   bindPend(root);for(const b of root.querySelectorAll('[data-cancelp]'))b.onclick=()=>{if(sh.pendentes)delete sh.pendentes[b.dataset.cancelp];queueSave(sh);render();};
