@@ -1063,6 +1063,23 @@ h1.view{font-family:var(--f-title);font-weight:400;font-size:32px;margin:4px 0 4
 .sheet.sins[data-raca="goetia"] .box>h4::before,.sheet.sins[data-raca="goetia"] .box>h4::after{content:"✦";color:var(--rmetal);font-size:12px}
 .sheet.sins[data-raca="goetia"] .stabs button{font-size:15px;font-weight:700}
 .sheet.sins[data-raca="goetia"] .xid .portrait{border-color:var(--rmetal)}
+.sheet.sins .xatr{grid-template-columns:118px auto 34px 44px minmax(0,1fr)}
+.sheet.sins .xatrh{display:grid;grid-template-columns:118px 104px 34px 44px minmax(0,1fr);gap:4px 12px;padding:0 4px;font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--sm)}
+.sheet.sins .xatrh span{text-align:center}.sheet.sins .xatrh span:first-child{text-align:left}
+.sheet.sins .xbon{color:var(--rmetal);font-weight:700;text-align:center;font-size:15px}
+.sheet.sins .xtot{font-size:22px;text-align:center;color:color-mix(in srgb,var(--vc) 30%,#fff)}
+@media (max-width:520px){.sheet.sins .xatr{grid-template-columns:minmax(0,1fr) auto 30px 40px}.sheet.sins .xatrh{grid-template-columns:minmax(0,1fr) 104px 30px 40px}.sheet.sins .xatrh span:nth-child(5){display:none}}
+.sheet.sins .xpts{font-family:"Alegreya Sans",sans-serif;font-size:13px}
+.sheet.sins .xpts.left b{color:var(--rmetal);font-size:15px}.sheet.sins .xpts.over b{color:#ff5a5a;font-size:15px}
+.sheet.sins .xlivre{display:flex;flex-direction:column;gap:2px;max-width:280px;margin:0 0 8px}
+.sheet.sins .xnotice{margin:0 0 12px;padding:10px 14px;border:1px solid var(--vc);border-radius:10px;background:color-mix(in srgb,var(--vc) 14%,transparent);font-size:15px}
+.sheet.sins .xnotice>b{color:color-mix(in srgb,var(--vc) 30%,#fff)}
+.sheet.sins .xnotice.todo{border-color:var(--rmetal);background:color-mix(in srgb,var(--rmetal) 10%,transparent)}
+.sheet.sins .xnotice a{color:var(--rmetal)}
+.sheet.sins .xnotice .row{margin-top:8px}
+.sheet.sins .xgains{margin:8px 0 0;padding-left:18px;display:flex;flex-direction:column;gap:6px}
+.sheet.sins .xgains ul{list-style:none;margin:2px 0 0;padding:0;display:flex;flex-direction:column;gap:2px}
+.sheet.sins .xgains li.auto{color:var(--sm)}.sheet.sins .xgains li.pick{color:var(--sf)}
 .sheet.sins .check-line{display:flex;gap:8px;align-items:flex-start;cursor:pointer}
 .sheet.sins input[type=checkbox]{width:auto;flex:none;margin:4px 0 0;accent-color:var(--sa)}
 .sheet.etmos{--sbg:#e5e0f0;--sp:#eeeaf6;--sp2:#d9d2ea;--sf:#2b1830;--sm:#6b5875;--sa:#4a2350;--sab:#f4effa;--sl:#b6abc9;--sl2:#cdc4dc;--sh:#f7f4fc;
@@ -5038,16 +5055,16 @@ const SINS={id:'sins',n:'Seven Sins',
     ['investigacao','Investigação','ast'],['tecnologia','Tecnologia','ast'],['ocultismo','Ocultismo','ast'],['percepcao','Percepção','ast'],['medicina','Medicina','ast'],
     ['intimidacao','Intimidação','inf'],['magia','Magia Infernal','inf'],['vontade','Vontade','inf']],
   racas:{
-    imp:{n:'Imp',pv:10,pvNv:4,desloc:9,voo:0,atr:'+1 Agilidade',pts:6,max:3,def:1,rd:0,pp:0,inf:1,per:{acrobacia:2,reflexos:2},magia:'Só com grimório.',
+    imp:{n:'Imp',bon:{agi:1},livre:0,pv:10,pvNv:4,desloc:9,voo:0,atr:'+1 Agilidade',pts:6,max:3,def:1,rd:0,pp:0,inf:1,per:{acrobacia:2,reflexos:2},magia:'Só com grimório.',
       tracos:[['Pequeno e esquivo','+1 na Defesa.'],['Cauda ágil','+2 em Acrobacia e Reflexos.'],['Cria da rua','Vantagem para notar golpes, armadilhas e emboscadas na cidade.'],['Sem dom para magia','Só lança feitiços com grimório.']],
       dons:[['Golpe do Assassino',1,'Contra um alvo desprevenido ou que não te viu, o ataque causa +2d6 de dano.']]},
-    hellhound:{n:'Hellhound',pv:14,pvNv:4,desloc:12,voo:0,atr:'+1 Brutalidade',pts:6,max:3,def:0,rd:0,pp:0,inf:1,per:{percepcao:2},magia:'Só com grimório.',
+    hellhound:{n:'Hellhound',bon:{brut:1},livre:0,pv:14,pvNv:4,desloc:12,voo:0,atr:'+1 Brutalidade',pts:6,max:3,def:0,rd:0,pp:0,inf:1,per:{percepcao:2},magia:'Só com grimório.',
       tracos:[['Faro','+2 em Percepção e vantagem para rastrear pelo cheiro.'],['Garras e presas','Arma natural de 1d6 + Brutalidade.'],['Matilha','Você e um aliado adjacente ao mesmo inimigo ganham +1 no ataque contra ele.'],['Sem dom para magia','Só lança feitiços com grimório.']],
       dons:[['Uivo',1,'Aliados que ouvem ganham +1 no ataque até seu próximo turno. Inimigos a até 9 m testam Vontade ou ficam Amedrontados por 1 rodada.']]},
-    sinner:{n:'Sinner',pv:12,pvNv:4,desloc:9,voo:0,atr:'+1 em qualquer',pts:6,max:3,def:0,rd:0,pp:0,inf:1,per:{},magia:'Com o arquétipo Ocultista (Iniciado) ou o talento Sangue Arcano.',
+    sinner:{n:'Sinner',bon:{},livre:1,pv:12,pvNv:4,desloc:9,voo:0,atr:'+1 em qualquer',pts:6,max:3,def:0,rd:0,pp:0,inf:1,per:{},magia:'Com o arquétipo Ocultista (Iniciado) ou o talento Sangue Arcano.',
       tracos:[['Já está morto','No limite de morte fica Despedaçado e se recompõe em 1d4 dias. Só o Aço Angelical o destrói.'],['Pecado de origem','Ganha o bônus de um pecado, além do Vício.'],['Arquétipo de vida','Perícia do arquétipo treinada e 1 Manifestação dele.'],['Sobe na cadeia','O caminho mais comum até Overlord.']],
       dons:[]},
-    goetia:{n:'Ars Goetia',pv:20,pvNv:6,desloc:9,voo:18,atr:'+2 Inferno e +1 em qualquer',pts:8,max:4,def:0,rd:1,pp:6,inf:5,per:{ocultismo:4},magia:'Conjurador nato: todas as escolas, 2º círculo desde o nível 1 e 3º a partir do 3.',
+    goetia:{n:'Ars Goetia',bon:{inf:2},livre:1,pv:20,pvNv:6,desloc:9,voo:18,atr:'+2 Inferno e +1 em qualquer',pts:8,max:4,def:0,rd:1,pp:6,inf:5,per:{ocultismo:4},magia:'Conjurador nato: todas as escolas, 2º círculo desde o nível 1 e 3º a partir do 3.',
       tracos:[['Sangue da Ars Goetia','8 pontos de atributo, máximo +4; depois +2 Inferno e +1 em qualquer.'],['Corpo nobre','PV base 20, +6 PP, +6 + Brutalidade PV por nível, RD 1 natural.'],['Asas','Voo de 18 m.'],['Sangue nobre','Começa com Influência 5. Quem tem Influência menor tem desvantagem para te atacar ou mentir na primeira rodada.'],['Olhos estelares','+4 em Ocultismo, enxerga no escuro, vê magia e marcas de contrato.'],['Magia de sangue','Uma vez por cena, um feitiço de 1º círculo não custa PP.'],['Aura Estelar','Presença Esmagadora de graça; DT +2 contra quem tem Influência menor.'],['Talento cedo','Um Talento de Assinatura no nível 1.'],['Etiqueta da corte','Vantagem em Persuasão com nobres, desvantagem em Furtividade em público.'],['O fardo do título','Um dever, um rival nobre e um superior na sua história.']],
       dons:[['Travessia',2,'Uma vez por cena. Portal entre o Inferno e o mundo mortal por um minuto. Do outro lado, todos parecem humanos.'],['Voz da Nobreza',2,'Uma vez por cena. Um Imp, Hellhound ou Sinner de Influência menor testa Vontade DT 19 ou obedece a uma ordem.'],['Presença Esmagadora',1,'Inimigos a até 6 m testam Vontade ou ficam Amedrontados por 1 rodada.']]}},
   vicios:[['soberba','Soberba','+2 em Intimidação e Vontade',{intimidacao:2,vontade:2},'é admirado, elogiado ou humilha alguém'],['luxuria','Luxúria','+2 em Sedução',{seducao:2},'vive uma cena de romance, sedução ou prazer'],['gula','Gula','+2 em Resistência; comida e bebida curam +2 PV',{resistencia:2},'come ou bebe em excesso'],['ganancia','Ganância','+2 em Persuasão para negociar; dobro de dinheiro inicial',{persuasao:2},'fecha um bom negócio ou lucra'],['ira','Ira','+1 de dano corpo a corpo',{},'briga, destrói coisas ou se vinga'],['inveja','Inveja','+2 em Enganação',{enganacao:2},'toma algo de alguém ou supera um rival'],['preguica','Preguiça','+1 na Defesa no turno em que não se mover',{},'dorme, enrola ou foge de uma obrigação']],
@@ -5087,13 +5104,18 @@ const SINS_REDENCAO=[[3,'Luz Interior: vantagem em Vontade contra Enfeitiçado; 
 const sRace=sh=>SINS.racas[sh.raca]||SINS.racas.sinner;
 const sVice=sh=>SINS.vicios.find(v=>v[0]===sh.vicio);
 const sTal=(sh,k)=>!!(sh.talentos||{})[k];
+const sBonus=(sh,k)=>{const r=sRace(sh);return num((r.bon||{})[k])+(r.livre&&sh.racaLivre===k?r.livre:0);};
+const sAtr=(sh,k)=>num((sh.atr||{})[k])+(sh.atrV===2?sBonus(sh,k):0);
+/* attribute points: the race's points at creation, +1 for the one attribute at −1, +1 at every even level */
+function sinsPool(sh){const r=sRace(sh),n=Math.max(1,num(sh.nivel)||1),vals=SINS.atrs.map(([k])=>num((sh.atr||{})[k]));
+  const total=r.pts+(vals.some(v=>v<0)?1:0)+Math.floor(n/2),used=vals.filter(v=>v>0).reduce((a,b)=>a+b,0);return {total,used,left:total-used,cap:n>=2?Math.max(r.max,5):r.max};}
 const sSkill=(sh,k)=>{const sk=SINS.skills.find(x=>x[0]===k);if(!sk)return 0;const r=sRace(sh),v=sVice(sh),po=SINS.vicios.find(x=>x[0]===sh.pecadoOrigem&&sh.raca==='sinner');
-  return num((sh.atr||{})[sk[2]])+[0,2,4][num((sh.per||{})[k])]+num(r.per[k])+num(v&&v[3][k])+num(po&&po!==v&&po[3][k]);};
+  return sAtr(sh,sk[2])+[0,2,4][num((sh.per||{})[k])]+num(r.per[k])+num(v&&v[3][k])+num(po&&po!==v&&po[3][k]);};
 const sOver=sh=>!!sh.overlord;
 const sRed=sh=>sh.raca==='sinner'?num(sh.redencao):0;
 const sCaster=sh=>sh.raca==='goetia'?'nato':(sh.raca==='sinner'&&(sh.arquetipo==='ocultista'||sTal(sh,'arcano')))?'estudo':'grimorio';
 const sCirc=sh=>{const n=num(sh.nivel)||1;return sh.raca==='goetia'?(n>=3?3:2):(n>=5?3:n>=3?2:1);};
-function sinsV(sh,f){const a=sh.atr||{},r=sRace(sh),n=Math.max(1,num(sh.nivel)||1),br=num(a.brut);switch(f){
+function sinsV(sh,f){const a={brut:sAtr(sh,'brut'),agi:sAtr(sh,'agi'),lab:sAtr(sh,'lab'),ast:sAtr(sh,'ast'),inf:sAtr(sh,'inf')},r=sRace(sh),n=Math.max(1,num(sh.nivel)||1),br=num(a.brut);switch(f){
   case 'pv':return r.pv+2*br+(n-1)*Math.max(1,r.pvNv+br)+(sTal(sh,'monstro')?10:0)+(sOver(sh)?20:0)+num(sh.pvAj);
   case 'pp':return Math.max(1,3+num(a.inf)+Math.floor(n/2)+r.pp+(sOver(sh)?5:0)-(sRed(sh)>=5?2:0)+num(sh.ppAj));
   case 'def':return 10+num(a.agi)+num((sh.armadura||{}).def)+r.def+(sTal(sh,'intocavel')?2:0)+num(sh.defAj);
@@ -5103,11 +5125,13 @@ function sinsV(sh,f){const a=sh.atr||{},r=sRace(sh),n=Math.max(1,num(sh.nivel)||
   case 'dt':return 10+num(a.inf)+Math.floor(n/2);
   case 'circ':return sCirc(sh);
   case 'infl':return clamp(num(sh.influencia),0,10);
-  case 'pts':return SINS.atrs.reduce((t,[k])=>t+num(a[k]),0);
-  case 'ptsMax':return r.pts;
+  case 'left':return sinsPool(sh).left;
+  case 'total':return sinsPool(sh).total;
   case 'desloc':return r.desloc;
   case 'morte':return -Math.floor(sinsV(sh,'pv')/2);}
-  if(f.startsWith('per.'))return sSkill(sh,f.slice(4));return 0;}
+  if(f.startsWith('per.'))return sSkill(sh,f.slice(4));
+  if(f.startsWith('atr.'))return sAtr(sh,f.slice(4));
+  if(f.startsWith('atrMax.')){const p=sinsPool(sh),cur=num((sh.atr||{})[f.slice(7)]);return Math.max(cur,Math.min(p.cap,cur+p.left));}return 0;}
 const SYS={dnd:DND,op:OP,etmos:ETMOS,sacra:SACRA,sins:SINS};
 const COLORS=['#7b1e1e','#2f5a7a','#3f6a3a','#8a5a1a','#5a3f7a','#1f6a6a','#8a2f5a','#4a4a52'];
 
@@ -5122,7 +5146,7 @@ function newSacra(){return {sys:'sacra',nome:'',jogador:'',nivel:1,xp:0,recompen
   ant:{atencao:0,medicina:0,montaria:0,negocios:0,roubo:0,suor:0,tradicao:0,violencia:0},habilidades:[],redencao:{titulo:'',desc:'',passos:[0,1,2,3,4,5].map(()=>({t:'',ok:false}))},
   itens:[],dinheiro:'',conceito:'',aparencia:'',passado:'',objetivo:'',anotacoes:'',cond:[],
   montaria:{nome:'',especie:'',fidelidade:0,vidaMarc:0,vidaExtra:0,dorMarc:0,dorExtra:0,potencia:0,resistencia:0,equip:'',notas:''}};}
-function newSins(){const s={sys:'sins',nome:'',jogador:'',raca:'sinner',nivel:1,vicio:'',anel:'',pecadoOrigem:'',arquetipo:'',cor:COLORS[Math.floor(Math.random()*COLORS.length)],
+function newSins(){const s={sys:'sins',atrV:2,nivelVisto:1,racaLivre:'',nome:'',jogador:'',raca:'sinner',nivel:1,vicio:'',anel:'',pecadoOrigem:'',arquetipo:'',cor:COLORS[Math.floor(Math.random()*COLORS.length)],
   atr:{brut:0,agi:0,lab:0,ast:0,inf:0},per:{},pvTemp:0,danoSagrado:0,pvAj:0,ppAj:0,defAj:0,rdAj:0,iniAj:0,armadura:{nome:'Nenhuma',rd:0,def:0},
   ataques:[{nome:'Soco / chute',tipo:'cc',per:'briga',dano:'1d4',notas:''}],dons:[],manif:[],feiticos:[],grimorio:[],escolas:{},talentos:{},
   influencia:1,almas:0,dinheiro:'$ 200',overlord:false,territorio:'',tenente:'',supremo:'',redencao:0,contratos:[],equipamento:'',cond:[],
@@ -5503,10 +5527,10 @@ const NPCGEN={
       ['Comerciante',{nivel:1,atr:{fis:0,vel:0,int:2,cor:0},ant:{negocios:3,atencao:1},defesa:5,itens:[],montaria:{nome:'Carroça e burro',especie:'Burro',potencia:1,resistencia:2,fidelidade:2}}]],
     sins:[['Capanga imp',{raca:'imp',nivel:1,atr:{brut:1,agi:2,lab:0,ast:0,inf:0},per:{armasFogo:1,furtividade:1},ataques:[{nome:'Faca',tipo:'cc',per:'armasBrancas',dano:'1d6',notas:''},{nome:'Pistola',tipo:'dist',per:'armasFogo',dano:'2d6',notas:'18 m'}]}],
       ['Hellhound feroz',{raca:'hellhound',nivel:2,atr:{brut:3,agi:1,lab:0,ast:0,inf:1},per:{briga:2,percepcao:1},ataques:[{nome:'Mordida',tipo:'cc',per:'briga',dano:'1d6',notas:''}]}],
-      ['Brutamontes da Ira',{raca:'sinner',nivel:4,vicio:'ira',atr:{brut:4,agi:0,lab:0,ast:0,inf:1},per:{briga:2,intimidacao:1},armadura:{nome:'Jaqueta reforçada',rd:1,def:0},ataques:[{nome:'Taco com pregos',tipo:'cc',per:'armasBrancas',dano:'1d8',notas:''}]}],
-      ['Guarda-costas',{raca:'sinner',nivel:3,atr:{brut:2,agi:2,lab:0,ast:1,inf:0},per:{armasFogo:2,percepcao:1},armadura:{nome:'Colete à prova de balas',rd:2,def:0},ataques:[{nome:'Revólver',tipo:'dist',per:'armasFogo',dano:'2d6+1',notas:'18 m'}]}],
-      ['Ocultista',{raca:'sinner',nivel:3,arquetipo:'ocultista',atr:{brut:0,agi:1,lab:1,ast:2,inf:2},per:{ocultismo:1,magia:1},feiticos:[{n:'Labareda',circ:1,escola:'chamas',e:'Ataque à distância (18 m): 2d6 de fogo.',dano:'2d6'}]}],
-      ['Nobre da Ars Goetia',{raca:'goetia',nivel:2,atr:{brut:0,agi:1,lab:2,ast:2,inf:5},per:{ocultismo:2,magia:2,persuasao:1},feiticos:[{n:'Coluna de Fogo',circ:2,escola:'chamas',e:'Área de 3 m: 3d6 de fogo.',dano:'3d6'},{n:'Voz Hipnótica',circ:2,escola:'encanto',e:'O alvo testa Vontade ou obedece.',dano:''}]}]],
+      ['Brutamontes da Ira',{raca:'sinner',racaLivre:'brut',nivel:4,vicio:'ira',atr:{brut:4,agi:0,lab:0,ast:0,inf:1},per:{briga:2,intimidacao:1},armadura:{nome:'Jaqueta reforçada',rd:1,def:0},ataques:[{nome:'Taco com pregos',tipo:'cc',per:'armasBrancas',dano:'1d8',notas:''}]}],
+      ['Guarda-costas',{raca:'sinner',racaLivre:'agi',nivel:3,atr:{brut:2,agi:2,lab:0,ast:1,inf:0},per:{armasFogo:2,percepcao:1},armadura:{nome:'Colete à prova de balas',rd:2,def:0},ataques:[{nome:'Revólver',tipo:'dist',per:'armasFogo',dano:'2d6+1',notas:'18 m'}]}],
+      ['Ocultista',{raca:'sinner',racaLivre:'inf',nivel:3,arquetipo:'ocultista',atr:{brut:0,agi:1,lab:1,ast:2,inf:2},per:{ocultismo:1,magia:1},feiticos:[{n:'Labareda',circ:1,escola:'chamas',e:'Ataque à distância (18 m): 2d6 de fogo.',dano:'2d6'}]}],
+      ['Nobre da Ars Goetia',{raca:'goetia',nivel:2,racaLivre:'lab',atr:{brut:0,agi:1,lab:2,ast:2,inf:3},per:{ocultismo:2,magia:2,persuasao:1},feiticos:[{n:'Coluna de Fogo',circ:2,escola:'chamas',e:'Área de 3 m: 3d6 de fogo.',dano:'3d6'},{n:'Voz Hipnótica',circ:2,escola:'encanto',e:'O alvo testa Vontade ou obedece.',dano:''}]}]],
     etmos:[['Estudante',{nivel:1,atr:{corpo:2,alma:2,mente:2},complex:1}],['Monitor',{nivel:3,atr:{corpo:3,alma:3,mente:3},complex:2}],['Professor',{nivel:6,atr:{corpo:2,alma:4,mente:5},complex:4}],['Guardião',{nivel:5,atr:{corpo:5,alma:3,mente:2},complex:3}]]}};
 const pick=a=>a[Math.floor(Math.random()*a.length)];
 function genNpc(sys,perfil){const P=NPCGEN.perfis[sys];const pf=P.find(x=>x[0]===perfil)||pick(P);
@@ -5515,7 +5539,7 @@ function genNpc(sys,perfil){const P=NPCGEN.perfis[sys];const pf=P.find(x=>x[0]==
 function npcFromGen(c,g){const sh=newFor(c.sys);sh.nome=g.nome;
   if(c.sys==='dnd'){Object.assign(sh,{classe:g.perfil,ca:g.st.ca,pvMax:g.st.pv,pv:g.st.pv,atr:g.st.atr,ataques:g.st.ataques,personalidade:g.pers,aparencia:g.apar,ideais:g.mot,notas:'Segredo: '+g.seg});}
   else if(c.sys==='op'){Object.assign(sh,{classe:g.st.classe,nex:g.st.nex,atr:g.st.atr,trilha:g.perfil,personalidade:g.pers,aparencia:g.apar,objetivo:g.mot,notas:'Segredo: '+g.seg});sh.pv=opMax(sh,'pv');sh.pe=opMax(sh,'pe');sh.san=opMax(sh,'san');sh._mx={pv:sh.pv,pe:sh.pe,san:sh.san};}
-  else if(c.sys==='sins'){Object.assign(sh,clone(g.st),{aparencia:g.apar,quer:g.mot,notas:g.perfil+'. '+g.pers+'. Segredo: '+g.seg});sh.pv=sinsV(sh,'pv');sh.ppAtual=sinsV(sh,'pp');sh._mx={pv:sh.pv,pp:sh.ppAtual};sh._raca=sh.raca;}
+  else if(c.sys==='sins'){Object.assign(sh,clone(g.st),{nivelVisto:g.st.nivel||1,aparencia:g.apar,quer:g.mot,notas:g.perfil+'. '+g.pers+'. Segredo: '+g.seg});sh.pv=sinsV(sh,'pv');sh.ppAtual=sinsV(sh,'pp');sh._mx={pv:sh.pv,pp:sh.ppAtual};sh._raca=sh.raca;}
   else if(c.sys==='sacra'){Object.assign(sh,{nivel:g.st.nivel,atr:g.st.atr,ant:Object.assign(sh.ant,g.st.ant),defesa:g.st.defesa,itens:g.st.itens||[],conceito:g.perfil+'. '+g.pers+'.',aparencia:g.apar,objetivo:g.mot,anotacoes:'Segredo: '+g.seg});if(g.st.montaria)Object.assign(sh.montaria,g.st.montaria);}
   else Object.assign(sh,{nivel:g.st.nivel,atr:g.st.atr,complex:g.st.complex,basico:g.perfil+'. '+g.pers+'.',aparencia:g.apar,futuro:g.mot,pontos:'Segredo: '+g.seg});
   return sh;}
@@ -7046,7 +7070,7 @@ function bindSheet(root,sh){
   bindPend(root);for(const b of root.querySelectorAll('[data-cancelp]'))b.onclick=()=>{if(sh.pendentes)delete sh.pendentes[b.dataset.cancelp];queueSave(sh);render();};
   calc(root,sh);}
 /* rules that react to a field: ritual cost follows its circle, OP current values follow a raised maximum */
-function afterSet(sh,k,val,old){let m;if(sh.sys==='op'&&(m=k.match(/^rituais\.(\d+)\.circ$/))){const r=sh.rituais[num(m[1])];if(num(r.custo)===OP.custo[num(old)]||!r.custo)r.custo=OP.custo[num(val)];return true;}
+function afterSet(sh,k,val,old){let m;if(sh.sys==='sins'&&k==='nivel'){if(num(val)>num(old))toast(`Nível ${num(val)}! Os ganhos aparecem no topo da ficha.`);return true;}if(sh.sys==='op'&&(m=k.match(/^rituais\.(\d+)\.circ$/))){const r=sh.rituais[num(m[1])];if(num(r.custo)===OP.custo[num(old)]||!r.custo)r.custo=OP.custo[num(val)];return true;}
   if(sh.sys==='op'&&/^(classe|nex|atr\.vig|atr\.pre|pvAj|peAj|sanAj)$/.test(k)){sh._mx=sh._mx||{};for(const s of['pv','pe','san']){const mx=opMax(sh,s),om=sh._mx[s];
       if(om!=null&&mx!==om)sh[s]=clamp(num(sh[s])+(mx-om),0,mx);else if(sh[s]==null||num(sh[s])>mx)sh[s]=mx;sh._mx[s]=mx;}return /^(classe|nex)$/.test(k);}
   return false;}
@@ -7157,20 +7181,41 @@ function sinsEmblem(sh){const fr={imp:`<circle cx="50" cy="52" r="34"/><path cla
     ganancia:'<circle class="sym" cx="50" cy="52" r="16"/><path d="M56 44 C52 40 44 41 44 47 C44 53 56 51 56 57 C56 63 47 64 43 60 M50 38 L50 66"/>',ira:'<path class="sym" d="M50 30 C54 42 64 44 62 56 a12 12 0 0 1-24 0 C38 48 44 46 46 38 C48 44 50 42 50 30Z"/>',
     inveja:'<path class="sym" d="M28 52 Q50 32 72 52 Q50 72 28 52Z"/><circle cx="50" cy="52" r="6"/>',preguica:'<path class="sym" d="M56 34 a18 18 0 1 0 10 30 a14 14 0 1 1-10-30Z"/><path d="M62 38 L70 38 L62 46 L70 46"/>'}[sh.vicio]||'<path class="sym" d="M50 26 L58 50 L82 50 L62 64 L70 88 L50 74 L30 88 L38 64 L18 50 L42 50 Z" transform="translate(0 -6) scale(1)"/>';
   return `<div class="xmark" aria-hidden="true"><svg viewBox="0 0 100 100">${fr}${sy}</svg></div>`;}
-function sinsSheet(sh,tab){sinsSync(sh);const r=sRace(sh),v=sVice(sh),st=sinsState(sh);sh.atr=sh.atr||{};sh.per=sh.per||{};
+/* what changed with each new level: automatic gains are already on the sheet, choices are listed */
+function sinsLevelGains(sh,L){const r=sRace(sh),br=sAtr(sh,'brut'),out=[];out.push(['auto',`+${Math.max(1,r.pvNv+br)} PV máximos`]);
+  if(L%2===0){out.push(['auto','+1 PP máximo']);out.push(['pick','+1 ponto de atributo para distribuir (até +5)']);}
+  else{out.push(['pick',sh.raca==='sinner'?'Escolha um: um Dom, uma Manifestação, Sangue Arcano, um feitiço (se conjura), duas perícias treinadas ou uma perícia vira especialista':'Escolha um: um Dom, um feitiço (se conjura), duas perícias treinadas ou uma perícia vira especialista']);
+    if(sCaster(sh)==='nato')out.push(['pick','Ars Goetia: aprenda 2 feitiços novos']);else if(sCaster(sh)==='estudo')out.push(['pick','Aprenda 1 feitiço novo das suas escolas']);}
+  if(L===3)out.push(['auto',sh.raca==='goetia'?'Feitiços de 3º círculo liberados':'Feitiços de 2º círculo liberados']);
+  if(L===5){out.push(['pick','Escolha um Talento de Assinatura (aba Poderes e magia)']);if(sh.raca!=='goetia')out.push(['auto','Feitiços de 3º círculo liberados']);}
+  return out;}
+function sinsNotice(sh){if(!canEdit(sh))return '';const n=Math.max(1,num(sh.nivel)||1);
+  if(sh.atrV!==2)return `<div class="xnotice"><b>Bônus da raça automático.</b> Agora o bônus da raça é somado sozinho ao total de cada atributo, e a ficha conta os pontos livres. Se você já tinha somado o bônus à mão, tire esse ponto dos atributos antes de ativar.<div class="row"><button type="button" class="btn small primary" id="sAtrV">Ativar</button></div></div>`;
+  const parts=[];const seen=Math.min(n,Math.max(1,num(sh.nivelVisto)||1));
+  if(n>seen){let li='';for(let L=seen+1;L<=n;L++)li+=`<li><b>Nível ${L}</b><ul>${sinsLevelGains(sh,L).map(([t,x])=>`<li class="${t}">${t==='auto'?'✓ ':'◆ '}${esc(x)}${t==='auto'?' <small>(já aplicado)</small>':''}</li>`).join('')}</ul></li>`;
+    parts.push(`<div class="xnotice lvl"><b>Subiu de nível!</b> ${n-seen>1?`Do nível ${seen} ao ${n}.`:`Agora no nível ${n}.`}<ol class="xgains">${li}</ol><div class="row"><button type="button" class="btn small primary" id="sLvlOk">Entendi</button></div></div>`);}
+  const p=sinsPool(sh),r=sRace(sh);const todo=[];
+  if(p.left>0)todo.push(`${p.left} ${p.left>1?'pontos':'ponto'} de atributo para distribuir`);
+  if(p.left<0)todo.push(`${-p.left} ${-p.left>1?'pontos':'ponto'} de atributo a mais do que o permitido`);
+  if(r.livre&&!sh.racaLivre)todo.push('o atributo do bônus livre da raça');
+  if(todo.length)parts.push(`<div class="xnotice todo"><b>Falta escolher:</b> ${esc(todo.join(' · '))}. <a href="#ficha-${esc(sh.id)}" data-gotab="personagem">Ir aos atributos</a></div>`);
+  return parts.join('');}
+function sinsSheet(sh,tab){sinsSync(sh);if(num(sh.nivelVisto)>Math.max(1,num(sh.nivel)||1))sh.nivelVisto=Math.max(1,num(sh.nivel)||1);const r=sRace(sh),v=sVice(sh),st=sinsState(sh),pool=sinsPool(sh);sh.atr=sh.atr||{};sh.per=sh.per||{};
   const head=`<header class="xhead">${sinsEmblem(sh)}
     <div class="xid">${portraitCell(sh)}<div class="xname"><span class="lbl">${sh.kind==='npc'?'Nome do NPC':'Nome do personagem'}</span><input data-k="nome" placeholder="Nome no Inferno" aria-label="Nome"><span class="xrace">${esc(r.n)}${v?' · '+esc(v[1]):''} · nível ${Math.max(1,num(sh.nivel)||1)}</span></div></div>
     <div class="xlogo" aria-hidden="true">Seven<b>Sins</b><small>${esc(r.n)}${v?" · "+esc(v[1]):""}</small></div>
     <div class="xmeta">${F('jogador','Jogador')}<label style="display:flex;flex-direction:column;gap:2px;min-width:0"><span class="lbl">Raça</span><select data-k="raca" data-re="1">${sinsOpts(Object.entries(SINS.racas).map(([k,x])=>[k,x.n]),sh.raca)}</select></label>
-      ${F('nivel','Nível',{n:1,min:1,max:10})}<label style="display:flex;flex-direction:column;gap:2px;min-width:0"><span class="lbl">Vício</span><select data-k="vicio" data-re="1">${sinsOpts(SINS.vicios.map(x=>[x[0],x[1]]),sh.vicio,'—')}</select></label>
+      <label style="display:flex;flex-direction:column;gap:2px;min-width:0"><span class="lbl">Nível</span><select data-k="nivel" data-t="n">${[1,2,3,4,5,6,7,8,9,10].map(i=>`<option value="${i}">${i}</option>`).join('')}</select></label><label style="display:flex;flex-direction:column;gap:2px;min-width:0"><span class="lbl">Vício</span><select data-k="vicio" data-re="1">${sinsOpts(SINS.vicios.map(x=>[x[0],x[1]]),sh.vicio,'—')}</select></label>
       <label style="display:flex;flex-direction:column;gap:2px;min-width:0"><span class="lbl">Anel de origem</span><select data-k="anel">${sinsOpts(SINS.aneis.map(a=>[a,a]),sh.anel,'—')}</select></label></div></header>`;
   const tabs=stabs(sh,tab,[['personagem','Personagem'],['combate','Combate'],['poderes','Poderes e magia'],['inferno','Inferno'],['historia','História']]);let b='';
   if(tab==='personagem'){
     const groups=SINS.atrs.map(([a,an])=>`<div class="xskg"><h5>${an}</h5>${SINS.skills.filter(s=>s[2]===a).map(([k,n])=>`<div class="xsk" data-roll="per:${k}" tabindex="0" title="Rolar 1d20 + ${esc(n)}"><button type="button" class="xdot" data-cycle="per.${k}" data-v="${num(sh.per[k])}" aria-label="${esc(n)}: ${['sem proficiência','proficiente','especialista'][num(sh.per[k])]}" title="Clique: treinado, especialista, nenhum"></button><span>${esc(n)}</span><b class="num" data-c="s:per.${k}" data-fmt="s"></b></div>`).join('')}</div>`).join('');
     b=`<div class="xgrid">
-      <div class="box"><h4>Atributos <small class="xpts"><span data-c="s:pts"></span> de ${r.pts} pontos</small></h4>
-        ${SINS.atrs.map(([k,n,d])=>`<div class="xatr" data-roll="atr:${k}" tabindex="0" title="Rolar 1d20 + ${n}"><span class="n">${n}</span><span class="stepper"><button type="button" data-step="atr.${k}" data-d="-1" data-floor="-1" aria-label="Menos ${n}">−</button><input type="number" data-t="n" data-k="atr.${k}" min="-1" max="6" aria-label="${n}"><button type="button" data-step="atr.${k}" data-d="1" aria-label="Mais ${n}">+</button></span><small>${d}</small></div>`).join('')}
-        <p class="note">Distribua ${r.pts} pontos, máximo +${r.max} no nível 1; um pode ir a −1 para ganhar +1. Depois some o bônus da raça: ${esc(r.atr)}. Clique no nome para rolar.</p></div>
+      <div class="box"><h4>Atributos <small class="xpts${pool.left<0?' over':pool.left>0?' left':''}">Pontos livres: <b data-c="s:left"></b> de <span data-c="s:total"></span></small></h4>
+        ${r.livre&&sh.atrV===2?`<label class="xlivre"><span class="lbl">Bônus livre da raça (+${r.livre})</span><select data-k="racaLivre" data-re="1">${sinsOpts(SINS.atrs.map(([k,n])=>[k,n]),sh.racaLivre,'Escolha o atributo…')}</select></label>`:''}
+        <div class="xatrh" aria-hidden="true"><span></span><span>Pontos</span><span>Raça</span><span>Total</span></div>
+        ${SINS.atrs.map(([k,n,d])=>{const bo=sh.atrV===2?sBonus(sh,k):0;return `<div class="xatr" data-roll="atr:${k}" tabindex="0" title="Rolar 1d20 + ${n}"><span class="n">${n}</span><span class="stepper"><button type="button" data-step="atr.${k}" data-d="-1" data-floor="-1" aria-label="Menos ${n}">−</button><input type="number" data-t="n" data-k="atr.${k}" min="-1" max="6" aria-label="Pontos em ${n}"><button type="button" data-step="atr.${k}" data-d="1" data-limf="s:atrMax.${k}" aria-label="Mais ${n}">+</button></span><span class="xbon">${bo?'+'+bo:''}</span><b class="xtot num" data-c="s:atr.${k}" data-fmt="s"></b><small>${d}</small></div>`;}).join('')}
+        <p class="note">${r.pts} pontos na criação (máximo +${r.max} por atributo no nível 1); um atributo pode ir a −1 para ganhar +1 ponto. Cada nível par dá mais 1 ponto, até +5. O bônus da raça (${esc(r.atr)}) é somado sozinho no total. Clique no nome para rolar.</p></div>
       <div class="box"><h4>Perícias</h4><div class="xskills">${groups}</div><p class="note">Bolinha vazia +0, cheia treinado +2, dupla especialista +4. Bônus da raça${v&&Object.keys(v[3]).length?' e do Vício':''} já estão somados.</p></div>
       <div class="box"><h4>${esc(r.n)}</h4><ul class="xtraits">${r.tracos.map(([n,d])=>`<li><b>${esc(n)}.</b> ${esc(d)}</li>`).join('')}</ul>
         <p class="note">PV base ${r.pv} · deslocamento ${r.desloc} m${r.voo?` · voo ${r.voo} m`:''} · ${esc(r.magia)}</p>
@@ -7237,9 +7282,13 @@ function sinsSheet(sh,tab){sinsSync(sh);const r=sRace(sh),v=sVice(sh),st=sinsSta
         <button type="button" class="btn small" data-add="contratos" data-tpl='{"com":"","termos":"","preco":""}'>+ Contrato</button><p class="note">Quebrar um contrato causa 2d6 de dano por dia, que não regenera.</p></div>
       <div class="box wide"><h4>Equipamento</h4><textarea data-k="equipamento" rows="4" placeholder="Celular infernal, kit médico, chaves do carro…"></textarea></div></div>`;}
   else b=`<div class="xgrid">${[['aparencia','Aparência',''],['chegada','Como chegou ao Inferno ou como nasceu',''],['vida','Quem foi em vida (Sinner)',''],['quer','O que mais quer',''],['teme','O que mais teme',''],['lacos','Laços','Quem ama, quem odeia, a quem deve'],['notas','Notas','']].filter(([k])=>k!=='vida'||sh.raca==='sinner').map(([k,n,ph])=>`<label class="box sfield"><span class="lbl">${n}</span><textarea data-k="${k}" rows="4" placeholder="${ph}"></textarea></label>`).join('')}</div>`;
-  return head+tabs+`<div class="sbody">${b}</div>`;}
+  return head+tabs+`<div class="sbody">${sinsNotice(sh)}${b}</div>`;}
 function sinsUse(sh,cost,what){const pp=num(sh.ppAtual);if(pp<cost){toast(`PP insuficiente: ${what} custa ${cost} e você tem ${pp}.`);return;}sh.ppAtual=pp-cost;queueSave(sh);toast(`${what}: −${cost} PP.`);render();}
 function bindSins(root,sh){
+  const av=root.querySelector('#sAtrV');if(av)av.onclick=()=>{sh.atrV=2;sh.nivelVisto=Math.max(1,num(sh.nivel)||1);queueSave(sh);render();};
+  const lo=root.querySelector('#sLvlOk');if(lo)lo.onclick=()=>{sh.nivelVisto=Math.max(1,num(sh.nivel)||1);queueSave(sh);render();};
+  for(const a of root.querySelectorAll('[data-gotab]'))a.onclick=e=>{e.preventDefault();ui.sheetTab[sh.id]=a.dataset.gotab;render();};
+  for(const b of root.querySelectorAll('[data-step^="atr."]'))b.addEventListener('click',()=>{const p=sinsPool(sh),x=root.querySelector('.xpts');if(x){x.classList.toggle('over',p.left<0);x.classList.toggle('left',p.left>0);}});
   for(const b of root.querySelectorAll('[data-suse]'))b.onclick=()=>{const [l,i]=b.dataset.suse.split('|');
     if(l==='raca'){const d=sRace(sh).dons[num(i)];return sinsUse(sh,d[1],d[0]);}
     if(l==='supremo'){const s=SINS.supremos.find(x=>x[0]===sh.supremo);return s&&sinsUse(sh,s[1],s[0]);}
@@ -7256,15 +7305,15 @@ function bindSins(root,sh){
     else{let d=kind==='sagrado'?amt:Math.max(1,amt-sinsV(sh,'rd'));let t=num(sh.pvTemp);const ab=Math.min(t,d);sh.pvTemp=t-ab;d-=ab;sh.pv=Math.max(-mx,num(sh.pv)-d);if(kind==='sagrado')sh.danoSagrado=num(sh.danoSagrado)+d;
       toast(kind==='sagrado'?`${d} de dano sagrado.`:`${d} de dano${amt-d-ab>0?` (RD absorveu ${Math.min(amt-1,sinsV(sh,'rd'))})`:''}.`);}
     queueSave(sh);render();};
-  const sh1=root.querySelector('#sShort');if(sh1)sh1.onclick=()=>{const d=rnd(8),g=Math.max(0,d+num(sh.atr.brut));const cap=sinsV(sh,'pv')-num(sh.danoSagrado);sh.pv=Math.min(cap,num(sh.pv)+g);rollSheet=sh;pushRoll({label:`${sh.nome||'Ficha'} · descanso curto`,total:g,detail:`1d8: ${d} ${sgn(num(sh.atr.brut))}`});queueSave(sh);render();};
+  const sh1=root.querySelector('#sShort');if(sh1)sh1.onclick=()=>{const d=rnd(8),g=Math.max(0,d+sAtr(sh,'brut'));const cap=sinsV(sh,'pv')-num(sh.danoSagrado);sh.pv=Math.min(cap,num(sh.pv)+g);rollSheet=sh;pushRoll({label:`${sh.nome||'Ficha'} · descanso curto`,total:g,detail:`1d8: ${d} ${sgn(sAtr(sh,'brut'))}`});queueSave(sh);render();};
   const lg=root.querySelector('#sLong');if(lg)lg.onclick=()=>{sh.danoSagrado=Math.floor(num(sh.danoSagrado)/2);sh.pv=sinsV(sh,'pv')-sh.danoSagrado;sh.ppAtual=sinsV(sh,'pp');sh.pvTemp=0;queueSave(sh);toast('Descanso longo: PV e PP recuperados.');render();};
   const vc=root.querySelector('#sVice');if(vc)vc.onclick=()=>{sh.ppAtual=Math.min(sinsV(sh,'pp'),num(sh.ppAtual)+2);if(sh.raca==='sinner')sh.redencao=Math.max(0,num(sh.redencao)-1);queueSave(sh);toast(sh.raca==='sinner'?'+2 PP, −1 de Redenção.':'+2 PP.');render();};}
 function sinsRoll(sh,f,a,who){
-  if(f==='atr'){const at=SINS.atrs.find(x=>x[0]===a);return rollDnd(`${who} · ${at?at[1]:a}`,num((sh.atr||{})[a]));}
+  if(f==='atr'){const at=SINS.atrs.find(x=>x[0]===a);return rollDnd(`${who} · ${at?at[1]:a}`,sAtr(sh,a));}
   if(f==='per'){const sk=SINS.skills.find(x=>x[0]===a);return rollDnd(`${who} · ${sk?sk[1]:a}`,sSkill(sh,a));}
   if(f==='ini')return rollDnd(`${who} · iniciativa`,sinsV(sh,'ini'));
   if(f==='atk'){const at=(sh.ataques||[])[num(a)];if(!at)return;const per=at.tipo==='mag'?'magia':at.per||(at.tipo==='dist'?'armasFogo':'briga');return rollDnd(`${who} · ${at.nome||'ataque'}`,sSkill(sh,per));}
-  if(f==='dmg'){const at=(sh.ataques||[])[num(a)];if(!at)return;let e=String(at.dano||'');if(at.tipo==='cc'){const br=num(sh.atr.brut)+(sh.vicio==='ira'?1:0);if(br)e+=(br>0?'+':'')+br;}return rollExpr(`${who} · dano de ${at.nome||'ataque'}`,e);}
+  if(f==='dmg'){const at=(sh.ataques||[])[num(a)];if(!at)return;let e=String(at.dano||'');if(at.tipo==='cc'){const br=sAtr(sh,'brut')+(sh.vicio==='ira'?1:0);if(br)e+=(br>0?'+':'')+br;}return rollExpr(`${who} · dano de ${at.nome||'ataque'}`,e);}
   if(f==='fatk'||f==='gatk'){const p=(sh[f==='fatk'?'feiticos':'grimorio']||[])[num(a)];if(!p)return;return rollDnd(`${who} · ${p.n||'feitiço'}${f==='gatk'?' (grimório)':''}`,sSkill(sh,f==='fatk'?'magia':'ocultismo'));}
   if(f==='fdmg'||f==='gdmg'){const p=(sh[f==='fdmg'?'feiticos':'grimorio']||[])[num(a)];if(!p)return;return rollExpr(`${who} · ${p.n||'feitiço'}`,p.dano);}}
 
