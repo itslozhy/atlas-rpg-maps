@@ -186,7 +186,7 @@ window.claude={use:async name=>{const ok=await state.ready;if(!ok||!state.user)r
 <title>Mesa do Mestre</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Alegreya+Sans:ital,wght@0,400;0,500;0,700;1,400&family=IM+Fell+English:ital@0;1&family=IM+Fell+English+SC&family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Playfair+Display+SC:wght@400;700&family=Cinzel:wght@400;600;700&family=Rye&family=Special+Elite&family=Courier+Prime:ital,wght@0,400;0,700;1,400&family=Cinzel:wght@500&family=EB+Garamond:ital,wght@0,400;0,600;1,400&family=IBM+Plex+Sans+Condensed:wght@400;500;600&family=IBM+Plex+Mono:wght@500&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Alegreya+Sans:ital,wght@0,400;0,500;0,700;1,400&family=IM+Fell+English:ital@0;1&family=IM+Fell+English+SC&family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Playfair+Display+SC:wght@400;700&family=Cinzel:wght@400;600;700&family=Rye&family=Pirata+One&family=Special+Elite&family=Courier+Prime:ital,wght@0,400;0,700;1,400&family=Cinzel:wght@500&family=EB+Garamond:ital,wght@0,400;0,600;1,400&family=IBM+Plex+Sans+Condensed:wght@400;500;600&family=IBM+Plex+Mono:wght@500&display=swap">
 <style>
 /* Layout: drafting-table workbench. Tools rail left, map canvas center, properties panel right; on phones the rail docks at the bottom and the panel becomes a sheet. */
 :root{
@@ -642,8 +642,8 @@ h1.view{font-family:var(--f-title);font-weight:400;font-size:32px;margin:4px 0 4
 .card a.cover{color:inherit;text-decoration:none}
 .badge{display:inline-flex;align-items:center;gap:5px;font-size:12px;letter-spacing:.06em;text-transform:uppercase;font-weight:700;padding:2px 8px;border-radius:99px;border:1px solid currentColor;width:max-content}
 .badge.dnd{color:#8e3a1f}.badge.op{color:#b0122f}
-@media (prefers-color-scheme:dark){:host(:not([data-theme="light"])) .badge.dnd{color:#e6a07f}:host(:not([data-theme="light"])) .badge.op{color:#f07087}:host(:not([data-theme="light"])) .badge.etmos{color:#c9a4e0}:host(:not([data-theme="light"])) .badge.sacra{color:#e2a676}}
-:host([data-theme="dark"]) .badge.dnd{color:#e6a07f}:host([data-theme="dark"]) .badge.op{color:#f07087}:host([data-theme="dark"]) .badge.etmos{color:#c9a4e0}:host([data-theme="dark"]) .badge.sacra{color:#e2a676}
+@media (prefers-color-scheme:dark){:host(:not([data-theme="light"])) .badge.dnd{color:#e6a07f}:host(:not([data-theme="light"])) .badge.op{color:#f07087}:host(:not([data-theme="light"])) .badge.etmos{color:#c9a4e0}:host(:not([data-theme="light"])) .badge.sacra{color:#e2a676}:host(:not([data-theme="light"])) .badge.sins{color:#ff6b86}}
+:host([data-theme="dark"]) .badge.dnd{color:#e6a07f}:host([data-theme="dark"]) .badge.op{color:#f07087}:host([data-theme="dark"]) .badge.etmos{color:#c9a4e0}:host([data-theme="dark"]) .badge.sacra{color:#e2a676}:host([data-theme="dark"]) .badge.sins{color:#ff6b86}
 .empty{border:1px dashed var(--line);border-radius:12px;padding:22px;color:var(--muted);text-align:center;background:var(--panel)}
 .field{display:flex;flex-direction:column;gap:4px;font-size:14px}
 .field>span{color:var(--muted);font-size:13px}
@@ -909,6 +909,112 @@ h1.view{font-family:var(--f-title);font-weight:400;font-size:32px;margin:4px 0 4
 .sheet.sacra .conds button[aria-pressed="true"]{background:var(--red);color:#f6e7c8;border-color:var(--red)}
 .sheet.sacra .tools{background:transparent;border-top:1.5px solid var(--sa)}
 .sheet.sacra .btn{border-radius:2px}
+/* ---- Seven Sins: hotel de neon no Inferno, preto, vermelho e rosa ---- */
+.sheet.sins{--sbg:#160709;--sp:rgba(40,10,16,.82);--sp2:#2a0c14;--sf:#f7e4e7;--sm:#d29aa6;--sa:#ff3358;--sab:#160709;--sl:#5c1d2b;--sl2:#43141f;--sh:#3a111c;--gold:#f2c14e;
+  background:var(--sbg);color:var(--sf);font-family:"Alegreya Sans",system-ui,sans-serif;font-size:16px;
+  background-image:radial-gradient(ellipse at 10% 0%,rgba(255,51,88,.22),transparent 50%),radial-gradient(ellipse at 100% 100%,rgba(242,193,78,.10),transparent 55%),repeating-linear-gradient(135deg,rgba(255,255,255,.015) 0 2px,transparent 2px 9px)}
+.sheet.sins .xhead{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:14px 18px;padding:20px 22px 16px;border-bottom:2px solid var(--sa);box-shadow:0 1px 18px rgba(255,51,88,.35);position:relative;overflow:hidden}
+.sheet.sins .xmark{position:absolute;right:-40px;top:-40px;width:220px;height:220px;opacity:.10;pointer-events:none}
+.sheet.sins .xmark svg{width:100%;height:100%;fill:none;stroke:var(--sa);stroke-width:2.2}
+.sheet.sins .xid{display:flex;gap:14px;align-items:center;min-width:0}
+.sheet.sins .xid .portrait{width:96px;height:96px;border-radius:50%;border:2px solid var(--sa);box-shadow:0 0 14px rgba(255,51,88,.55);flex:none}
+.sheet.sins .xname{display:flex;flex-direction:column;gap:2px;min-width:0;flex:1}
+.sheet.sins .xname input{font-family:"Pirata One","Cinzel",serif;font-size:clamp(26px,4vw,38px);color:var(--sf);border-bottom:1px solid var(--sl);text-shadow:0 0 12px rgba(255,51,88,.45)}
+.sheet.sins .xrace{color:var(--gold);font-size:14px;letter-spacing:.06em}
+.sheet.sins .xlogo{font-family:"Pirata One","Cinzel",serif;font-size:30px;line-height:.9;text-align:right;color:var(--sa);text-shadow:0 0 10px rgba(255,51,88,.8),0 0 26px rgba(255,51,88,.4);align-self:start}
+.sheet.sins .xlogo b{display:block;font-weight:400;font-size:46px;color:#ffd6de}
+.sheet.sins .xlogo small{display:block;font-family:"Alegreya Sans",sans-serif;font-size:10px;letter-spacing:.35em;text-transform:uppercase;color:var(--sm);margin-top:4px;text-shadow:none}
+.sheet.sins .xmeta{grid-column:1/-1;display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:8px 14px}
+@media (max-width:860px){.sheet.sins .xhead{grid-template-columns:minmax(0,1fr)}.sheet.sins .xlogo{text-align:left;order:-1}.sheet.sins .xmeta{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.sheet.sins select{color:var(--sf);background:var(--sbg)}
+.sheet.sins select option,.sheet.sins select optgroup{background:#200a10;color:var(--sf)}
+.sheet.sins .stabs{background:rgba(20,5,9,.7);border-bottom:1px solid var(--sl)}
+.sheet.sins .stabs button{font-family:"Pirata One","Cinzel",serif;font-size:18px;font-weight:400;letter-spacing:.02em}
+.sheet.sins .stabs button[aria-selected="true"]{color:#ffd6de;border-bottom-color:var(--sa);text-shadow:0 0 8px rgba(255,51,88,.7)}
+.sheet.sins .sbody{padding:16px 18px 20px}
+.sheet.sins .xgrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.sheet.sins .xgrid .wide{grid-column:1/-1}
+@media (max-width:760px){.sheet.sins .xgrid{grid-template-columns:minmax(0,1fr)}}
+.sheet.sins .box{background:var(--sp);border:1px solid var(--sl);border-radius:12px;box-shadow:inset 0 0 0 1px rgba(255,51,88,.06)}
+.sheet.sins .box>h4{font-family:"Pirata One","Cinzel",serif;font-size:21px;font-weight:400;letter-spacing:.02em;text-transform:none;color:var(--sa);display:flex;gap:10px;align-items:baseline;flex-wrap:wrap}
+.sheet.sins .box h5{margin:0 0 4px;font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--gold)}
+.sheet.sins .xpts{font-family:"Alegreya Sans",sans-serif;font-size:13px;color:var(--sm)}
+.sheet.sins .note{color:var(--sm);font-size:13px;margin:6px 0 0}
+.sheet.sins .btn{background:var(--sp2);border-color:var(--sl);color:var(--sf)}
+.sheet.sins .btn.primary{background:var(--sa);border-color:var(--sa);color:#fff}
+.sheet.sins .btn:hover{border-color:var(--sa);box-shadow:0 0 8px rgba(255,51,88,.4)}
+.sheet.sins .x{background:none;border:0;color:var(--sm);font-size:20px;cursor:pointer;line-height:1;padding:0 4px}
+.sheet.sins .x:hover{color:var(--sa)}
+.sheet.sins .stepper{display:inline-flex;align-items:center;border:1px solid var(--sl);border-radius:8px;overflow:hidden}
+.sheet.sins .stepper button{background:var(--sp2);border:0;color:var(--sf);width:28px;height:30px;cursor:pointer;font-size:16px}
+.sheet.sins .stepper button:hover{background:var(--sa)}
+.sheet.sins .stepper input{width:46px;text-align:center;border:0;font-size:18px;font-weight:700}
+.sheet.sins .xatr{display:grid;grid-template-columns:118px auto minmax(0,1fr);gap:4px 12px;align-items:center;padding:6px 4px;border-bottom:1px solid var(--sl2);cursor:pointer;border-radius:6px}
+.sheet.sins .xatr:hover,.sheet.sins .xsk:hover{background:var(--sh)}
+.sheet.sins .xatr .n{font-family:"Pirata One","Cinzel",serif;font-size:19px}
+.sheet.sins .xatr small{color:var(--sm);font-size:12.5px}
+@media (max-width:520px){.sheet.sins .xatr{grid-template-columns:minmax(0,1fr) auto}.sheet.sins .xatr small{grid-column:1/-1}}
+.sheet.sins .xskills{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px 14px}
+.sheet.sins .xsk{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:8px;align-items:center;padding:3px 4px;border-radius:6px;cursor:pointer;font-size:15px}
+.sheet.sins .xdot{width:15px;height:15px;border-radius:50%;border:1.5px solid var(--sa);background:transparent;cursor:pointer;padding:0}
+.sheet.sins .xdot[data-v="1"]{background:var(--sa)}
+.sheet.sins .xdot[data-v="2"]{background:var(--sa);box-shadow:0 0 0 2px var(--sp),0 0 0 3.5px var(--gold)}
+.sheet.sins .xtraits{margin:0;padding-left:18px;display:flex;flex-direction:column;gap:4px;font-size:15px}
+.sheet.sins .xtraits b,.sheet.sins .xvice b{color:var(--gold);font-weight:700}
+.sheet.sins .xrdom{display:flex;gap:10px;align-items:flex-start;justify-content:space-between;padding:8px 0;border-top:1px solid var(--sl2)}
+.sheet.sins .xrdom p{margin:2px 0 0;font-size:14.5px}.sheet.sins .xrdom small{color:var(--sm)}
+.sheet.sins .xstate{margin:0 0 12px;padding:10px 14px;border:1px solid var(--sa);border-radius:10px;background:rgba(255,51,88,.14)}
+.sheet.sins .xstate b{color:#ffd6de;font-family:"Pirata One","Cinzel",serif;font-size:20px;font-weight:400;margin-right:6px}
+.sheet.sins .xbig{display:flex;align-items:center;gap:10px}.sheet.sins .xbig .sep{color:var(--sm);font-size:22px}.sheet.sins .xbig b{font-size:26px}
+.sheet.sins .xbar{height:10px;border-radius:99px;background:var(--sl2);overflow:hidden;margin:10px 0}
+.sheet.sins .xbar i{display:block;height:100%;background:linear-gradient(90deg,#b3122e,var(--sa));box-shadow:0 0 10px rgba(255,51,88,.7);width:0}
+.sheet.sins .xbar.pp i{background:linear-gradient(90deg,#8a5a12,var(--gold));box-shadow:0 0 10px rgba(242,193,78,.6)}
+.sheet.sins .xdmg{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+.sheet.sins .xdmg input{width:80px;border:1px solid var(--sl);border-radius:7px;padding:4px 8px}
+.sheet.sins .xrow{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:8px 12px;margin-top:8px}
+.sheet.sins .xstats{display:grid;grid-template-columns:repeat(auto-fill,minmax(110px,1fr));gap:8px;margin:10px 0 4px}
+.sheet.sins .xstat{display:flex;flex-direction:column;gap:2px;border:1px solid var(--sl);border-radius:10px;padding:6px 10px;background:rgba(20,5,9,.5)}
+.sheet.sins .xstat b{font-size:22px;color:#ffd6de}
+.sheet.sins .xroll{background:none;border:0;padding:0;cursor:pointer;text-align:left;color:inherit;font:inherit}
+.sheet.sins .xroll:hover b{color:var(--sa)}
+.sheet.sins .xextra{margin-top:8px}.sheet.sins .xextra summary{cursor:pointer;color:var(--sm);font-size:14px}
+.sheet.sins .xatks{display:flex;flex-direction:column;gap:4px}
+.sheet.sins .xatk{display:grid;grid-template-columns:minmax(0,1.6fr) minmax(0,1fr) minmax(0,1fr) 80px minmax(0,1.4fr) auto;gap:6px;align-items:center;padding:6px 0;border-bottom:1px solid var(--sl2)}
+@media (max-width:760px){.sheet.sins .xatk{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}.sheet.sins .xatk .xbtns{grid-column:1/-1}}
+.sheet.sins .xbtns{display:flex;gap:4px;align-items:center;flex-wrap:wrap;justify-content:flex-end}
+.sheet.sins .xadd{display:flex;flex-direction:column;gap:2px;max-width:420px;margin-top:8px}
+.sheet.sins .xadd select{border:1px solid var(--sl);border-radius:7px;padding:5px 8px}
+.sheet.sins .xpow{padding:8px 0;border-bottom:1px solid var(--sl2)}
+.sheet.sins .xph{display:grid;grid-template-columns:minmax(0,1fr) auto auto;gap:8px;align-items:center}
+@media (max-width:620px){.sheet.sins .xph{grid-template-columns:minmax(0,1fr) auto}.sheet.sins .xph .xbtns{grid-column:1/-1}}
+.sheet.sins .xph>input{font-weight:700;font-size:16px;color:#ffd6de}
+.sheet.sins .xcost{display:inline-flex;gap:4px;align-items:center}.sheet.sins .xcost input,.sheet.sins .xcost select{width:52px;text-align:center}.sheet.sins .xcost small{color:var(--gold);font-size:12px;white-space:nowrap}
+.sheet.sins .xpow textarea{min-height:44px;margin-top:6px;font-size:14.5px}
+.sheet.sins .xcaster{margin:0 0 6px}.sheet.sins .xcaster b{color:var(--gold)}
+.sheet.sins .xschools,.sheet.sins .xtal{display:flex;flex-wrap:wrap;gap:6px 16px;margin:6px 0}
+.sheet.sins .xtal{flex-direction:column}
+.sheet.sins .xtal b{color:var(--gold)}
+.sheet.sins .xinfl{display:flex;align-items:center;gap:10px;flex-wrap:wrap}.sheet.sins .xinfl b{font-size:24px;color:var(--gold)}
+.sheet.sins .xpips{display:flex;gap:4px;flex-wrap:wrap}
+.sheet.sins .xpip{width:20px;height:20px;border-radius:4px;transform:rotate(45deg);border:1.5px solid var(--sa);background:transparent;cursor:pointer;padding:0;margin:3px;font-size:0}
+.sheet.sins .xpip.on{background:var(--sa);box-shadow:0 0 8px rgba(255,51,88,.7)}
+.sheet.sins .xpip.z{transform:none;border-radius:50%;width:22px;height:22px;font-size:11px;color:var(--sm);border-color:var(--sl)}
+.sheet.sins .xpip.z.on{background:var(--sl);box-shadow:none;color:var(--sf)}
+.sheet.sins .xreq{list-style:none;margin:8px 0;padding:0;display:flex;flex-direction:column;gap:2px;color:var(--sm);font-size:14px}.sheet.sins .xreq li.ok{color:var(--gold)}
+.sheet.sins .xred{list-style:none;margin:10px 0 0;padding:0;display:flex;flex-direction:column;gap:6px}
+.sheet.sins .xred li{display:grid;grid-template-columns:34px minmax(0,1fr);gap:8px;align-items:baseline;color:var(--sm);font-size:14.5px}
+.sheet.sins .xred li b{font-family:"Pirata One","Cinzel",serif;font-size:20px;font-weight:400;text-align:center}
+.sheet.sins .xred li.on{color:var(--sf)}.sheet.sins .xred li.on b{color:#fff4c8;text-shadow:0 0 10px rgba(242,193,78,.9)}
+.sheet.sins .xred em{display:block;color:#ff8da2;font-style:normal;font-size:13px}
+.sheet.sins .xctr{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,2fr) minmax(0,1fr) auto;gap:6px;align-items:center;padding:4px 0}
+@media (max-width:620px){.sheet.sins .xctr{grid-template-columns:minmax(0,1fr) auto}}
+.sheet.sins textarea{background:rgba(20,5,9,.5)}
+.sheet.sins .conds button[aria-pressed="true"]{box-shadow:0 0 8px rgba(255,51,88,.6)}
+.sheet.sins .tools{background:rgba(20,5,9,.7);border-top:1px solid var(--sl)}
+.sheet.sins .portrait.empty{color:var(--sm);background:var(--sp2)}
+.sheet.sins .sfield{display:flex;flex-direction:column;gap:4px}
+.sheet.sins .check-line{display:flex;gap:8px;align-items:flex-start;cursor:pointer}
+.sheet.sins input[type=checkbox]{width:auto;flex:none;margin:4px 0 0;accent-color:var(--sa)}
 .sheet.etmos{--sbg:#e5e0f0;--sp:#eeeaf6;--sp2:#d9d2ea;--sf:#2b1830;--sm:#6b5875;--sa:#4a2350;--sab:#f4effa;--sl:#b6abc9;--sl2:#cdc4dc;--sh:#f7f4fc;
   background:var(--sbg);color:var(--sf);font-family:"EB Garamond",Georgia,serif;font-size:16px;
   background-image:radial-gradient(ellipse at 0% 0%,rgba(255,255,255,.55),transparent 55%),radial-gradient(ellipse at 100% 100%,rgba(74,35,80,.12),transparent 50%)}
@@ -1007,7 +1113,7 @@ h1.view{font-family:var(--f-title);font-weight:400;font-size:32px;margin:4px 0 4
 .sheet.etmos .erecent b{font-family:"IM Fell English SC",Georgia,serif;font-weight:400;font-size:18px;color:var(--sa)}
 .sheet.etmos .erecent small{margin-left:auto;color:var(--sm)}
 .sheet.etmos .erecent:hover{background:var(--sh)}
-.badge.etmos{color:#5b2a63}.badge.sacra{color:#8a3b12}
+.badge.etmos{color:#5b2a63}.badge.sacra{color:#8a3b12}.badge.sins{color:#c8102e}
 .etw-mini{font-family:"IM Fell English SC",Georgia,serif;font-weight:400!important}
 /* section switch shared with the map (same look on both sides) */
 .viewsw{display:inline-flex;border:1px solid var(--line);border-radius:8px;overflow:hidden;flex:0 0 auto}
@@ -4873,7 +4979,86 @@ const sacV=(sh,f)=>{const a=sh.atr||{},m=sh.montaria||{};switch(f){
   case 'mov':return (sh.movBase==null?1:num(sh.movBase))+num(a.vel)+num(sh.movExtra);case 'acoes':return (sh.acoesBase==null?1:num(sh.acoesBase))+num(a.cor)+num(sh.acoesExtra);
   case 'antpts':return 4+num(a.int);case 'antuso':return SACRA.ants.reduce((t,[k])=>t+num((sh.ant||{})[k]),0);
   case 'mvida':return 6+num(m.vidaExtra);case 'mdor':return 6+num(m.dorExtra);case 'mpts':return num(m.potencia)+num(m.resistencia);}return 0;};
-const SYS={dnd:DND,op:OP,etmos:ETMOS,sacra:SACRA};
+/* ---------- Seven Sins: fansistema do Hellaverse, 1d20 + atributo + perícia ---------- */
+const SINS={id:'sins',n:'Seven Sins',
+  atrs:[['brut','Brutalidade','Força, briga, armas brancas. Soma no dano corpo a corpo e nos PV.'],['agi','Agilidade','Reflexos, armas de fogo, furtividade. Soma na Defesa e na Iniciativa.'],['lab','Lábia','Conversa, sedução, mentira, negócios.'],['ast','Astúcia','Inteligência, tecnologia, investigação, ocultismo.'],['inf','Inferno','Poder demoníaco: magia, intimidação, vontade. Soma nos PP.']],
+  skills:[['briga','Briga','brut'],['armasBrancas','Armas Brancas','brut'],['atletismo','Atletismo','brut'],['resistencia','Resistência','brut'],
+    ['armasFogo','Armas de Fogo','agi'],['furtividade','Furtividade','agi'],['reflexos','Reflexos','agi'],['pilotagem','Pilotagem','agi'],['acrobacia','Acrobacia','agi'],
+    ['persuasao','Persuasão','lab'],['seducao','Sedução','lab'],['enganacao','Enganação','lab'],['performance','Performance','lab'],
+    ['investigacao','Investigação','ast'],['tecnologia','Tecnologia','ast'],['ocultismo','Ocultismo','ast'],['percepcao','Percepção','ast'],['medicina','Medicina','ast'],
+    ['intimidacao','Intimidação','inf'],['magia','Magia Infernal','inf'],['vontade','Vontade','inf']],
+  racas:{
+    imp:{n:'Imp',pv:10,pvNv:4,desloc:9,voo:0,atr:'+1 Agilidade',pts:6,max:3,def:1,rd:0,pp:0,inf:1,per:{acrobacia:2,reflexos:2},magia:'Só com grimório.',
+      tracos:[['Pequeno e esquivo','+1 na Defesa.'],['Cauda ágil','+2 em Acrobacia e Reflexos.'],['Cria da rua','Vantagem para notar golpes, armadilhas e emboscadas na cidade.'],['Sem dom para magia','Só lança feitiços com grimório.']],
+      dons:[['Golpe do Assassino',1,'Contra um alvo desprevenido ou que não te viu, o ataque causa +2d6 de dano.']]},
+    hellhound:{n:'Hellhound',pv:14,pvNv:4,desloc:12,voo:0,atr:'+1 Brutalidade',pts:6,max:3,def:0,rd:0,pp:0,inf:1,per:{percepcao:2},magia:'Só com grimório.',
+      tracos:[['Faro','+2 em Percepção e vantagem para rastrear pelo cheiro.'],['Garras e presas','Arma natural de 1d6 + Brutalidade.'],['Matilha','Você e um aliado adjacente ao mesmo inimigo ganham +1 no ataque contra ele.'],['Sem dom para magia','Só lança feitiços com grimório.']],
+      dons:[['Uivo',1,'Aliados que ouvem ganham +1 no ataque até seu próximo turno. Inimigos a até 9 m testam Vontade ou ficam Amedrontados por 1 rodada.']]},
+    sinner:{n:'Sinner',pv:12,pvNv:4,desloc:9,voo:0,atr:'+1 em qualquer',pts:6,max:3,def:0,rd:0,pp:0,inf:1,per:{},magia:'Com o arquétipo Ocultista (Iniciado) ou o talento Sangue Arcano.',
+      tracos:[['Já está morto','No limite de morte fica Despedaçado e se recompõe em 1d4 dias. Só o Aço Angelical o destrói.'],['Pecado de origem','Ganha o bônus de um pecado, além do Vício.'],['Arquétipo de vida','Perícia do arquétipo treinada e 1 Manifestação dele.'],['Sobe na cadeia','O caminho mais comum até Overlord.']],
+      dons:[]},
+    goetia:{n:'Ars Goetia',pv:20,pvNv:6,desloc:9,voo:18,atr:'+2 Inferno e +1 em qualquer',pts:8,max:4,def:0,rd:1,pp:6,inf:5,per:{ocultismo:4},magia:'Conjurador nato: todas as escolas, 2º círculo desde o nível 1 e 3º a partir do 3.',
+      tracos:[['Sangue da Ars Goetia','8 pontos de atributo, máximo +4; depois +2 Inferno e +1 em qualquer.'],['Corpo nobre','PV base 20, +6 PP, +6 + Brutalidade PV por nível, RD 1 natural.'],['Asas','Voo de 18 m.'],['Sangue nobre','Começa com Influência 5. Quem tem Influência menor tem desvantagem para te atacar ou mentir na primeira rodada.'],['Olhos estelares','+4 em Ocultismo, enxerga no escuro, vê magia e marcas de contrato.'],['Magia de sangue','Uma vez por cena, um feitiço de 1º círculo não custa PP.'],['Aura Estelar','Presença Esmagadora de graça; DT +2 contra quem tem Influência menor.'],['Talento cedo','Um Talento de Assinatura no nível 1.'],['Etiqueta da corte','Vantagem em Persuasão com nobres, desvantagem em Furtividade em público.'],['O fardo do título','Um dever, um rival nobre e um superior na sua história.']],
+      dons:[['Travessia',2,'Uma vez por cena. Portal entre o Inferno e o mundo mortal por um minuto. Do outro lado, todos parecem humanos.'],['Voz da Nobreza',2,'Uma vez por cena. Um Imp, Hellhound ou Sinner de Influência menor testa Vontade DT 19 ou obedece a uma ordem.'],['Presença Esmagadora',1,'Inimigos a até 6 m testam Vontade ou ficam Amedrontados por 1 rodada.']]}},
+  vicios:[['soberba','Soberba','+2 em Intimidação e Vontade',{intimidacao:2,vontade:2},'é admirado, elogiado ou humilha alguém'],['luxuria','Luxúria','+2 em Sedução',{seducao:2},'vive uma cena de romance, sedução ou prazer'],['gula','Gula','+2 em Resistência; comida e bebida curam +2 PV',{resistencia:2},'come ou bebe em excesso'],['ganancia','Ganância','+2 em Persuasão para negociar; dobro de dinheiro inicial',{persuasao:2},'fecha um bom negócio ou lucra'],['ira','Ira','+1 de dano corpo a corpo',{},'briga, destrói coisas ou se vinga'],['inveja','Inveja','+2 em Enganação',{enganacao:2},'toma algo de alguém ou supera um rival'],['preguica','Preguiça','+1 na Defesa no turno em que não se mover',{},'dorme, enrola ou foge de uma obrigação']],
+  aneis:['Soberba','Luxúria','Gula','Ganância','Ira','Inveja','Preguiça'],
+  universais:[['Marca da Morte',1,'Por uma cena, o jeito como você morreu vira poder: +1d6 de um tipo de dano ligado à morte ou vantagem em um tipo de teste.'],['Arma Assinatura',0,'Livre. Uma arma ou objeto ligado à sua vida aparece na sua mão. Se perdida, volta no fim da cena.'],['Recomposição',2,'Recupera 2d8 PV e recoloca partes perdidas. Não cura dano sagrado.'],['Último Suspiro',1,'Reação: ao chegar a 0 PV, faça um ataque ou uma ação antes de cair.'],['Lembrança Viva',0,'Uma vez por sessão, uma memória da sua vida dá vantagem num teste de perícia ligado a ela.'],['Aura do Pecado',1,'Por uma cena, quem tem o mesmo Vício que você tem desvantagem para resistir à sua Lábia e Intimidação.'],['Domínio',0,'Só com Influência 8+. Numa área sua você tem vantagem em tudo, sabe quem entra e sai, e seus capangas recebem +2.']],
+  arquetipos:{
+    mafioso:{n:'Mafioso / Gângster',per:'intimidacao',m:[['Arsenal sem Fim',1,'Saca qualquer arma de fogo comum do paletó. Não fica sem munição por uma cena.'],['Chuva de Balas',2,'Cone de 9 m: 3d6, Reflexos reduz à metade.'],['Família',1,'Uma vez por sessão, dois capangas (PV 8, ataque +3, 2d6) ajudam por uma cena.'],['Oferta Irrecusável',1,'Vantagem em Intimidação ou Persuasão para impor um acordo. Quem recusa fica Amedrontado por 1 rodada.'],['Colete de Chumbo',0,'RD +1 contra armas de fogo.'],['Acerto de Contas',2,'Seu próximo acerto contra quem te feriu nesta cena causa +2d6.']]},
+    sedutor:{n:'Sedutor / Cortesão',per:'seducao',m:[['Charme Infernal',0,'Uma vez por cena, vantagem em Sedução ou Persuasão.'],['Ler Desejos',1,'Olhando alguém, você sabe o que essa pessoa mais quer agora.'],['Beijo Drenante',2,'Toque ou beijo: 2d6 de dano, e você recupera metade em PV.'],['Paixão Cega',2,'O alvo testa Vontade ou fica Enfeitiçado por você por uma cena. Se você ou um aliado o atacar, o efeito acaba.'],['Lágrimas na Hora',1,'Vantagem em Enganação para despertar pena, ganhar tempo ou escapar de uma punição.'],['Ciúme',2,'Dois inimigos que te veem testam Vontade ou passam a próxima rodada brigando entre si.']]},
+    artista:{n:'Artista / Estrela',per:'performance',m:[['Holofote',1,'Por uma rodada, inimigos têm desvantagem para atacar seus aliados.'],['Bis!',2,'Repete a última ação de um aliado, ou a sua, como ação livre. Uma vez por cena.'],['Fã-clube',1,'Uma multidão de fãs aparece, vira terreno difícil para inimigos e te esconde.'],['Ensaio Perfeito',0,'Uma vez por cena, role de novo um teste de Performance, Acrobacia ou Enganação.'],['Número Musical',2,'Aliados que ouvem recuperam 1d6 PV e deixam de estar Amedrontados.'],['Crítica Mordaz',1,'O alvo testa Vontade ou tem desvantagem no próximo teste, humilhado.']]},
+    cientista:{n:'Cientista / Inventor',per:'tecnologia',m:[['Engenhoca',1,'Monta na hora um aparelho simples que dura uma cena.'],['Corpo Modificado',0,'Uma arma embutida (1d8 corpo a corpo ou 2d6 à distância) ou RD +1.'],['Experimento Instável',2,'Área de 3 m: 3d6 de ácido, fogo ou veneno. Num 1 natural, explode em você também.'],['Análise',1,'Descobre a Defesa, a RD e um ponto fraco de um alvo.'],['Remendo Rápido',1,'Conserta um objeto ou aparelho, ou dá 1d8 PV a um aliado.'],['Robô Ajudante',2,'Um ajudante mecânico por uma cena: Defesa 12, 10 PV, ataque +4, 1d8.']]},
+    assassino:{n:'Assassino / Psicopata',per:'furtividade',m:[['Marcar a Presa',1,'Por uma cena: +1d6 de dano contra um alvo e você sempre sabe onde ele está.'],['Sumiço',1,'Invisível até atacar ou até o fim da próxima rodada.'],['Instrumento Favorito',0,'Sua Arma Assinatura causa +2 de dano e tem crítico em 19–20.'],['Golpe Limpo',2,'Contra um alvo Fora de combate, Agarrado ou desprevenido: o acerto é crítico.'],['Rosto Comum',0,'Vantagem em Furtividade em multidões. Ninguém lembra bem do seu rosto.'],['Lâmina Oculta',0,'Você sempre tem uma arma pequena escondida que nenhuma revista encontra.']]},
+    ocultista:{n:'Ocultista / Cultista',per:'ocultismo',m:[['Iniciado',0,'Pode estudar Magia Infernal: 2 escolas à escolha e 2 feitiços. É a Manifestação do nível 1 deste arquétipo.'],['Oferenda de Sangue',1,'Custa também 1d6 PV. O próximo feitiço não gasta PP.'],['Círculo de Proteção',2,'Círculo de 3 m: demônios e anjos de fora precisam passar em Vontade para entrar.'],['Familiar',0,'Um bichinho infernal que vê e ouve por você a até 1 km.'],['Leitor de Runas',0,'Vantagem para identificar magia. Grimórios não custam +1 PP para você.'],['Selo de Banimento',2,'Desfaz uma criatura invocada ou sombra. Criaturas reais testam Vontade ou são empurradas 9 m.']]},
+    comunicador:{n:'Comunicador / Mídia',per:'persuasao',m:[['Voz em Todo Lugar',1,'Projeta voz e imagem por qualquer tela, alto-falante ou câmera a até 1 km.'],['Manchete',2,'Uma notícia sua se espalha pelo anel: +1 de Influência por uma sessão, ou −1 para um alvo.'],['Interferência',1,'Desliga ou embaralha câmeras, rádios e telas num raio de 30 m por uma cena.'],['Entrevista Exclusiva',1,'O alvo testa Vontade ou responde uma pergunta com a verdade.'],['Ao Vivo!',2,'Enquanto a cena é transmitida, inimigos têm desvantagem para te atacar.'],['Fonte Anônima',0,'Uma vez por sessão, um contato te passa uma informação útil.']]},
+    soldado:{n:'Soldado / Policial',per:'armasFogo',m:[['Disciplina',0,'+1 na Defesa e +2 em Iniciativa.'],['Fogo de Supressão',1,'Área de 6 m: quem se mover dentro dela leva 2d6.'],['Não Caio Aqui',2,'Reação: reduz à metade o dano de um golpe.'],['Cobertura',1,'Reação: um aliado adjacente ganha +4 na Defesa contra um ataque.'],['Granadeiro',0,'Começa cada sessão com 2 granadas. Reflexos contra elas tem desvantagem.'],['Ordem de Comando',1,'Um aliado faz agora um movimento ou ataque extra.']]},
+    festeiro:{n:'Festeiro / Viciado',per:'resistencia',m:[['Química no Sangue',0,'Imune a veneno. Bêbado ou chapado, não tem desvantagem e ganha +1 de dano.'],['Alma da Festa',1,'Numa cena social, você e aliados têm vantagem em Lábia.'],['Coquetel Infernal',2,'Garrafa arremessada: 2d6 de fogo em área de 3 m, alvos ficam Em chamas.'],['Ressaca Imortal',0,'Recupera +1d6 PV em cada descanso curto.'],['Rodada por Minha Conta',1,'Por uma hora, todo mundo no bar te trata como amigo e conta mais do que devia.'],['Pista de Dança',2,'Área de 6 m: inimigos testam Vontade ou dançam e perdem a próxima ação.']]},
+    aristocrata:{n:'Aristocrata / Rico',per:'persuasao',m:[['Dinheiro Resolve',1,'Uma vez por sessão, compra uma solução: suborno, equipamento, transporte, informação.'],['Criados',0,'Um criado leal (PV 10, sem combate) que busca, entrega e espiona.'],['Letra Miúda',2,'Num contrato que você escreve, a outra parte tem desvantagem para notar brechas.'],['Sangue Azul',0,'+1 de Influência.'],['Herança',1,'Uma vez por sessão, uma propriedade ou objeto valioso da família te serve na cena.'],['Desprezo',1,'Um alvo de Influência menor que a sua testa Vontade ou não consegue te atacar nesta rodada.']]},
+    fera:{n:'Fera / Monstro',per:'atletismo',m:[['Forma Monstruosa',2,'Por uma cena: +10 PV temporários, garras 2d6 + Brutalidade, desvantagem em Furtividade e Lábia.'],['Couro Grosso',0,'RD +1.'],['Rugido',1,'Inimigos a até 9 m testam Vontade ou ficam Atordoados por 1 rodada.'],['Faro de Sangue',0,'Sente feridos a até 30 m e causa +1d6 contra alvos Sangrando.'],['Investida',1,'Move até o dobro e ataca. O alvo testa Atletismo ou fica Caído.'],['Devorar',2,'Mordida num alvo Agarrado: 3d6, e você recupera metade em PV.']]},
+    golpista:{n:'Golpista / Ladrão',per:'enganacao',m:[['Mãos Leves',0,'Vantagem para roubar, trocar e esconder objetos.'],['Cara de Pau',1,'Uma mentira sua é aceita até alguém provar o contrário.'],['Rota de Fuga',1,'Move o dobro, e ataques contra você têm desvantagem até seu próximo turno.'],['Golpe do Baú',2,'Uma vez por sessão, arranca de alguém dinheiro, um objeto ou um favor sem que ele perceba até ser tarde.']]},
+    lutador:{n:'Lutador / Atleta',per:'briga',m:[['Punhos de Aço',0,'Seus socos causam 1d8 + Brutalidade.'],['Nocaute',2,'Num acerto corpo a corpo, o alvo testa Resistência ou fica Atordoado.'],['Segundo Fôlego',1,'Recupera 1d10 + Brutalidade PV.'],['Contra-ataque',1,'Reação: quando um ataque corpo a corpo erra você, ataque de volta.']]},
+    pregador:{n:'Pregador / Religioso',per:'vontade',m:[['Fé Cega',0,'Vantagem contra ficar Amedrontado ou Enfeitiçado.'],['Sermão',1,'Por uma cena, aliados que ouvem ganham +2 em Vontade e deixam de estar Amedrontados.'],['Penitência',2,'O alvo testa Vontade ou leva 2d6 e fica Atordoado. Contra anjos, +1d6.'],['Rebanho',1,'Uma vez por sessão, fiéis aparecem para esconder, abrigar ou defender você.']]}},
+  dons:[['Forma Demoníaca',2,'Por uma cena: +2 em ataques e testes de Brutalidade, +5 PV temporários, vantagem em Intimidação.'],['Regeneração',1,'Recupera 1d8 + Inferno PV. Não cura dano sagrado.'],['Presença Esmagadora',1,'Inimigos a até 6 m testam Vontade ou ficam Amedrontados por 1 rodada.'],['Lâmina de Pecado',1,'Por uma cena, a arma corpo a corpo causa +1d6 do tipo do seu Vício.'],['Olhos do Abismo',1,'Por uma hora: enxerga no escuro, vê magia e marcas de contrato.'],['Pele de Ferro',1,'+2 de RD até o fim da cena.'],['Frenesi',2,'Um ataque extra por turno por 3 rodadas; depois fica Atordoado por 1 rodada.'],['Faro de Negócio',1,'Descobre o preço, o ponto fraco ou a mentira de alguém numa negociação.'],['Não Dessa Vez',2,'Reação: quando um ataque te leva a 0 PV, fique com 1 PV. Uma vez por sessão.'],['Olhar Sedutor',1,'Vantagem em Sedução com um alvo por uma cena.'],['Sopro de Fogo',1,'Cone de 4,5 m: 2d6 de fogo, Reflexos reduz à metade.'],['Cauda Chicote',0,'Sua cauda é uma arma natural de 1d6 + Brutalidade com alcance de 3 m.'],['Salto Infernal',1,'Salta até 12 m em qualquer direção e cai sem sofrer dano.'],['Escalador',0,'Anda por paredes e tetos na velocidade normal.'],['Sangue Ácido',0,'Quem te fere corpo a corpo leva 1d4 de ácido.'],['Mandíbula de Ferro',1,'Mordida de 2d6 + Brutalidade; o alvo fica Agarrado.'],['Sentidos Aguçados',0,'+2 em Percepção e não pode ser surpreendido.'],['Raça Ruim',0,'+1 PV por nível e vantagem contra veneno e doença.'],['Ventre Sem Fundo',1,'Engole um objeto do tamanho de uma maleta e o guarda dentro de você até querer tirá-lo.'],['Fogo nos Olhos',1,'Um alvo que te encara testa Vontade ou fica Amedrontado por 1 rodada.'],['Braço Extra',0,'Um braço ou tentáculo a mais: segura mais um objeto e +2 em Atletismo para agarrar.'],['Pele Camaleão',1,'Por uma cena, vantagem em Furtividade parado ou em sombras.']],
+  escolas:{
+    chamas:{n:'Chamas',f:[[1,'Labareda','Ataque à distância (18 m): 2d6 de fogo. No crítico, o alvo fica Em chamas.','2d6'],[1,'Mão Ardente','Seu toque ou arma queima por uma cena: +1d4 de fogo.'],[1,'Fumaça Sulfurosa','Nuvem de 6 m que bloqueia a visão por 3 rodadas. Quem respira testa Resistência ou perde o movimento.'],[2,'Coluna de Fogo','Área de 3 m: 3d6 de fogo, Reflexos reduz à metade.','3d6'],[2,'Muralha de Chamas','Parede de fogo de 9 m por uma cena: 2d6 a quem atravessar.','2d6'],[3,'Inferno Pessoal','Área de 6 m ao seu redor: 5d6 de fogo, você é imune. O chão queima por 3 rodadas.','5d6'],[3,'Meteoro de Enxofre','Área de 6 m até 60 m: 4d6 de fogo e alvos ficam Caídos. Reflexos reduz à metade e evita a queda.','4d6']]},
+    sombras:{n:'Sombras',f:[[1,'Passo das Sombras','Teleporte de 12 m entre áreas escuras.'],[1,'Manto Escuro','Por uma cena, vantagem em Furtividade e luzes fracas se apagam perto de você.'],[1,'Toque Gélido','Ataque corpo a corpo: 2d6 de frio e o alvo perde o movimento no próximo turno.','2d6'],[2,'Correntes do Abismo','2d6 de dano e o alvo fica Agarrado (Reflexos evita).','2d6'],[2,'Escuridão Profunda','Esfera de 6 m de escuridão total por uma cena. Só você enxerga dentro dela.'],[3,'Sombra Viva','Sua sombra luta por uma cena: Defesa 14, 15 PV, ataque +6, 2d6.'],[3,'Engolir pelo Chão','O alvo some por 1d4 rodadas e volta com 3d6 de dano (Vontade evita).','3d6']]},
+    encanto:{n:'Encanto e Ilusão',f:[[1,'Ilusão Menor','Imagem ou som falso por uma cena. Investigação contra a DT revela.'],[1,'Sussurro','Fala na mente de alguém que você vê, até 30 m.'],[1,'Rosto Amigável','O alvo testa Vontade ou te trata como conhecido por uma cena.'],[2,'Voz Hipnótica','O alvo testa Vontade ou obedece a uma ordem curta.'],[2,'Duplos','Três cópias suas: cada ataque contra você tem 50% de chance de acertar uma cópia.'],[3,'Disfarce Perfeito','Você, ou um aliado, vira outra pessoa por uma hora, com voz e cheiro.'],[3,'Memória Roubada','O alvo testa Vontade ou esquece os últimos 10 minutos, ou uma pessoa, por um dia.']]},
+    pactos:{n:'Pactos',f:[[2,'Ler Alma','Vê com quem o alvo tem contratos.'],[3,'Contrato em Massa','Firma o mesmo contrato com várias pessoas ao mesmo tempo. Cada uma aceita ou recusa os termos.']]},
+    portais:{n:'Portais',f:[[1,'Bolso Infernal','Guarda até 3 objetos num espaço só seu e tira quando quiser.'],[1,'Puxão','Puxa um objeto ou criatura pequena até 18 m para perto de você.'],[1,'Fechadura Aberta','Abre ou tranca qualquer porta, cofre ou cadeado comum.'],[2,'Porta Rápida','Portal entre dois pontos que você vê, até 60 m, por uma rodada.'],[2,'Troca de Lugar','Você e uma criatura a até 18 m trocam de posição. Quem não quer testa Vontade.'],[3,'Travessia','Portal entre o Inferno e o mundo mortal por um minuto.'],[3,'Fenda Infernal','Fenda de 3 m no chão: quem estiver em cima testa Reflexos ou cai num lugar escolhido do anel.']]},
+    astros:{n:'Astros',f:[[1,'Ler as Estrelas','Uma pergunta de sim ou não ao mestre sobre o futuro próximo.'],[1,'Sorte Torta','Um alvo tem desvantagem no próximo teste (Vontade evita).'],[1,'Pressentimento','Por uma cena, você não pode ser surpreendido e ganha +2 em Iniciativa.'],[2,'Fio do Destino','Uma vez por cena, faz alguém rolar de novo um d20.'],[2,'Estrela Cadente','Ataque à distância (36 m): 3d6 e o alvo fica ofuscado.','3d6'],[3,'Constelação Protetora','Aliados a até 9 m ganham +2 na Defesa e em resistências por uma cena.'],[3,'Profecia','Uma vez por sessão, o próximo d20 de alguém vira 20 ou 1, à sua escolha.']]},
+    pesadelos:{n:'Pesadelos',f:[[1,'Medo Repentino','O alvo testa Vontade ou fica Amedrontado por 1 rodada.'],[1,'Visão Horrenda','Você parece um monstro por uma cena: vantagem em Intimidação.'],[2,'Pior Pesadelo','3d6 de dano psíquico e fica Amedrontado (Vontade reduz à metade e evita o medo).','3d6'],[2,'Sono Inquieto','O alvo testa Vontade ou dorme por uma cena.'],[3,'Terror em Massa','Inimigos a até 12 m testam Vontade ou fogem de você por 2 rodadas.'],[3,'Caminhar em Sonhos','Entra no sonho de alguém: conversa, espiona ou causa 4d6 de dano psíquico.','4d6']]},
+    carne:{n:'Carne e Ossos',f:[[1,'Garras Afiadas','Por uma cena, suas mãos causam 1d8 + Brutalidade.'],[1,'Estancar','Para o Sangrando e cura 1d6 PV de um alvo tocado.'],[2,'Ossos de Pedra','+2 de RD e vantagem contra ficar Caído por uma cena.'],[2,'Ferver o Sangue','O alvo testa Resistência ou leva 3d6 e fica Sangrando.','3d6'],[3,'Mutação','Por uma cena: asas (voo 12 m), couro (RD +2) ou braços extras (um ataque a mais).'],[3,'Retorcer','O alvo testa Resistência ou leva 5d6 e fica Atordoado. Metade se passar.','5d6']]}},
+  talentos:[['executor','Executor','Críticos com 19 ou 20.'],['magnata','Magnata','+3 de Influência.'],['intocavel','Intocável','+2 na Defesa.'],['pactos','Mestre dos Pactos','+2 para negociar e achar brechas em contratos.'],['monstro','Monstro','+10 PV.'],['arcano','Sangue Arcano','Sinner: estuda 1 escola de Magia Infernal.']],
+  supremos:[['Forma Verdadeira',4,'Por uma cena: +2 de tamanho, +20 PV temporários, +2 em ataques e Defesa, ataques de 3d6 + Brutalidade.'],['Transmissão Total',3,'Toma todas as telas e alto-falantes do anel por uma cena. Quem vê testa Vontade ou fica Amedrontado.'],['Legião',4,'Uma vez por sessão, 20 capangas (PV 8, ataque +4, 2d6) lutam por uma cena.'],['Preço Cobrado',3,'Quem te deve algo testa Vontade DT 22 ou cumpre a dívida agora.'],['Tempestade do Anel',5,'Área de 30 m: 6d6 do tipo do seu Vício, Reflexos reduz à metade.'],['Imortalidade Comprada',0,'Uma vez por arco, quando seria destruído, volta 1d4 dias depois no seu território. Não contra Aço Angelical.']],
+  armas:[['Soco / chute','1d4','cc','briga',''],['Garras e presas','1d6','cc','briga','Hellhound'],['Faca, adaga','1d6','cc','armasBrancas','arremesso 9 m'],['Taco, bastão, corrente','1d8','cc','armasBrancas',''],['Machado, montante, foice','2d6','cc','armasBrancas','duas mãos'],['Pistola','2d6','dist','armasFogo','18 m · 12 tiros'],['Revólver','2d6+1','dist','armasFogo','18 m · 6 tiros'],['Escopeta','3d6','dist','armasFogo','9 m · 2 tiros'],['Fuzil','2d8','dist','armasFogo','60 m'],['Submetralhadora','2d6','dist','armasFogo','18 m · rajada: 5 tiros, 2 alvos'],['Granada','4d6','dist','atletismo','raio 3 m · Reflexos DT 13 metade']],
+  armaduras:[['Nenhuma',0,0],['Jaqueta reforçada',1,0],['Colete à prova de balas',2,0],['Armadura pesada',3,1],['Escudo',0,2]],
+  conds:['Caído','Agarrado','Amedrontado','Atordoado','Em chamas','Sangrando','Envenenado','Enfeitiçado','Bêbado','Fora de combate']};
+const SINS_REDENCAO=[[3,'Luz Interior: vantagem em Vontade contra Enfeitiçado; dano sagrado contra você −2.',''],[5,'Toque Restaurador (1 PP): cura 1d8 + Inferno PV, inclusive dano sagrado.','−2 PP máximos e não pode virar Overlord.'],[7,'Brilho Fraco (2 PP, 1×/cena): +2d6 de dano sagrado no próximo ataque.','−2 de Influência.'],[9,'Asas de Luz: voo 12 m; exorcistas têm desvantagem na primeira rodada.','Dons e Manifestações custam +1 PP.'],[10,'Redimido: sobe ao Céu.','Deixa tudo no Inferno.']];
+const sRace=sh=>SINS.racas[sh.raca]||SINS.racas.sinner;
+const sVice=sh=>SINS.vicios.find(v=>v[0]===sh.vicio);
+const sTal=(sh,k)=>!!(sh.talentos||{})[k];
+const sSkill=(sh,k)=>{const sk=SINS.skills.find(x=>x[0]===k);if(!sk)return 0;const r=sRace(sh),v=sVice(sh),po=SINS.vicios.find(x=>x[0]===sh.pecadoOrigem&&sh.raca==='sinner');
+  return num((sh.atr||{})[sk[2]])+[0,2,4][num((sh.per||{})[k])]+num(r.per[k])+num(v&&v[3][k])+num(po&&po!==v&&po[3][k]);};
+const sOver=sh=>!!sh.overlord;
+const sRed=sh=>sh.raca==='sinner'?num(sh.redencao):0;
+const sCaster=sh=>sh.raca==='goetia'?'nato':(sh.raca==='sinner'&&(sh.arquetipo==='ocultista'||sTal(sh,'arcano')))?'estudo':'grimorio';
+const sCirc=sh=>{const n=num(sh.nivel)||1;return sh.raca==='goetia'?(n>=3?3:2):(n>=5?3:n>=3?2:1);};
+function sinsV(sh,f){const a=sh.atr||{},r=sRace(sh),n=Math.max(1,num(sh.nivel)||1),br=num(a.brut);switch(f){
+  case 'pv':return r.pv+2*br+(n-1)*Math.max(1,r.pvNv+br)+(sTal(sh,'monstro')?10:0)+(sOver(sh)?20:0)+num(sh.pvAj);
+  case 'pp':return Math.max(1,3+num(a.inf)+Math.floor(n/2)+r.pp+(sOver(sh)?5:0)-(sRed(sh)>=5?2:0)+num(sh.ppAj));
+  case 'def':return 10+num(a.agi)+num((sh.armadura||{}).def)+r.def+(sTal(sh,'intocavel')?2:0)+num(sh.defAj);
+  case 'rd':return num((sh.armadura||{}).rd)+r.rd+num(sh.rdAj);
+  case 'ini':return num(a.agi)+num(sh.iniAj);
+  case 'mag':return num(a.inf)+[0,2,4][num((sh.per||{}).magia)];
+  case 'dt':return 10+num(a.inf)+Math.floor(n/2);
+  case 'circ':return sCirc(sh);
+  case 'infl':return clamp(num(sh.influencia),0,10);
+  case 'pts':return SINS.atrs.reduce((t,[k])=>t+num(a[k]),0);
+  case 'ptsMax':return r.pts;
+  case 'desloc':return r.desloc;
+  case 'morte':return -Math.floor(sinsV(sh,'pv')/2);}
+  if(f.startsWith('per.'))return sSkill(sh,f.slice(4));return 0;}
+const SYS={dnd:DND,op:OP,etmos:ETMOS,sacra:SACRA,sins:SINS};
 const COLORS=['#7b1e1e','#2f5a7a','#3f6a3a','#8a5a1a','#5a3f7a','#1f6a6a','#8a2f5a','#4a4a52'];
 
 function newDnd(){return {sys:'dnd',nome:'',jogador:'',classe:'',subclasse:'',nivel:1,especie:'',antecedente:'',alinhamento:'',xp:0,cor:COLORS[Math.floor(Math.random()*COLORS.length)],
@@ -4887,7 +5072,20 @@ function newSacra(){return {sys:'sacra',nome:'',jogador:'',nivel:1,xp:0,recompen
   ant:{atencao:0,medicina:0,montaria:0,negocios:0,roubo:0,suor:0,tradicao:0,violencia:0},habilidades:[],redencao:{titulo:'',desc:'',passos:[0,1,2,3,4,5].map(()=>({t:'',ok:false}))},
   itens:[],dinheiro:'',conceito:'',aparencia:'',passado:'',objetivo:'',anotacoes:'',cond:[],
   montaria:{nome:'',especie:'',fidelidade:0,vidaMarc:0,vidaExtra:0,dorMarc:0,dorExtra:0,potencia:0,resistencia:0,equip:'',notas:''}};}
-const NEWSHEET={dnd:()=>newDnd(),op:()=>newOp(),etmos:()=>newEtmos(),sacra:()=>newSacra()};
+function newSins(){const s={sys:'sins',nome:'',jogador:'',raca:'sinner',nivel:1,vicio:'',anel:'',pecadoOrigem:'',arquetipo:'',cor:COLORS[Math.floor(Math.random()*COLORS.length)],
+  atr:{brut:0,agi:0,lab:0,ast:0,inf:0},per:{},pvTemp:0,danoSagrado:0,pvAj:0,ppAj:0,defAj:0,rdAj:0,iniAj:0,armadura:{nome:'Nenhuma',rd:0,def:0},
+  ataques:[{nome:'Soco / chute',tipo:'cc',per:'briga',dano:'1d4',notas:''}],dons:[],manif:[],feiticos:[],grimorio:[],escolas:{},talentos:{},
+  influencia:1,almas:0,dinheiro:'$ 200',overlord:false,territorio:'',tenente:'',supremo:'',redencao:0,contratos:[],equipamento:'',cond:[],
+  aparencia:'',chegada:'',vida:'',quer:'',teme:'',lacos:'',notas:''};s.pv=sinsV(s,'pv');s.ppAtual=sinsV(s,'pp');s._mx={pv:s.pv,pp:s.ppAtual};s._raca=s.raca;return s;}
+/* derived maxima follow the sheet: a raised maximum raises the current value by the same amount */
+function sinsSync(sh){const mx={pv:sinsV(sh,'pv'),pp:sinsV(sh,'pp')};let ch=false;
+  if(sh._raca&&sh._raca!==sh.raca){const o=SINS.racas[sh._raca];if(o&&num(sh.influencia)===o.inf){sh.influencia=sRace(sh).inf;ch=true;}}
+  if(sh._raca!==sh.raca){sh._raca=sh.raca;ch=true;}
+  if(sh.pv==null)sh.pv=mx.pv;if(sh.ppAtual==null)sh.ppAtual=mx.pp;
+  if(!sh._mx){sh._mx=mx;ch=true;}
+  else{if(mx.pv!==sh._mx.pv){sh.pv=Math.min(mx.pv,num(sh.pv)+mx.pv-num(sh._mx.pv));ch=true;}if(mx.pp!==sh._mx.pp){sh.ppAtual=clamp(num(sh.ppAtual)+mx.pp-num(sh._mx.pp),0,mx.pp);ch=true;}sh._mx=mx;}
+  if(ch&&canEdit(sh))queueSave(sh);}
+const NEWSHEET={dnd:()=>newDnd(),op:()=>newOp(),etmos:()=>newEtmos(),sacra:()=>newSacra(),sins:()=>newSins()};
 const newFor=sys=>(NEWSHEET[sys]||NEWSHEET.dnd)();
 function newOp(){const s={sys:'op',nome:'',jogador:'',origem:'',classe:'combatente',trilha:'',nex:5,patente:'Recruta',pp:0,afinidade:'',cor:COLORS[Math.floor(Math.random()*COLORS.length)],
   atr:{agi:1,for:1,int:1,pre:1,vig:1},pvAj:0,peAj:0,sanAj:0,defB:0,desloc:9,resist:'',per:{},ataques:[],rituais:[],habilidades:[],itens:[],cond:[],aparencia:'',personalidade:'',historico:'',objetivo:'',notas:''};
@@ -5095,7 +5293,7 @@ async function salvarAcesso(c,code,pass,er){
   c.codigo=code;if(pass)c.chave=await shaHex('mesa-do-mestre|'+c.id+'|'+pass);return true;}
 function campForm(c){const isNew=!c;c=c||{id:uid(),nome:'',sys:'dnd',desc:'',createdAt:Date.now()};let sys=c.sys;
   openModal(`<h2>${isNew?'Nova campanha':'Editar campanha'}</h2><label class="field"><span>Nome</span><input id="cNome" value="${esc(c.nome)}" placeholder="Ex.: A Maldição de Valdren"></label>
-    <div class="field"><span>Sistema</span><div class="choices" id="cSys">${Object.values(SYS).map(s=>`<button type="button" class="choice" data-s="${s.id}" aria-pressed="${s.id===sys}"><b>${esc(s.n)}</b><small>${{dnd:'Pergaminho, atributos, magias por nível.',op:'Dossiê da Ordem, NEX, rituais e sanidade.',etmos:'Grimório de partículas, fadiga e palavras mágicas.',sacra:'Velho oeste: 1d6 + antecedente, Vida e Dor, montaria na ficha.'}[s.id]}</small></button>`).join('')}</div>
+    <div class="field"><span>Sistema</span><div class="choices" id="cSys">${Object.values(SYS).map(s=>`<button type="button" class="choice" data-s="${s.id}" aria-pressed="${s.id===sys}"><b>${esc(s.n)}</b><small>${{dnd:'Pergaminho, atributos, magias por nível.',op:'Dossiê da Ordem, NEX, rituais e sanidade.',etmos:'Grimório de partículas, fadiga e palavras mágicas.',sacra:'Velho oeste: 1d6 + antecedente, Vida e Dor, montaria na ficha.',sins:'Hellaverse: Imps, Hellhounds, Sinners e Ars Goetia, Pecado e Magia Infernal.'}[s.id]}</small></button>`).join('')}</div>
     ${isNew?'':'<small class="note">Mudar o sistema não converte as fichas que já existem.</small>'}</div>
     <label class="field"><span>Descrição</span><textarea id="cDesc" rows="3">${esc(c.desc)}</textarea></label>
     ${S.mode==='cloud'?`<fieldset class="access"><legend>Acesso dos jogadores</legend><p class="note">Os jogadores entram com este código e esta senha. ${isNew?'':'Deixe a senha em branco para manter a atual.'}</p>
@@ -5110,12 +5308,13 @@ function campForm(c){const isNew=!c;c=c||{id:uid(),nome:'',sys:'dnd',desc:'',cre
       const ok=await salvarAcesso(c,code,pass||null,er);if(!ok)return;}
     closeModal();await saveCamp(c);location.hash='campanha-'+c.id;render();};
   const del=$('#cDel');if(del)del.onclick=()=>confirmBox(`Apagar “${c.nome}”? As fichas continuam guardadas, mas a campanha some da lista.`,async()=>{if(NV)await NV.removerAcesso(c.id);await removeCamp(c);location.hash='mestre';render();});}
-function hpOf(sh){if(sh.sys==='sacra'){const t=sacV(sh,'vida');return [t-num(sh.vidaMarc),t];}if(sh.sys==='etmos'){const l=etLimF(sh);return [l-num(sh.ferimentos),l];}if(sh.sys==='op'){const mx=opMax(sh,'pv');return [num(sh.pv),mx];}return [num(sh.pv),num(sh.pvMax)];}
+function hpOf(sh){if(sh.sys==='sins')return [num(sh.pv),sinsV(sh,'pv')];if(sh.sys==='sacra'){const t=sacV(sh,'vida');return [t-num(sh.vidaMarc),t];}if(sh.sys==='etmos'){const l=etLimF(sh);return [l-num(sh.ferimentos),l];}if(sh.sys==='op'){const mx=opMax(sh,'pv');return [num(sh.pv),mx];}return [num(sh.pv),num(sh.pvMax)];}
 function setHpVal(sh,v){const [,mx]=hpOf(sh);if(sh.sys==='sacra'){sh.vidaMarc=clamp(mx-v,0,mx);return;}if(sh.sys==='etmos')sh.ferimentos=clamp(mx-v,0,mx);else sh.pv=clamp(v,-mx,mx);}
 function barColor(f){return f>.5?'#3f9a5a':f>.25?'#d4a42c':'#c0392b';}
-function subOf(sh){if(sh.sys==='sacra')return `Nível ${sh.nivel||1}${num(sh.recompensa)?' · Recompensa $'+num(sh.recompensa):''}${sh.montaria&&sh.montaria.nome?' · '+sh.montaria.nome:''}`;if(sh.sys==='etmos')return `Nível ${sh.nivel||1}${sh.ano?' · '+sh.ano+' ano':''}${sh.idade?' · '+sh.idade+' anos':''}`;if(sh.sys==='op')return `${(OP.classes[sh.classe]||{n:''}).n} · NEX ${sh.nex}%${sh.trilha?' · '+sh.trilha:''}`;return `${sh.classe||'Sem classe'} ${sh.nivel||1}${sh.especie?' · '+sh.especie:''}`;}
+function subOf(sh){if(sh.sys==='sins'){const v=sVice(sh);return `${sRace(sh).n} · Nível ${sh.nivel||1}${v?' · '+v[1]:''}${sh.overlord?(sh.raca==='goetia'?' · Nobre titulado':' · Overlord'):''}`;}if(sh.sys==='sacra')return `Nível ${sh.nivel||1}${num(sh.recompensa)?' · Recompensa $'+num(sh.recompensa):''}${sh.montaria&&sh.montaria.nome?' · '+sh.montaria.nome:''}`;if(sh.sys==='etmos')return `Nível ${sh.nivel||1}${sh.ano?' · '+sh.ano+' ano':''}${sh.idade?' · '+sh.idade+' anos':''}`;if(sh.sys==='op')return `${(OP.classes[sh.classe]||{n:''}).n} · NEX ${sh.nex}%${sh.trilha?' · '+sh.trilha:''}`;return `${sh.classe||'Sem classe'} ${sh.nivel||1}${sh.especie?' · '+sh.especie:''}`;}
 function pcCard(sh,camp){const [pv,mx]=hpOf(sh),f=mx>0?clamp(pv/mx,0,1):0;const ini=(sh.nome||'?').trim().split(/\s+/).map(w=>w[0]||'').join('').slice(0,2).toUpperCase()||'?';const owner=sh.kind==='pc'&&S.mode==='cloud'?(sh.owner===S.uid?'você':S.names[sh.owner]||'jogador'):'';
   let stats;if(sh.sys==='etmos'){const ul=(sh.ultimas||[])[0];stats=`<div><b>${num(sh.atr.corpo)}·${num(sh.atr.alma)}·${num(sh.atr.mente)}</b>Corpo·Alma·Mente</div><div><b>${esc(etFad(sh))}</b>Fadiga</div><div><b>${num(sh.estresse)}/${etLimE(sh)}</b>Estresse</div>${ul?`<div style="grid-column:1/-1"><b class="etw-mini">${esc(etWord(ul.seq))}</b>Última palavra</div>`:''}`;}
+  else if(sh.sys==='sins')stats=`<div><b>${sinsV(sh,'def')}</b>Defesa</div><div><b>${num(sh.ppAtual)}/${sinsV(sh,'pp')}</b>PP</div><div><b>${sinsV(sh,'infl')}</b>Influência</div>`;
   else if(sh.sys==='sacra'){const dt=sacV(sh,'dor');stats=`<div><b>${num(sh.defesa)}</b>Defesa</div><div><b>${dt-num(sh.dorMarc)}/${dt}</b>Dor</div><div><b>${num(sh.sina)}</b>Sina</div>${sh.montaria&&sh.montaria.nome?`<div style="grid-column:1/-1"><b>${esc(sh.montaria.nome)}</b>Montaria</div>`:''}`;}
   else if(sh.sys==='op'){const san=num(sh.san),smx=opMax(sh,'san'),pe=num(sh.pe),pmx=opMax(sh,'pe');stats=`<div><b>${opDef(sh)}</b>Defesa</div><div><b>${pe}/${pmx}</b>PE</div><div><b>${san}/${smx}</b>SAN</div>`;}
   else stats=`<div><b>${num(sh.ca)}</b>CA</div><div><b>${sgn(dIni(sh))}</b>Iniciativa</div><div><b>${10+dSkill(sh,'percepcao')}</b>Perc. passiva</div>`;
@@ -5235,6 +5434,8 @@ const NPCGEN={
     dnd:['Aldric','Brienne','Corvin','Dagna','Elric','Fenna','Gorim','Hilde','Isolde','Jorund','Kaela','Lothar','Mirela','Nyx','Orsik','Petra','Quillon','Rurik','Sefa','Tamsin','Ulric','Vesna','Wendel','Ysolde','Zarek','Bram','Edda','Tobin','Maela','Cassian'],
     dnds:['da Ponte Velha','Ferro-Negro','das Brumas','Pedra-Funda','o Manco','Martelo-Rubro','de Valdren','Sete-Ventos','Corvo-Cinzento','das Cinzas'],
     mod:['Ana','Bruno','Carla','Diego','Elisa','Fábio','Giovana','Heitor','Isabela','João','Karina','Lucas','Marina','Nelson','Olívia','Paulo','Raquel','Sérgio','Tatiane','Vítor','Yara','Rafael','Lívia','Otávio','Bianca'],
+    inferno:['Brasa','Fuligem','Vesper','Cinza','Navalha','Rubi','Sabre','Torque','Fumaça','Ônix','Escarlate','Sulfa','Lilás','Trinca','Carvão','Faísca','Breu','Cobalto','Malva','Ferrugem'],
+    infernos:['“Dente-de-Ouro”','“Fósforo”','do Anel da Ira','“Sorriso”','da Gula','“Três-Olhos”','“Caixa-Preta”','“Pé-de-Cabra”','da Ganância','“Lâmina”','“Cartola”','“Brilho”'],
     mods:['Albuquerque','Barreto','Cavalcanti','Duarte','Esteves','Fontana','Guimarães','Holanda','Lacerda','Moraes','Nogueira','Pacheco','Queiroz','Ramos','Siqueira','Teixeira','Valadares']},
   pers:['desconfiado de forasteiros','fala demais quando está nervoso','gentil, mas esconde algo','ambicioso e calculista','supersticioso','leal até o fim a quem o ajudou','ri das próprias piadas','cansado e de poucas palavras','curioso como uma criança','arrogante com quem acha inferior','medroso, mas honesto','coleciona fofocas'],
   apar:['cicatriz atravessando a sobrancelha','roupas remendadas e limpas','anéis demais nos dedos','olhos fundos de quem não dorme','tatuagem antiga no pescoço','sempre de luvas','voz rouca e baixa','manca de uma perna','sorriso com um dente de ouro','cabelo grisalho preso em trança','óculos rachados','cheiro forte de ervas'],
@@ -5250,14 +5451,21 @@ const NPCGEN={
       ['Fora-da-lei',{nivel:2,atr:{fis:2,vel:1,int:0,cor:1},ant:{roubo:2,violencia:2,montaria:1},defesa:5,itens:[{nome:'Escopeta',dano:'2d6',municao:'2'}],montaria:{nome:'Ladrão',especie:'Cavalo',potencia:2,resistencia:1,fidelidade:1}}],
       ['Pregador',{nivel:2,atr:{fis:0,vel:0,int:2,cor:2},ant:{tradicao:3,medicina:1,negocios:1},defesa:5,itens:[],montaria:{nome:'Mula velha',especie:'Mula',potencia:1,resistencia:2,fidelidade:3}}],
       ['Comerciante',{nivel:1,atr:{fis:0,vel:0,int:2,cor:0},ant:{negocios:3,atencao:1},defesa:5,itens:[],montaria:{nome:'Carroça e burro',especie:'Burro',potencia:1,resistencia:2,fidelidade:2}}]],
+    sins:[['Capanga imp',{raca:'imp',nivel:1,atr:{brut:1,agi:2,lab:0,ast:0,inf:0},per:{armasFogo:1,furtividade:1},ataques:[{nome:'Faca',tipo:'cc',per:'armasBrancas',dano:'1d6',notas:''},{nome:'Pistola',tipo:'dist',per:'armasFogo',dano:'2d6',notas:'18 m'}]}],
+      ['Hellhound feroz',{raca:'hellhound',nivel:2,atr:{brut:3,agi:1,lab:0,ast:0,inf:1},per:{briga:2,percepcao:1},ataques:[{nome:'Mordida',tipo:'cc',per:'briga',dano:'1d6',notas:''}]}],
+      ['Brutamontes da Ira',{raca:'sinner',nivel:4,vicio:'ira',atr:{brut:4,agi:0,lab:0,ast:0,inf:1},per:{briga:2,intimidacao:1},armadura:{nome:'Jaqueta reforçada',rd:1,def:0},ataques:[{nome:'Taco com pregos',tipo:'cc',per:'armasBrancas',dano:'1d8',notas:''}]}],
+      ['Guarda-costas',{raca:'sinner',nivel:3,atr:{brut:2,agi:2,lab:0,ast:1,inf:0},per:{armasFogo:2,percepcao:1},armadura:{nome:'Colete à prova de balas',rd:2,def:0},ataques:[{nome:'Revólver',tipo:'dist',per:'armasFogo',dano:'2d6+1',notas:'18 m'}]}],
+      ['Ocultista',{raca:'sinner',nivel:3,arquetipo:'ocultista',atr:{brut:0,agi:1,lab:1,ast:2,inf:2},per:{ocultismo:1,magia:1},feiticos:[{n:'Labareda',circ:1,escola:'chamas',e:'Ataque à distância (18 m): 2d6 de fogo.',dano:'2d6'}]}],
+      ['Nobre da Ars Goetia',{raca:'goetia',nivel:2,atr:{brut:0,agi:1,lab:2,ast:2,inf:5},per:{ocultismo:2,magia:2,persuasao:1},feiticos:[{n:'Coluna de Fogo',circ:2,escola:'chamas',e:'Área de 3 m: 3d6 de fogo.',dano:'3d6'},{n:'Voz Hipnótica',circ:2,escola:'encanto',e:'O alvo testa Vontade ou obedece.',dano:''}]}]],
     etmos:[['Estudante',{nivel:1,atr:{corpo:2,alma:2,mente:2},complex:1}],['Monitor',{nivel:3,atr:{corpo:3,alma:3,mente:3},complex:2}],['Professor',{nivel:6,atr:{corpo:2,alma:4,mente:5},complex:4}],['Guardião',{nivel:5,atr:{corpo:5,alma:3,mente:2},complex:3}]]}};
 const pick=a=>a[Math.floor(Math.random()*a.length)];
 function genNpc(sys,perfil){const P=NPCGEN.perfis[sys];const pf=P.find(x=>x[0]===perfil)||pick(P);
-  const nome=sys==='dnd'?pick(NPCGEN.nomes.dnd)+' '+pick(NPCGEN.nomes.dnds):sys==='sacra'?pick(NPCGEN.nomes.oeste)+' '+pick(NPCGEN.nomes.oestes):pick(NPCGEN.nomes.mod)+' '+pick(NPCGEN.nomes.mods);
+  const nome=sys==='dnd'?pick(NPCGEN.nomes.dnd)+' '+pick(NPCGEN.nomes.dnds):sys==='sacra'?pick(NPCGEN.nomes.oeste)+' '+pick(NPCGEN.nomes.oestes):sys==='sins'?pick(NPCGEN.nomes.inferno)+' '+pick(NPCGEN.nomes.infernos):pick(NPCGEN.nomes.mod)+' '+pick(NPCGEN.nomes.mods);
   return {nome,perfil:pf[0],pers:pick(NPCGEN.pers),apar:pick(NPCGEN.apar),mot:pick(NPCGEN.mot),seg:pick(NPCGEN.seg),st:clone(pf[1])};}
 function npcFromGen(c,g){const sh=newFor(c.sys);sh.nome=g.nome;
   if(c.sys==='dnd'){Object.assign(sh,{classe:g.perfil,ca:g.st.ca,pvMax:g.st.pv,pv:g.st.pv,atr:g.st.atr,ataques:g.st.ataques,personalidade:g.pers,aparencia:g.apar,ideais:g.mot,notas:'Segredo: '+g.seg});}
   else if(c.sys==='op'){Object.assign(sh,{classe:g.st.classe,nex:g.st.nex,atr:g.st.atr,trilha:g.perfil,personalidade:g.pers,aparencia:g.apar,objetivo:g.mot,notas:'Segredo: '+g.seg});sh.pv=opMax(sh,'pv');sh.pe=opMax(sh,'pe');sh.san=opMax(sh,'san');sh._mx={pv:sh.pv,pe:sh.pe,san:sh.san};}
+  else if(c.sys==='sins'){Object.assign(sh,clone(g.st),{aparencia:g.apar,quer:g.mot,notas:g.perfil+'. '+g.pers+'. Segredo: '+g.seg});sh.pv=sinsV(sh,'pv');sh.ppAtual=sinsV(sh,'pp');sh._mx={pv:sh.pv,pp:sh.ppAtual};sh._raca=sh.raca;}
   else if(c.sys==='sacra'){Object.assign(sh,{nivel:g.st.nivel,atr:g.st.atr,ant:Object.assign(sh.ant,g.st.ant),defesa:g.st.defesa,itens:g.st.itens||[],conceito:g.perfil+'. '+g.pers+'.',aparencia:g.apar,objetivo:g.mot,anotacoes:'Segredo: '+g.seg});if(g.st.montaria)Object.assign(sh.montaria,g.st.montaria);}
   else Object.assign(sh,{nivel:g.st.nivel,atr:g.st.atr,complex:g.st.complex,basico:g.perfil+'. '+g.pers+'.',aparencia:g.apar,futuro:g.mot,pontos:'Segredo: '+g.seg});
   return sh;}
@@ -5364,7 +5572,7 @@ function viewInvite(app,id){crumbs([['Convite','#convite-'+id]]);
     app.innerHTML=box(esc(c.nome),mine?'Você já usou este convite.':'Este convite já foi usado. Para criar uma ficha, peça um novo convite ao mestre.',sh?`<div class="row" style="justify-content:center;margin-top:12px"><a class="btn primary" href="#ficha-${sh.id}">Abrir minha ficha</a></div>`:'');return;}
   const can=canCreate()&&!S.master;const npc=v.tipo==='npc';
   const why=!S.uid?'Esta página não conseguiu identificar sua conta. Abra o link logado no claude.ai, com o e-mail que o mestre convidou.':S.canWrite===false?'Você pode abrir esta mesa, mas ainda não pode criar fichas. Peça ao mestre para te convidar como Editor no menu Compartilhar.':'';
-  const ph=npc?'Ex.: Velho Corvo, o taberneiro':({dnd:'Ex.: Thorin Escudo-de-Carvalho',op:'Ex.: Arthur Cervero',etmos:'Ex.: Lina Vasconcelos',sacra:'Ex.: Jesse Calloway'}[c.sys]||'Nome');
+  const ph=npc?'Ex.: Velho Corvo, o taberneiro':({dnd:'Ex.: Thorin Escudo-de-Carvalho',op:'Ex.: Arthur Cervero',etmos:'Ex.: Lina Vasconcelos',sacra:'Ex.: Jesse Calloway',sins:'Ex.: Brasa “Dente-de-Ouro”'}[c.sys]||'Nome');
   app.innerHTML=`<div class="join">${S.master?'<div class="banner">Prévia: é assim que a pessoa vê este convite. Você não pode usá-lo pela sua conta.</div>':''}
     <p class="lbl-join">${npc?'O mestre pediu que você crie um NPC para a mesa':'Você foi convidado para a mesa'}</p><span class="badge ${c.sys}">${esc(SYS[c.sys].n)}</span><h1 class="view">${esc(c.nome)}</h1>${c.desc?`<p class="lead">${esc(c.desc)}</p>`:''}
     ${why?`<div class="banner">${esc(why)}</div>`:''}
@@ -5400,6 +5608,8 @@ const LBL={vidaMarc:'Vida marcada',dorMarc:'Dor marcada',vidaExtra:'Vida extra',
   ano:'Ano escolar',idade:'Idade',empenho:'Dados de empenho',fadiga:'Fadiga',ferimentos:'Ferimentos',estresse:'Estresse',complex:'Complexidade máxima',origens:'Origens',praticas:'Habilidades práticas',teoricas:'Habilidades teóricas',inventario:'Inventário',basico:'Básico',pontos:'Pontos de importância',futuro:'Futuro',
   morte:'Testes contra a morte',moedas:'Moedas',itens:'Item',ataques:'Ataque',magias:'Magia',rituais:'Ritual',habilidades:'Habilidade',palavras:'Palavra guardada',slots:'Espaços de magia',valores:'Valores',marcos:'Marcos'};
 const SUB={s:'sucessos',f:'falhas',fis:'físicos',emo:'emocionais',men:'mentais',a:'lado A',b:'lado B',g:'grau',b2:'bônus',nome:'nome',qtd:'quantidade',peso:'peso',bonus:'bônus',dano:'dano',nivel:'nível',circ:'círculo',custo:'custo',elem:'elemento',esp:'espaços',cat:'categoria',desc:'descrição',nota:'anotação',tot:'total',usados:'usados',per:'perícia',crit:'crítico',alc:'alcance',tipo:'tipo'};
+Object.assign(LBL,{raca:'Raça',vicio:'Vício',anel:'Anel de origem',pecadoOrigem:'Pecado de origem',arquetipo:'Arquétipo',influencia:'Influência',almas:'Almas sob contrato',ppAtual:'PP',ppAj:'PP extra',rdAj:'RD extra',defAj:'Defesa extra',iniAj:'Iniciativa extra',overlord:'Overlord',territorio:'Território',tenente:'Tenente',supremo:'Poder Supremo',dons:'Dom',manif:'Manifestação',feiticos:'Feitiço',grimorio:'Feitiço do grimório',contratos:'Contrato',talentos:'Talento',escolas:'Escola',danoSagrado:'Dano sagrado',armadura:'Armadura',equipamento:'Equipamento',chegada:'Chegada ao Inferno',vida:'Vida mortal',quer:'O que quer',teme:'O que teme',lacos:'Laços'});
+Object.assign(SUB,{n:'nome',e:'efeito',com:'com quem',termos:'termos',preco:'preço',escola:'escola',rd:'RD',def:'Defesa'});
 function labelFor(sh,path){const sys=SYS[sh.sys]||DND;const ps=path.split('.');const [a,b,c]=ps;
   if(a==='atr'){const at=(sys.atrs||[]).find(x=>x[0]===b);return at?at[1]:b==='corpo'?'Corpo':b==='alma'?'Alma':b==='mente'?'Mente':path;}
   if(a==='per'){const sk=(sys.skills||[]).find(x=>x[0]===b);const n=sk?sk[1]:b;return sh.sys==='op'?`${n} (${c==='g'?'grau':'outros bônus'})`:`${n} (proficiência)`;}
@@ -5412,7 +5622,7 @@ function labelFor(sh,path){const sys=SYS[sh.sys]||DND;const ps=path.split('.');c
   if(/^\d+$/.test(b||''))return `${LBL[a]||a} ${num(b)+1}${c?' · '+(SUB[c]||c):''}`;
   return (LBL[a]||a)+(b?' · '+(SUB[b]||b):'');}
 /* fields a player changes only with the master's approval (campaign setting, on by default) */
-const PROT={dnd:/^(atr\.|nivel$|classe$|subclasse$|pvMax$|ca$|xp$|salv\.|per\.)/,op:/^(atr\.|nex$|classe$|trilha$|patente$|per\.|pvAj$|peAj$|sanAj$|defB$)/,etmos:/^(atr\.|nivel$|parts\.|complex$|marcos\.)/,sacra:/^(atr\.|nivel$|ant\.|defesa$|montaria\.(potencia|resistencia)$)/};
+const PROT={dnd:/^(atr\.|nivel$|classe$|subclasse$|pvMax$|ca$|xp$|salv\.|per\.)/,op:/^(atr\.|nex$|classe$|trilha$|patente$|per\.|pvAj$|peAj$|sanAj$|defB$)/,etmos:/^(atr\.|nivel$|parts\.|complex$|marcos\.)/,sacra:/^(atr\.|nivel$|ant\.|defesa$|montaria\.(potencia|resistencia)$)/,sins:/^(atr\.|nivel$|raca$|per\.|arquetipo$|talentos\.|overlord$|influencia$|redencao$|escolas\.)/};
 function isProt(sh,k){if(S.master||S.mode!=='cloud'||sh.owner!==S.uid||sh.criacao==='rascunho')return false;const c=S.camps[sh.camp];if(c&&c.aprovacao===false)return false;return !!(PROT[sh.sys]&&PROT[sh.sys].test(k));}
 let propToast=0;
 function propose(sh,k,val){const old=getP(sh,k);sh.pendentes=sh.pendentes||{};if(same(val,old))delete sh.pendentes[k];else sh.pendentes[k]={de:old===undefined?null:old,para:val,t:Date.now()};
@@ -6409,8 +6619,8 @@ function portraitEditor(sh){const cur=sh.retrato||null;const curSpec=cur&&cur.ti
 /* ================= SHEET VIEW ================= */
 const F=(k,label,o={})=>`<label class="${o.cls||''}" style="display:flex;flex-direction:column;gap:2px;min-width:0"><span class="lbl">${label}</span>${o.sel?`<select data-k="${k}">${o.sel.map(v=>Array.isArray(v)?`<option value="${esc(v[0])}">${esc(v[1])}</option>`:`<option>${esc(v)}</option>`).join('')}</select>`:`<input data-k="${k}"${o.n?` type="number" data-t="n"${o.min!=null?` min="${o.min}"`:''}${o.max!=null?` max="${o.max}"`:''}`:''} placeholder="${esc(o.ph||'')}">`}</label>`;
 function viewSheet(app,sh){const camp=S.camps[sh.camp];crumbs([['Campanhas',HUB()]].concat(camp?[[camp.nome,'#campanha-'+camp.id]]:[]).concat([[sh.nome||'Ficha','#ficha-'+sh.id]]));
-  const ro=!canEdit(sh);if(!S.master&&sh.owner!==S.uid){app.innerHTML='<div class="empty">Esta ficha não é sua.</div>';crumbs([['Campanhas',HUB()]]);return;}const tab=ui.sheetTab[sh.id]||(sh.sys==='etmos'||sh.sys==='sacra'?'personagem':'principal');const sc=HOST.scrollTop;
-  const body=sh.sys==='op'?opSheet(sh,tab):sh.sys==='etmos'?etSheet(sh,tab):sh.sys==='sacra'?sacSheet(sh,tab):dndSheet(sh,tab);
+  const ro=!canEdit(sh);if(!S.master&&sh.owner!==S.uid){app.innerHTML='<div class="empty">Esta ficha não é sua.</div>';crumbs([['Campanhas',HUB()]]);return;}const tab=ui.sheetTab[sh.id]||(sh.sys==='etmos'||sh.sys==='sacra'||sh.sys==='sins'?'personagem':'principal');const sc=HOST.scrollTop;
+  const body=sh.sys==='op'?opSheet(sh,tab):sh.sys==='etmos'?etSheet(sh,tab):sh.sys==='sacra'?sacSheet(sh,tab):sh.sys==='sins'?sinsSheet(sh,tab):dndSheet(sh,tab);
   app.innerHTML=`${S.readOnlyMsg?`<div class="banner">${esc(S.readOnlyMsg)}</div>`:''}<div id="sheetRoot" class="sheet ${sh.sys}">${pendList(sh,S.master)}${sh.criacao==='rascunho'?(sh.owner===S.uid&&!S.master?`<div class="draftbar"><span><b>Ficha em criação.</b> Preencha com calma. Quando terminar, conclua: a partir daí o mestre acompanha cada alteração no registro.</span><button type="button" class="btn small" id="shDone">Concluir criação</button></div>`:'<div class="draftbar"><span><b>Em criação.</b> O jogador ainda não concluiu esta ficha.</span></div>'):''}${ro?'<div class="ro-note">Somente leitura: esta ficha é de outro jogador.</div>':''}<fieldset ${ro?'disabled':''}>${body}</fieldset>
     <div class="tools"><span class="note" style="margin-right:auto;color:var(--sm)">${sh.kind==='npc'?(sh.owner&&sh.owner!==S.uid?'NPC criado por convite · visível para você e para quem o criou':'NPC · visível só para o mestre'):''}</span>${window.Atlas&&Atlas.hasToken(sh.id)?'<button class="btn small" id="shMap">Mostrar no mapa</button>':''}${S.master&&sh.kind==='npc'?'<button class="btn small" id="shBest">Salvar no bestiário</button>':''}<button class="btn small" id="shLink">Copiar link da ficha</button>${canEdit(sh)?'<button class="btn small danger" id="shDel">Apagar ficha</button>':''}</div></div>`;
   HOST.scrollTop=sc;bindSheet($('#sheetRoot'),sh);}
@@ -6434,6 +6644,7 @@ function bindSheet(root,sh){
   const sbb=$('#shBest');if(sbb)sbb.onclick=()=>saveToBest(sh);
   $('#shLink').onclick=()=>copyText(APP_URL+'#ficha-'+sh.id);const sm=$('#shMap');if(sm)sm.onclick=()=>Atlas.showToken(sh.id);const d=$('#shDel');if(d)d.onclick=()=>confirmBox(`Apagar a ficha “${sh.nome||'sem nome'}”? Isso não pode ser desfeito.`,async()=>{const cid=sh.camp;await removeSheet(sh);location.hash=cid?'campanha-'+cid:HUB().slice(1);render();});
   if(sh.sys==='etmos')bindEtmos(root,sh);
+  if(sh.sys==='sins')bindSins(root,sh);
   const pt=$('#shPortrait');if(pt&&canEdit(sh))pt.onclick=()=>portraitEditor(sh);
   bindPend(root);for(const b of root.querySelectorAll('[data-cancelp]'))b.onclick=()=>{if(sh.pendentes)delete sh.pendentes[b.dataset.cancelp];queueSave(sh);render();};
   calc(root,sh);}
@@ -6443,6 +6654,7 @@ function afterSet(sh,k,val,old){let m;if(sh.sys==='op'&&(m=k.match(/^rituais\.(\
       if(om!=null&&mx!==om)sh[s]=clamp(num(sh[s])+(mx-om),0,mx);else if(sh[s]==null||num(sh[s])>mx)sh[s]=mx;sh._mx[s]=mx;}return /^(classe|nex)$/.test(k);}
   return false;}
 function calcVal(sh,name){const [f,a]=name.split(':');
+  if(sh.sys==='sins')return f==='s'?sinsV(sh,a):0;
   if(sh.sys==='sacra')return f==='sac'?sacV(sh,a):0;
   if(sh.sys==='etmos'){if(f==='limf')return etLimF(sh);if(f==='lime')return etLimE(sh);return 0;}
   if(sh.sys==='op'){switch(f){case 'max':return opMax(sh,a);case 'per':return opSkill(sh,a);case 'def':return opDef(sh);case 'carga':return opCarga(sh);case 'esp':return opEsp(sh);case 'lim':return opLvl(sh);}return 0;}
@@ -6451,6 +6663,7 @@ function calc(root,sh){for(const el of root.querySelectorAll('[data-c]')){const 
   for(const el of root.querySelectorAll('[data-meter]')){const [cur,mx]=el.dataset.meter.split('|');const m=calcVal(sh,mx),f=m>0?clamp(num(getP(sh,cur))/m,0,1):0;el.firstElementChild.style.width=(f*100)+'%';}
   const cg=root.querySelector('[data-carga]');if(cg){const over=sh.sys==='op'?opEsp(sh)>opCarga(sh):dWeight(sh)>dCap(sh);cg.style.color=over?'var(--sa)':'';cg.textContent=over?'Sobrecarregado':'';}}
 function doRoll(sh,spec){rollSheet=sh;const [f,a,b]=spec.split(':');const who=sh.nome||'Ficha';
+  if(sh.sys==='sins')return sinsRoll(sh,f,a,who);
   if(sh.sys==='sacra'){const d=rnd(6);const R=(label,bn,na)=>pushRoll({label,total:d+bn,detail:`1d6: ${d} ${bn>=0?'+':'−'} ${Math.abs(bn)}${na?` · alvo ${na}: ${d+bn>=na?'sucesso':'falha'}`:''}`,crit:d===6,fail:d===1});
     if(f==='atr'){const at=SACRA.atrs.find(x=>x[0]===a);return R(`${who} · ${at?at[1]:a}`,num((sh.atr||{})[a]));}
     if(f==='ant'){const at=SACRA.ants.find(x=>x[0]===a);return R(`${who} · ${at?at[1]:a}`,num((sh.ant||{})[a]));}
@@ -6523,6 +6736,131 @@ function sacSheet(sh,tab){const m=sh.montaria=sh.montaria||{};sh.ant=sh.ant||{};
       <p class="note">O dano corpo a corpo aumenta +1 por ponto de Físico; some quando for o caso.</p></div>`;}
   else b=`<div class="smain">${[['conceito','Conceito','Quem é você em uma frase'],['aparencia','Aparência',''],['passado','Passado',''],['objetivo','Objetivo',''],['anotacoes','Anotações','']].map(([k,n,ph])=>`<label class="box sfield"><span class="lbl">${n}</span><textarea data-k="${k}" rows="5" placeholder="${ph}"></textarea></label>`).join('')}</div>`;
   return head+tabs+`<div class="sbody">${b}</div>`;}
+
+/* ---------- Seven Sins: ficha infernal ---------- */
+const sinsOpts=(list,cur,none)=>(none!=null?`<option value="">${esc(none)}</option>`:'')+list.map(([v,n])=>`<option value="${esc(v)}"${v===cur?' selected':''}>${esc(n)}</option>`).join('');
+const sinsPips=(k,n,cur,lbl,from0)=>`<span class="xpips" role="group" aria-label="${esc(lbl)}">${from0?`<button type="button" class="xpip z${cur===0?' on':''}" data-pip="${k}" data-i="0" aria-label="${esc(lbl)} 0">0</button>`:''}${Array.from({length:n},(_,i)=>`<button type="button" class="xpip${cur>=i+1?' on':''}" data-pip="${k}" data-i="${i+1}" aria-label="${esc(lbl)} ${i+1}"></button>`).join('')}</span>`;
+const sinsStat=(lbl,inner,cls)=>`<div class="xstat${cls?' '+cls:''}"><span class="lbl">${lbl}</span>${inner}</div>`;
+function sinsState(sh){const pv=num(sh.pv),mx=sinsV(sh,'pv');if(pv<=sinsV(sh,'morte'))return sh.raca==='sinner'?['Despedaçado','Volta em 1d4 dias. Só Aço Angelical destrói.']:['Morto','Passou do limite de morte.'];if(pv<=0)return ['Fora de combate','Caído e inconsciente.'];if(pv<=mx/4)return ['Por um fio',''];return null;}
+/* a power card: dom, manifestation, spell or grimoire entry */
+function sinsPower(sh,list,i,o){const p=sh[list][i];const cost=o.cost(p);const k=`${list}.${i}`;
+  return `<div class="xpow"><div class="xph"><input data-k="${k}.n" placeholder="${o.ph}" aria-label="Nome"><span class="xcost">${o.circ?`<select data-k="${k}.circ" data-t="n" data-re="1" aria-label="Círculo">${[1,2,3].map(c=>`<option value="${c}">${c}º</option>`).join('')}</select>`:`<input data-k="${k}.custo" type="number" data-t="n" min="0" data-re="1" aria-label="Custo em PP">`}<small>${cost?cost+' PP':'livre'}</small></span>
+    <span class="xbtns">${o.atk?`<button type="button" class="btn small" data-roll="${o.atk}:${i}" title="Rolar ataque">Ataque</button>`:''}${p.dano?`<button type="button" class="btn small" data-roll="${o.dmg}:${i}" title="Rolar ${esc(p.dano)}">🎲 ${esc(p.dano)}</button>`:''}${cost?`<button type="button" class="btn small primary" data-suse="${list}|${i}">Usar −${cost}</button>`:''}<button type="button" class="x" data-del="${list}|${i}" aria-label="Remover">×</button></span></div>
+    <textarea data-k="${k}.e" rows="2" placeholder="Efeito" aria-label="Efeito"></textarea>${o.extra?o.extra(p,k):''}</div>`;}
+const sinsAdd=(id,lbl,groups)=>`<label class="xadd"><span class="lbl">${lbl}</span><select id="${id}"><option value="">Escolher…</option>${groups.map(([g,items])=>items.length?`<optgroup label="${esc(g)}">${items.map(([v,n])=>`<option value="${esc(v)}">${esc(n)}</option>`).join('')}</optgroup>`:'').join('')}<option value="__novo">Criar do zero</option></select></label>`;
+const sPowCost=(sh,p)=>Math.max(0,num(p.custo)+(num(p.custo)>0&&sRed(sh)>=9?1:0));
+const sSpellCost=(sh,p,grim)=>Math.max(0,num(p.circ)+(grim&&!(sh.manif||[]).some(m=>m.n==='Leitor de Runas')?1:0));
+function sinsSchools(sh){const c=sCaster(sh);if(c==='nato')return Object.keys(SINS.escolas);if(c==='estudo')return Object.keys(SINS.escolas).filter(k=>(sh.escolas||{})[k]);return [];}
+function sinsSheet(sh,tab){sinsSync(sh);const r=sRace(sh),v=sVice(sh),st=sinsState(sh);sh.atr=sh.atr||{};sh.per=sh.per||{};
+  const head=`<header class="xhead"><div class="xmark" aria-hidden="true"><svg viewBox="0 0 100 100"><circle cx="50" cy="50" r="46"/><path d="M50 6 L76 88 L8 36 L92 36 L24 88 Z"/></svg></div>
+    <div class="xid">${portraitCell(sh)}<div class="xname"><span class="lbl">${sh.kind==='npc'?'Nome do NPC':'Nome do personagem'}</span><input data-k="nome" placeholder="Nome no Inferno" aria-label="Nome"><span class="xrace">${esc(r.n)}${v?' · '+esc(v[1]):''} · nível ${Math.max(1,num(sh.nivel)||1)}</span></div></div>
+    <div class="xlogo" aria-hidden="true">Seven<b>Sins</b><small>ficha do Inferno</small></div>
+    <div class="xmeta">${F('jogador','Jogador')}<label style="display:flex;flex-direction:column;gap:2px;min-width:0"><span class="lbl">Raça</span><select data-k="raca" data-re="1">${sinsOpts(Object.entries(SINS.racas).map(([k,x])=>[k,x.n]),sh.raca)}</select></label>
+      ${F('nivel','Nível',{n:1,min:1,max:10})}<label style="display:flex;flex-direction:column;gap:2px;min-width:0"><span class="lbl">Vício</span><select data-k="vicio" data-re="1">${sinsOpts(SINS.vicios.map(x=>[x[0],x[1]]),sh.vicio,'—')}</select></label>
+      <label style="display:flex;flex-direction:column;gap:2px;min-width:0"><span class="lbl">Anel de origem</span><select data-k="anel">${sinsOpts(SINS.aneis.map(a=>[a,a]),sh.anel,'—')}</select></label></div></header>`;
+  const tabs=stabs(sh,tab,[['personagem','Personagem'],['combate','Combate'],['poderes','Poderes e magia'],['inferno','Inferno'],['historia','História']]);let b='';
+  if(tab==='personagem'){
+    const groups=SINS.atrs.map(([a,an])=>`<div class="xskg"><h5>${an}</h5>${SINS.skills.filter(s=>s[2]===a).map(([k,n])=>`<div class="xsk" data-roll="per:${k}" tabindex="0" title="Rolar 1d20 + ${esc(n)}"><button type="button" class="xdot" data-cycle="per.${k}" data-v="${num(sh.per[k])}" aria-label="${esc(n)}: ${['sem proficiência','proficiente','especialista'][num(sh.per[k])]}" title="Clique: treinado, especialista, nenhum"></button><span>${esc(n)}</span><b class="num" data-c="s:per.${k}" data-fmt="s"></b></div>`).join('')}</div>`).join('');
+    b=`<div class="xgrid">
+      <div class="box"><h4>Atributos <small class="xpts"><span data-c="s:pts"></span> de ${r.pts} pontos</small></h4>
+        ${SINS.atrs.map(([k,n,d])=>`<div class="xatr" data-roll="atr:${k}" tabindex="0" title="Rolar 1d20 + ${n}"><span class="n">${n}</span><span class="stepper"><button type="button" data-step="atr.${k}" data-d="-1" data-floor="-1" aria-label="Menos ${n}">−</button><input type="number" data-t="n" data-k="atr.${k}" min="-1" max="6" aria-label="${n}"><button type="button" data-step="atr.${k}" data-d="1" aria-label="Mais ${n}">+</button></span><small>${d}</small></div>`).join('')}
+        <p class="note">Distribua ${r.pts} pontos, máximo +${r.max} no nível 1; um pode ir a −1 para ganhar +1. Depois some o bônus da raça: ${esc(r.atr)}. Clique no nome para rolar.</p></div>
+      <div class="box"><h4>Perícias</h4><div class="xskills">${groups}</div><p class="note">Bolinha vazia +0, cheia treinado +2, dupla especialista +4. Bônus da raça${v&&Object.keys(v[3]).length?' e do Vício':''} já estão somados.</p></div>
+      <div class="box"><h4>${esc(r.n)}</h4><ul class="xtraits">${r.tracos.map(([n,d])=>`<li><b>${esc(n)}.</b> ${esc(d)}</li>`).join('')}</ul>
+        <p class="note">PV base ${r.pv} · deslocamento ${r.desloc} m${r.voo?` · voo ${r.voo} m`:''} · ${esc(r.magia)}</p>
+        ${r.dons.length?`<h4 style="margin-top:10px">Dom racial</h4>${r.dons.map(([n,c,e],i)=>`<div class="xrdom"><div><b>${esc(n)}</b> <small>${c} PP</small><p>${esc(e)}</p></div><button type="button" class="btn small primary" data-suse="raca|${i}">Usar −${c}</button></div>`).join('')}`:''}</div>
+      <div class="box"><h4>Vício</h4>${v?`<p class="xvice"><b>${esc(v[1])}</b> ${esc(v[2])}.</p><p class="note">Recupera PP quando ${esc(v[4])}. Uma vez por sessão, ceder ao Vício numa cena relevante dá +2 PP.</p>
+        <button type="button" class="btn small" id="sVice">Ceder ao Vício (+2 PP${sh.raca==='sinner'?', −1 Redenção':''})</button>`:'<p class="note">Escolha o Vício no topo da ficha.</p>'}
+        ${sh.raca==='sinner'?`<label style="display:flex;flex-direction:column;gap:2px;margin-top:10px"><span class="lbl">Pecado de origem (Sinner)</span><select data-k="pecadoOrigem" data-re="1">${sinsOpts(SINS.vicios.map(x=>[x[0],x[1]+' — '+x[2]]),sh.pecadoOrigem,'—')}</select></label>`:''}</div>
+    </div>`;}
+  else if(tab==='combate'){const A=sh.ataques=sh.ataques||[];const ar=sh.armadura=sh.armadura||{nome:'Nenhuma',rd:0,def:0};
+    b=`${st?`<div class="xstate"><b>${esc(st[0])}</b> ${esc(st[1])}</div>`:''}<div class="xgrid">
+      <div class="box"><h4>Pontos de Vida</h4><div class="xbig"><span class="stepper"><button type="button" data-step="pv" data-d="-1" aria-label="Menos 1 PV">−</button><input type="number" data-t="n" data-k="pv" data-re="1" aria-label="PV atuais"><button type="button" data-step="pv" data-d="1" data-limf="s:pv" aria-label="Mais 1 PV">+</button></span><span class="sep">/</span><b class="num" data-c="s:pv"></b></div>
+        <div class="xbar" data-meter="pv|s:pv"><i></i></div>
+        <div class="xdmg"><input type="number" id="sAmt" min="0" placeholder="Valor" aria-label="Valor de dano ou cura"><button type="button" class="btn small" data-sdmg="dano">Dano (−RD)</button><button type="button" class="btn small" data-sdmg="sagrado">Dano sagrado</button><button type="button" class="btn small" data-sdmg="cura">Curar</button></div>
+        <div class="xrow">${F('pvTemp','PV temporários',{n:1,min:0})}${F('danoSagrado','Dano sagrado (não regenera)',{n:1,min:0})}</div>
+        <div class="row" style="margin-top:8px"><button type="button" class="btn small" id="sShort">Descanso curto (1d8 + Brutalidade)</button><button type="button" class="btn small" id="sLong">Descanso longo</button></div>
+        <p class="note">Morte em ${sinsV(sh,'morte')} PV${sh.raca==='sinner'?' (Sinner fica Despedaçado)':''}. Dano sagrado limita a cura até um descanso longo, que cura metade dele.</p></div>
+      <div class="box"><h4>Pontos de Pecado</h4><div class="xbig"><span class="stepper"><button type="button" data-step="ppAtual" data-d="-1" data-floor="0" aria-label="Menos 1 PP">−</button><input type="number" data-t="n" data-k="ppAtual" aria-label="PP atuais"><button type="button" data-step="ppAtual" data-d="1" data-limf="s:pp" aria-label="Mais 1 PP">+</button></span><span class="sep">/</span><b class="num" data-c="s:pp"></b></div>
+        <div class="xbar pp" data-meter="ppAtual|s:pp"><i></i></div>
+        <div class="xstats">${sinsStat('Defesa','<b class="num" data-c="s:def"></b>')}${sinsStat('RD','<b class="num" data-c="s:rd"></b>')}${sinsStat('Iniciativa',`<button type="button" class="xroll" data-roll="ini"><b class="num" data-c="s:ini" data-fmt="s"></b></button>`)}${sinsStat('Deslocamento',`<b>${r.desloc} m${r.voo?` · voo ${r.voo} m`:''}</b>`)}</div>
+        <details class="xextra"><summary>Ajustes</summary><div class="xrow">${F('pvAj','PV máximo extra',{n:1})}${F('ppAj','PP máximo extra',{n:1})}${F('defAj','Defesa extra',{n:1})}${F('rdAj','RD extra',{n:1})}${F('iniAj','Iniciativa extra',{n:1})}</div></details></div>
+      <div class="box wide"><h4>Ataques</h4><div class="xatks">${A.map((a,i)=>`<div class="xatk"><input data-k="ataques.${i}.nome" placeholder="Arma" aria-label="Arma"><select data-k="ataques.${i}.tipo" data-re="1" aria-label="Tipo">${sinsOpts([['cc','Corpo a corpo'],['dist','À distância'],['mag','Mágico']],a.tipo)}</select>
+          <select data-k="ataques.${i}.per" aria-label="Perícia">${sinsOpts(SINS.skills.map(s=>[s[0],s[1]]),a.per)}</select><input data-k="ataques.${i}.dano" placeholder="2d6" aria-label="Dano"><input data-k="ataques.${i}.notas" placeholder="Alcance, munição, notas" aria-label="Notas">
+          <span class="xbtns"><button type="button" class="btn small primary" data-roll="atk:${i}">Ataque</button><button type="button" class="btn small" data-roll="dmg:${i}">Dano</button><button type="button" class="x" data-del="ataques|${i}" aria-label="Remover ataque">×</button></span></div>`).join('')||'<p class="note">Nenhum ataque ainda.</p>'}</div>
+        <div class="row" style="margin-top:8px">${sinsAdd('sAddArma','Adicionar arma',[['Armas',SINS.armas.map((w,i)=>[String(i),`${w[0]} (${w[1]})`])]])}</div>
+        <p class="note">Corpo a corpo soma Brutalidade no dano${v&&v[0]==='ira'?' e +1 da Ira':''}. Aço Angelical: some +1d6 sagrado no dano.</p></div>
+      <div class="box"><h4>Armadura</h4><label style="display:flex;flex-direction:column;gap:2px"><span class="lbl">Peça</span><select id="sArmor">${SINS.armaduras.map((x,i)=>`<option value="${i}"${x[0]===ar.nome?' selected':''}>${esc(x[0])}${x[1]?' · RD '+x[1]:''}${x[2]?' · Defesa +'+x[2]:''}</option>`).join('')}</select></label>
+        <p class="note">Armadura pesada dá desvantagem em Furtividade e Acrobacia.</p></div>
+      <div class="box"><h4>Condições</h4>${condBox(sh,SINS.conds)}</div></div>`;}
+  else if(tab==='poderes'){const D=sh.dons=sh.dons||[],M=sh.manif=sh.manif||[],Fe=sh.feiticos=sh.feiticos||[],G=sh.grimorio=sh.grimorio||[];const caster=sCaster(sh),schools=sinsSchools(sh),circ=sCirc(sh);const arq=SINS.arquetipos[sh.arquetipo];
+    const spellOpts=ks=>ks.map(k=>[SINS.escolas[k].n,SINS.escolas[k].f.map((f,i)=>[k+'|'+i,`${f[0]}º · ${f[1]}`])]);
+    const extraSpell=(p,k)=>`<div class="xrow"><label style="display:flex;flex-direction:column;gap:2px"><span class="lbl">Escola</span><select data-k="${k}.escola">${sinsOpts(Object.entries(SINS.escolas).map(([x,e])=>[x,e.n]),p.escola,'—')}</select></label>${F(k+'.dano','Dano (se houver)',{ph:'2d6'})}</div>`;
+    b=`<div class="xgrid">
+      <div class="box wide"><h4>Dons</h4>${D.map((p,i)=>sinsPower(sh,'dons',i,{ph:'Nome do dom',cost:p=>sPowCost(sh,p)})).join('')||'<p class="note">Nenhum dom ainda.</p>'}
+        ${sinsAdd('sAddDom','Adicionar dom',[['Dons',SINS.dons.map((d,i)=>[String(i),`${d[0]} (${d[1]?d[1]+' PP':'livre'})`])]])}
+        <p class="note">Na criação: Imp e Hellhound 2 dons, Sinner 1, Ars Goetia 2. ${sRed(sh)>=9?'Redenção 9+: dons e manifestações custam +1 PP.':''}</p></div>
+      ${sh.raca==='sinner'?`<div class="box wide"><h4>Manifestações</h4><label style="display:flex;flex-direction:column;gap:2px;max-width:360px"><span class="lbl">Arquétipo de vida</span><select data-k="arquetipo" data-re="1">${sinsOpts(Object.entries(SINS.arquetipos).map(([k,a])=>[k,a.n]),sh.arquetipo,'—')}</select></label>
+        ${arq?`<p class="note">Perícia do arquétipo: ${esc(SINS.skills.find(s=>s[0]===arq.per)[1])} (marque como treinada).</p>`:''}
+        ${M.map((p,i)=>sinsPower(sh,'manif',i,{ph:'Nome da manifestação',cost:p=>sPowCost(sh,p)})).join('')||'<p class="note">Nenhuma manifestação ainda.</p>'}
+        ${sinsAdd('sAddMan','Adicionar manifestação',[[arq?arq.n:'Escolha um arquétipo',arq?arq.m.map((m,i)=>['a|'+i,`${m[0]} (${m[1]?m[1]+' PP':'livre'})`]):[]],['Universais',SINS.universais.map((m,i)=>['u|'+i,`${m[0]} (${m[1]?m[1]+' PP':'livre'})`])],['Outros arquétipos',Object.entries(SINS.arquetipos).filter(([k])=>k!==sh.arquetipo).flatMap(([k,a])=>a.m.map((m,i)=>[k+'|'+i,`${a.n}: ${m[0]}`]))]])}</div>`:''}
+      <div class="box wide"><h4>Magia Infernal</h4>
+        <p class="xcaster">${caster==='nato'?'<b>Conjurador nato.</b> Todas as escolas.':caster==='estudo'?'<b>Conjurador por estudo.</b> Marque as escolas que você estuda.':'<b>Sem dom para magia.</b> Só lança feitiços de um grimório, usando Ocultismo e pagando +1 PP.'}</p>
+        ${caster==='estudo'?`<div class="xschools">${Object.entries(SINS.escolas).map(([k,e])=>`<label class="check-line"><input type="checkbox" data-k="escolas.${k}" data-re="1"> ${esc(e.n)}</label>`).join('')}</div>`:''}
+        ${caster!=='grimorio'?`<div class="xstats">${sinsStat('Ataque mágico',`<button type="button" class="xroll" data-roll="per:magia"><b class="num" data-c="s:per.magia" data-fmt="s"></b></button>`)}${sinsStat('DT dos feitiços','<b class="num" data-c="s:dt"></b>')}${sinsStat('Círculo máximo',`<b>${circ}º</b>`)}</div>
+        ${Fe.map((p,i)=>sinsPower(sh,'feiticos',i,{ph:'Nome do feitiço',circ:1,cost:p=>sSpellCost(sh,p,false),atk:'fatk',dmg:'fdmg',extra:extraSpell})).join('')||'<p class="note">Nenhum feitiço ainda.</p>'}
+        ${sinsAdd('sAddSpell','Aprender feitiço',spellOpts(schools).map(([g,l])=>[g,l.filter(x=>SINS.escolas[x[0].split('|')[0]].f[num(x[0].split('|')[1])][0]<=circ)]))}`:''}
+        <h4 style="margin-top:14px">Grimório</h4><p class="note">Qualquer um lança o que está escrito: usa Ocultismo, custa +1 PP e, num 1 natural, a magia sai do controle.</p>
+        ${G.map((p,i)=>sinsPower(sh,'grimorio',i,{ph:'Feitiço do grimório',circ:1,cost:p=>sSpellCost(sh,p,true),atk:'gatk',dmg:'gdmg',extra:extraSpell})).join('')}
+        ${sinsAdd('sAddGrim','Copiar feitiço para o grimório',spellOpts(Object.keys(SINS.escolas)))}</div>
+      <div class="box wide"><h4>Talentos de Assinatura</h4><div class="xtal">${SINS.talentos.map(([k,n,d])=>`<label class="check-line"><input type="checkbox" data-k="talentos.${k}" data-re="1"> <span><b>${esc(n)}</b> ${esc(d)}</span></label>`).join('')}</div><p class="note">Um no nível 5${sh.raca==='goetia'?' e um já no nível 1 (Ars Goetia)':''}. Executor não muda a rolagem: conte 19 como crítico.</p></div></div>`;}
+  else if(tab==='inferno'){const C=sh.contratos=sh.contratos||[];const red=sRed(sh);const infl=sinsV(sh,'infl');const reqs=[[infl>=10,'Influência 10'],[num(sh.almas)>=9,'9 almas sob contrato'],[!!String(sh.territorio||'').trim(),'Um território'],[red<5||sh.raca!=='sinner','Redenção abaixo de 5']];
+    b=`<div class="xgrid">
+      <div class="box"><h4>Influência e almas</h4><div class="xinfl">${sinsPips('influencia',10,infl,'Influência',true)}<b class="num">${infl}</b></div>
+        <p class="note">${['Ralé','Ralé','Conhecido no bairro','Conhecido no bairro','Nome respeitado no anel','Nome respeitado no anel','Elite','Elite','Candidato a Overlord','Candidato a Overlord','Overlord'][infl]}. Some a Influência em testes sociais com quem conhece sua fama.</p>
+        <div class="xrow">${F('almas','Almas sob contrato',{n:1,min:0})}${F('dinheiro','Dinheiro',{ph:'$ 200'})}</div><p class="note">Cada 3 almas sob contrato dão +1 de Influência.</p></div>
+      <div class="box"><h4>${sh.raca==='goetia'?'Título da Ars Goetia':'Overlord'}</h4><label class="check-line"><input type="checkbox" data-k="overlord" data-re="1"> ${sh.raca==='goetia'?'Recebeu o título (Príncipe, Duque, Marquês)':'Reconhecido como Overlord'}</label>
+        <ul class="xreq">${reqs.map(([ok,t])=>`<li class="${ok?'ok':''}">${ok?'✓':'·'} ${esc(t)}</li>`).join('')}</ul>
+        ${sh.overlord?`<div class="xrow">${F('territorio','Território',{ph:'Distrito, negócio, torre'})}${F('tenente','Tenente')}</div>
+          <label style="display:flex;flex-direction:column;gap:2px;margin-top:6px"><span class="lbl">Poder Supremo</span><select data-k="supremo" data-re="1">${sinsOpts(SINS.supremos.map(s=>[s[0],s[0]+(s[1]?' ('+s[1]+' PP)':'')]),sh.supremo,'—')}</select></label>
+          ${(()=>{const s=SINS.supremos.find(x=>x[0]===sh.supremo);return s?`<div class="xrdom"><div><p>${esc(s[2])}</p></div>${s[1]?`<button type="button" class="btn small primary" data-suse="supremo|0">Usar −${s[1]}</button>`:''}</div>`:'';})()}
+          <p class="note">Já somados: +20 PV, +5 PP. Também: RD 2 contra dano não sagrado, Domínio no território (+1 PP por cena lá), Ação de Overlord (1 PP: agir no fim do turno de outra criatura), Aura de Pavor, uma ordem por cena a cada alma, até 10 capangas por sessão.</p>`:`${F('territorio','Território',{ph:'Distrito, negócio, torre'})}<p class="note">Marque quando cumprir os requisitos e um ato de reconhecimento diante de outro Overlord ou nobre.</p>`}</div>
+      ${sh.raca==='sinner'?`<div class="box wide"><h4>Redenção</h4><div class="xinfl">${sinsPips('redencao',10,red,'Redenção',true)}<b class="num">${red}</b></div>
+        <ul class="xred">${SINS_REDENCAO.map(([n,g,p])=>`<li class="${red>=n?'on':''}"><b>${n}</b><span>${esc(g)}${p?` <em>${esc(p)}</em>`:''}</span></li>`).join('')}</ul><p class="note">No máximo +1 por sessão. Usar o Vício para recuperar PP custa 1.</p></div>`:''}
+      <div class="box wide"><h4>Contratos</h4>${C.map((c,i)=>`<div class="xctr"><input data-k="contratos.${i}.com" placeholder="Com quem" aria-label="Com quem"><input data-k="contratos.${i}.termos" placeholder="Termos" aria-label="Termos"><input data-k="contratos.${i}.preco" placeholder="Preço ou prazo" aria-label="Preço ou prazo"><button type="button" class="x" data-del="contratos|${i}" aria-label="Remover contrato">×</button></div>`).join('')||'<p class="note">Nenhum contrato.</p>'}
+        <button type="button" class="btn small" data-add="contratos" data-tpl='{"com":"","termos":"","preco":""}'>+ Contrato</button><p class="note">Quebrar um contrato causa 2d6 de dano por dia, que não regenera.</p></div>
+      <div class="box wide"><h4>Equipamento</h4><textarea data-k="equipamento" rows="4" placeholder="Celular infernal, kit médico, chaves do carro…"></textarea></div></div>`;}
+  else b=`<div class="xgrid">${[['aparencia','Aparência',''],['chegada','Como chegou ao Inferno ou como nasceu',''],['vida','Quem foi em vida (Sinner)',''],['quer','O que mais quer',''],['teme','O que mais teme',''],['lacos','Laços','Quem ama, quem odeia, a quem deve'],['notas','Notas','']].filter(([k])=>k!=='vida'||sh.raca==='sinner').map(([k,n,ph])=>`<label class="box sfield"><span class="lbl">${n}</span><textarea data-k="${k}" rows="4" placeholder="${ph}"></textarea></label>`).join('')}</div>`;
+  return head+tabs+`<div class="sbody">${b}</div>`;}
+function sinsUse(sh,cost,what){const pp=num(sh.ppAtual);if(pp<cost){toast(`PP insuficiente: ${what} custa ${cost} e você tem ${pp}.`);return;}sh.ppAtual=pp-cost;queueSave(sh);toast(`${what}: −${cost} PP.`);render();}
+function bindSins(root,sh){
+  for(const b of root.querySelectorAll('[data-suse]'))b.onclick=()=>{const [l,i]=b.dataset.suse.split('|');
+    if(l==='raca'){const d=sRace(sh).dons[num(i)];return sinsUse(sh,d[1],d[0]);}
+    if(l==='supremo'){const s=SINS.supremos.find(x=>x[0]===sh.supremo);return s&&sinsUse(sh,s[1],s[0]);}
+    const p=(sh[l]||[])[num(i)];if(!p)return;const cost=l==='feiticos'?sSpellCost(sh,p,false):l==='grimorio'?sSpellCost(sh,p,true):sPowCost(sh,p);sinsUse(sh,cost,p.n||'Poder');};
+  const add=(id,fn)=>{const s=root.querySelector('#'+id);if(s)s.onchange=()=>{if(!s.value)return;fn(s.value);queueSave(sh);render();};};
+  add('sAddArma',v=>{sh.ataques=sh.ataques||[];if(v==='__novo'){sh.ataques.push({nome:'',tipo:'cc',per:'briga',dano:'',notas:''});return;}const w=SINS.armas[num(v)];sh.ataques.push({nome:w[0],tipo:w[2],per:w[3],dano:w[1],notas:w[4]});});
+  add('sAddDom',v=>{sh.dons=sh.dons||[];const d=v==='__novo'?['',1,'']:SINS.dons[num(v)];sh.dons.push({n:d[0],custo:d[1],e:d[2]});});
+  add('sAddMan',v=>{sh.manif=sh.manif||[];if(v==='__novo'){sh.manif.push({n:'',custo:1,e:''});return;}const [g,i]=v.split('|');const m=g==='u'?SINS.universais[num(i)]:(g==='a'?SINS.arquetipos[sh.arquetipo]:SINS.arquetipos[g]).m[num(i)];sh.manif.push({n:m[0],custo:m[1],e:m[2]});});
+  const spell=list=>v=>{sh[list]=sh[list]||[];if(v==='__novo'){sh[list].push({n:'',circ:1,escola:'',e:'',dano:''});return;}const [k,i]=v.split('|');const f=SINS.escolas[k].f[num(i)];sh[list].push({n:f[1],circ:f[0],escola:k,e:f[2],dano:f[3]||''});};
+  add('sAddSpell',spell('feiticos'));add('sAddGrim',spell('grimorio'));
+  const arm=root.querySelector('#sArmor');if(arm)arm.onchange=()=>{const a=SINS.armaduras[num(arm.value)];sh.armadura={nome:a[0],rd:a[1],def:a[2]};queueSave(sh);render();};
+  for(const b of root.querySelectorAll('[data-sdmg]'))b.onclick=()=>{const amt=Math.max(0,Math.round(num(root.querySelector('#sAmt').value)));if(!amt){toast('Escreva o valor primeiro.');return;}const mx=sinsV(sh,'pv'),kind=b.dataset.sdmg;
+    if(kind==='cura'){const cap=mx-num(sh.danoSagrado);sh.pv=Math.min(cap,num(sh.pv)+amt);toast(`+${amt} PV.`);}
+    else{let d=kind==='sagrado'?amt:Math.max(1,amt-sinsV(sh,'rd'));let t=num(sh.pvTemp);const ab=Math.min(t,d);sh.pvTemp=t-ab;d-=ab;sh.pv=Math.max(-mx,num(sh.pv)-d);if(kind==='sagrado')sh.danoSagrado=num(sh.danoSagrado)+d;
+      toast(kind==='sagrado'?`${d} de dano sagrado.`:`${d} de dano${amt-d-ab>0?` (RD absorveu ${Math.min(amt-1,sinsV(sh,'rd'))})`:''}.`);}
+    queueSave(sh);render();};
+  const sh1=root.querySelector('#sShort');if(sh1)sh1.onclick=()=>{const d=rnd(8),g=Math.max(0,d+num(sh.atr.brut));const cap=sinsV(sh,'pv')-num(sh.danoSagrado);sh.pv=Math.min(cap,num(sh.pv)+g);rollSheet=sh;pushRoll({label:`${sh.nome||'Ficha'} · descanso curto`,total:g,detail:`1d8: ${d} ${sgn(num(sh.atr.brut))}`});queueSave(sh);render();};
+  const lg=root.querySelector('#sLong');if(lg)lg.onclick=()=>{sh.danoSagrado=Math.floor(num(sh.danoSagrado)/2);sh.pv=sinsV(sh,'pv')-sh.danoSagrado;sh.ppAtual=sinsV(sh,'pp');sh.pvTemp=0;queueSave(sh);toast('Descanso longo: PV e PP recuperados.');render();};
+  const vc=root.querySelector('#sVice');if(vc)vc.onclick=()=>{sh.ppAtual=Math.min(sinsV(sh,'pp'),num(sh.ppAtual)+2);if(sh.raca==='sinner')sh.redencao=Math.max(0,num(sh.redencao)-1);queueSave(sh);toast(sh.raca==='sinner'?'+2 PP, −1 de Redenção.':'+2 PP.');render();};}
+function sinsRoll(sh,f,a,who){
+  if(f==='atr'){const at=SINS.atrs.find(x=>x[0]===a);return rollDnd(`${who} · ${at?at[1]:a}`,num((sh.atr||{})[a]));}
+  if(f==='per'){const sk=SINS.skills.find(x=>x[0]===a);return rollDnd(`${who} · ${sk?sk[1]:a}`,sSkill(sh,a));}
+  if(f==='ini')return rollDnd(`${who} · iniciativa`,sinsV(sh,'ini'));
+  if(f==='atk'){const at=(sh.ataques||[])[num(a)];if(!at)return;const per=at.tipo==='mag'?'magia':at.per||(at.tipo==='dist'?'armasFogo':'briga');return rollDnd(`${who} · ${at.nome||'ataque'}`,sSkill(sh,per));}
+  if(f==='dmg'){const at=(sh.ataques||[])[num(a)];if(!at)return;let e=String(at.dano||'');if(at.tipo==='cc'){const br=num(sh.atr.brut)+(sh.vicio==='ira'?1:0);if(br)e+=(br>0?'+':'')+br;}return rollExpr(`${who} · dano de ${at.nome||'ataque'}`,e);}
+  if(f==='fatk'||f==='gatk'){const p=(sh[f==='fatk'?'feiticos':'grimorio']||[])[num(a)];if(!p)return;return rollDnd(`${who} · ${p.n||'feitiço'}${f==='gatk'?' (grimório)':''}`,sSkill(sh,f==='fatk'?'magia':'ocultismo'));}
+  if(f==='fdmg'||f==='gdmg'){const p=(sh[f==='fdmg'?'feiticos':'grimorio']||[])[num(a)];if(!p)return;return rollExpr(`${who} · ${p.n||'feitiço'}`,p.dano);}}
 
 /* ---------- Etmos: the grimoire of particles ---------- */
 const etPips=(k,n,cur,lbl)=>`<span class="epips" role="group" aria-label="${esc(lbl)}">${Array.from({length:n},(_,i)=>`<button type="button" class="epip${cur>=i+1?' on':''}" data-pip="${k}" data-i="${i+1}" aria-label="${esc(lbl)} ${i+1}"></button>`).join('')}</span>`;
