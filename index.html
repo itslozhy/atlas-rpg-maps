@@ -186,7 +186,7 @@ window.claude={use:async name=>{const ok=await state.ready;if(!ok||!state.user)r
 <title>Mesa do Mestre</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Alegreya+Sans:ital,wght@0,400;0,500;0,700;1,400&family=IM+Fell+English:ital@0;1&family=IM+Fell+English+SC&family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Playfair+Display+SC:wght@400;700&family=Cinzel:wght@400;600;700&family=Rye&family=Pirata+One&family=Bungee&family=Metal+Mania&family=Limelight&family=Cinzel+Decorative:wght@400;700&family=Special+Elite&family=Courier+Prime:ital,wght@0,400;0,700;1,400&family=Cinzel:wght@500&family=EB+Garamond:ital,wght@0,400;0,600;1,400&family=IBM+Plex+Sans+Condensed:wght@400;500;600&family=IBM+Plex+Mono:wght@500&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Alegreya+Sans:ital,wght@0,400;0,500;0,700;1,400&family=IM+Fell+English:ital@0;1&family=IM+Fell+English+SC&family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Playfair+Display+SC:wght@400;700&family=Cinzel:wght@400;600;700&family=Rye&family=Permanent+Marker&family=Pirata+One&family=Bungee&family=Metal+Mania&family=Limelight&family=Cinzel+Decorative:wght@400;700&family=Special+Elite&family=Courier+Prime:ital,wght@0,400;0,700;1,400&family=Cinzel:wght@500&family=EB+Garamond:ital,wght@0,400;0,600;1,400&family=IBM+Plex+Sans+Condensed:wght@400;500;600&family=IBM+Plex+Mono:wght@500&display=swap">
 <style>
 /* Layout: drafting-table workbench. Tools rail left, map canvas center, properties panel right; on phones the rail docks at the bottom and the panel becomes a sheet. */
 :root{
@@ -1080,6 +1080,123 @@ h1.view{font-family:var(--f-title);font-weight:400;font-size:32px;margin:4px 0 4
 .sheet.sins .xgains{margin:8px 0 0;padding-left:18px;display:flex;flex-direction:column;gap:6px}
 .sheet.sins .xgains ul{list-style:none;margin:2px 0 0;padding:0;display:flex;flex-direction:column;gap:2px}
 .sheet.sins .xgains li.auto{color:var(--sm)}.sheet.sins .xgains li.pick{color:var(--sf)}
+/* ---- Business of the group: a document whose look follows the chosen scale ---- */
+.negfound h2{font-family:var(--f-title);font-weight:400;margin:0 0 4px}
+.negesc{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:10px;margin-top:12px}
+.negcard{display:flex;flex-direction:column;gap:4px;text-align:left;padding:14px;border-radius:8px;cursor:pointer;border:1px solid var(--ink);background:var(--pp);color:var(--ink);font-family:var(--bf);box-shadow:var(--shadow)}
+.negcard b{font-family:var(--hf);font-size:20px;font-weight:400;color:var(--acc)}.negcard small{color:var(--mut)}.negcard span{font-size:13.5px}
+.negcard:hover{transform:translateY(-2px)}
+.negdoc,.negcard{--pp:#fbfaf6;--ink:#1e2a3a;--mut:#5e6b7a;--acc:#b3261e;--line:#c9ced6;--hf:"Playfair Display",Georgia,serif;--bf:"Courier Prime","Courier New",monospace}
+.negdoc{position:relative;max-width:980px;margin:6px auto 20px;padding:34px 40px 26px;background:var(--pp);color:var(--ink);font-family:var(--bf);font-size:15.5px;line-height:1.45;box-shadow:0 2px 0 rgba(0,0,0,.08),0 18px 40px rgba(0,0,0,.18);overflow:hidden}
+@media (max-width:640px){.negdoc{padding:24px 16px 18px}}
+.negdoc .lbl{font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--mut);display:block}
+.negdoc .note{color:var(--mut);font-size:13px}
+.negdoc .btn{background:transparent;border:1px solid var(--ink);color:var(--ink);border-radius:3px;font-family:var(--bf)}
+.negdoc .btn:hover{background:var(--ink);color:var(--pp)}
+.negdoc .btn:disabled{opacity:.4;background:transparent;color:var(--ink)}
+.negdoc .btn.danger{border-color:var(--acc);color:var(--acc)}
+.negdoc .x{background:none;border:0;color:var(--mut);font-size:18px;cursor:pointer;padding:0 4px}.negdoc .x:hover{color:var(--acc)}
+.negdoc .ninp{background:transparent;border:0;border-bottom:1px dashed var(--line);color:inherit;font:inherit;padding:2px 2px;width:100%;min-width:0;border-radius:0}
+.negdoc select.ninp{background:var(--pp)}
+.negdoc textarea.ninp{border:1px dashed var(--line);min-height:80px;resize:vertical;padding:6px}
+.negdoc .ninp:focus{outline:none;border-color:var(--acc);background:color-mix(in srgb,var(--acc) 6%,transparent)}
+.negstamp{position:absolute;top:26px;right:-6px;transform:rotate(9deg);border:3px double var(--acc);color:var(--acc);padding:4px 14px;font-family:var(--hf);font-size:18px;letter-spacing:.14em;opacity:.78;text-transform:uppercase;pointer-events:none;mix-blend-mode:multiply}
+.neghead{display:flex;gap:16px;align-items:center;border-bottom:3px solid var(--ink);padding-bottom:12px;margin-bottom:10px;padding-right:120px}
+@media (max-width:640px){.neghead{padding-right:0}.negstamp{top:6px;font-size:13px}}
+.negmark{flex:none;width:58px;height:58px;display:grid;place-items:center;border:2px solid var(--ink);font-family:var(--hf);font-size:32px;color:var(--acc)}
+.negtitle{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}
+.negkind{font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:var(--mut)}
+.negname,.negname.nval{font-family:var(--hf);font-size:clamp(24px,4vw,36px);line-height:1.1;color:var(--ink)}
+.neglema{font-style:italic;color:var(--mut)}
+.negdoc .ninp.negname{font-family:var(--hf);font-size:clamp(24px,4vw,36px);line-height:1.15}.negdoc .ninp.neglema{font-style:italic;color:var(--mut)}
+.negdoc .negtab{table-layout:auto}.negdoc .negtab .ninp{min-width:60px}@media (max-width:640px){.negdoc .negtab td,.negdoc .negtab th{padding:4px 3px}.negdoc .negtab .btn.small{padding:2px 5px;font-size:12px}}
+.negyou{margin:6px 0 4px;padding:6px 10px;border-left:3px solid var(--acc);background:color-mix(in srgb,var(--acc) 7%,transparent)}
+.negsec{margin-top:18px}
+.negsec>h3{font-family:var(--hf);font-weight:400;font-size:21px;margin:0 0 8px;padding-bottom:3px;border-bottom:1px solid var(--line);color:var(--ink)}
+.negsec h4{font-family:var(--hf);font-weight:400;font-size:17px;margin:10px 0 6px}
+.negfacts{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px 18px}
+.negfacts .nval.big{font-family:var(--hf);font-size:24px;display:block}.negfacts .nval.hot{color:var(--acc)}
+.negpips{display:flex;gap:3px;flex-wrap:wrap;margin-top:3px}
+.negpips button{width:13px;height:13px;border:1.5px solid var(--ink);background:transparent;padding:0;cursor:pointer;border-radius:2px}
+.negpips button.on{background:var(--ink)}.negpips.calor button.on{background:var(--acc);border-color:var(--acc)}
+.negpips button:disabled{cursor:default}
+.negbonus{margin:10px 0 0}.neghot{color:var(--acc);font-weight:700;margin:6px 0 0}
+.negorg{display:flex;flex-direction:column;gap:12px}
+.neglead{align-self:center;text-align:center;min-width:220px;padding:8px 18px;border:2px solid var(--ink)}
+.neglead ul,.neggrp ul{list-style:none;margin:0;padding:0}
+.neggroups{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px}
+.neggrp{border:1px solid var(--line);padding:8px 10px}.neggrp h4{margin:0 0 4px}.neggrp.loose{border-style:dashed}
+.negchefe{margin:0 0 4px;font-size:13.5px}
+.negmem{display:flex;flex-direction:column;padding:4px 0;border-bottom:1px dotted var(--line)}
+.neglead .negmem{border:0}
+.negmem b{font-family:var(--hf);font-weight:400;font-size:17px}.negmem span{font-size:13.5px}.negmem small{color:var(--mut);font-size:12px}
+.negmem em{font-style:normal;font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--acc)}
+.negedit{margin-top:12px;border:1px dashed var(--line);padding:8px 10px}.negedit summary{cursor:pointer;color:var(--mut)}
+.negtab{width:100%;border-collapse:collapse;font-size:14.5px;margin:4px 0 8px}
+.negtab th{font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--mut);text-align:left;font-weight:400;border-bottom:1px solid var(--ink);padding:4px 6px}
+.negtab td{border-bottom:1px solid var(--line);padding:5px 6px;vertical-align:middle}
+.negtab .r{text-align:right;white-space:nowrap}
+.negtab td.neg{color:var(--acc)}.negtab .negp{color:var(--mut);font-size:12px;display:block}
+@media (max-width:640px){.negtab.ledger th:nth-child(1),.negtab.ledger td:nth-child(1),.negtab.ledger th:nth-child(6),.negtab.ledger td:nth-child(6){display:none}.negtab{font-size:13px}}
+.negrec{color:var(--acc);font-size:13.5px}
+.neg2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:0 26px}@media (max-width:760px){.neg2{grid-template-columns:minmax(0,1fr)}}
+.neglist{list-style:none;margin:0;padding:0}
+.neglist li{display:grid;grid-template-columns:minmax(0,1fr) auto auto;gap:2px 10px;padding:5px 0;border-bottom:1px dotted var(--line);align-items:center}
+.neglist li span{grid-column:1/-1;font-size:13px;color:var(--mut);grid-row:2}.neglist li em{font-style:normal;font-size:13px}
+.negsel{display:flex;flex-direction:column;gap:2px;font-size:12px;color:var(--mut);margin-top:8px;max-width:340px}
+.negsel select{border:1px solid var(--line);background:var(--pp);color:var(--ink);font:inherit;font-size:14px;padding:4px 6px}
+.neggedit{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr) minmax(0,1.4fr) auto;gap:6px;margin-bottom:6px}
+@media (max-width:640px){.neggedit{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}}
+.negtools{display:flex;gap:8px;flex-wrap:wrap}
+.negfoot{margin-top:22px;padding-top:8px;border-top:3px solid var(--ink);display:flex;justify-content:space-between;align-items:center;gap:10px;font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--mut)}
+/* empresa: corporate memo */
+.negdoc[data-escala="empresa"]{border-top:14px solid var(--ink)}
+/* agência: manila case file with a paper clip */
+[data-escala="agencia"]{--pp:#ead5a0;--ink:#2b2416;--mut:#6b5a3a;--acc:#9b1c1c;--line:#b69c63;--hf:"Special Elite","Courier New",monospace;--bf:"Special Elite","Courier New",monospace}
+.negdoc[data-escala="agencia"]{background-image:radial-gradient(ellipse at 20% 0%,rgba(255,255,255,.35),transparent 60%),radial-gradient(ellipse at 90% 100%,rgba(90,60,10,.18),transparent 60%);border-top:22px solid #d9bf7f}
+.negdoc[data-escala="agencia"]::before{content:"";position:absolute;top:-8px;left:40px;width:14px;height:54px;border:3px solid #8d8f94;border-radius:8px;box-shadow:inset 0 0 0 2px #c5c7cc}
+.negdoc[data-escala="agencia"] .negmark{border-radius:50%}
+/* gangue: lined notebook page and marker */
+[data-escala="gangue"]{--pp:#f6f3ea;--ink:#191919;--mut:#555;--acc:#e0218a;--line:#9cb7d8;--hf:"Permanent Marker","Bungee",sans-serif;--bf:"Courier Prime","Courier New",monospace}
+.negdoc[data-escala="gangue"]{background-image:linear-gradient(90deg,transparent 52px,rgba(224,33,138,.45) 52px 54px,transparent 54px),repeating-linear-gradient(180deg,transparent 0 27px,rgba(80,120,200,.28) 27px 28px);padding-left:70px}
+@media (max-width:640px){.negdoc[data-escala="gangue"]{padding-left:22px;background-image:repeating-linear-gradient(180deg,transparent 0 27px,rgba(80,120,200,.28) 27px 28px)}}
+.negdoc[data-escala="gangue"] .negmark{border:0;transform:rotate(-8deg);font-size:40px}
+.negdoc[data-escala="gangue"] .negstamp{border-style:solid;transform:rotate(-7deg);font-size:22px}
+.negdoc[data-escala="gangue"] .negsec>h3{transform:rotate(-1deg);color:var(--acc)}
+/* família: ledger with double frame and a wax seal */
+[data-escala="familia"]{--pp:#f2e6cc;--ink:#3a2414;--mut:#7a5c3c;--acc:#7a1010;--line:#c8ad7f;--hf:"IM Fell English SC","IM Fell English",serif;--bf:"IM Fell English","EB Garamond",serif}
+.negdoc[data-escala="familia"]{outline:2px solid var(--ink);outline-offset:-12px;box-shadow:inset 0 0 0 16px var(--pp),inset 0 0 0 17px var(--ink),0 18px 40px rgba(0,0,0,.2)}
+.negdoc[data-escala="familia"] .negmark{border-radius:50%;background:radial-gradient(circle at 35% 30%,#b3261e,#6b0d0d);color:#f2e6cc;border:0;box-shadow:0 2px 4px rgba(0,0,0,.4)}
+.negdoc[data-escala="familia"] .neghead{border-bottom:1px solid var(--ink);box-shadow:0 3px 0 var(--pp),0 4px 0 var(--ink)}
+/* hotel: registry card with gold deco */
+[data-escala="hotel"]{--pp:#f7eedc;--ink:#4a0e1a;--mut:#8a5a4a;--acc:#b8892b;--line:#dcc69a;--hf:"Limelight","Playfair Display",serif;--bf:"EB Garamond",Georgia,serif}
+.negdoc[data-escala="hotel"]{border:10px solid #4a0e1a;outline:2px solid #b8892b;outline-offset:-18px}
+.negdoc[data-escala="hotel"] .neghead{justify-content:center;text-align:center;border-bottom:2px solid var(--acc)}
+.negdoc[data-escala="hotel"] .negmark{transform:rotate(45deg);border-color:var(--acc)}
+.negdoc[data-escala="hotel"] .negsec>h3{text-align:center;color:var(--ink);border-bottom-color:var(--acc)}
+/* boate: black playbill with marquee bulbs */
+[data-escala="boate"]{--pp:#141013;--ink:#f6e7c8;--mut:#c9a9b6;--acc:#ff4fa3;--line:#4b3a44;--hf:"Limelight","Playfair Display",serif;--bf:"Alegreya Sans",system-ui,sans-serif}
+.negdoc[data-escala="boate"]{border:6px solid #2a1a22;box-shadow:inset 0 0 0 2px #f2c14e,0 18px 40px rgba(0,0,0,.35);background-image:radial-gradient(ellipse at 50% 0%,rgba(255,79,163,.22),transparent 55%)}
+.negdoc[data-escala="boate"]::before{content:"";position:absolute;inset:8px;border:3px dotted #f2c14e;pointer-events:none;opacity:.8}
+.negdoc[data-escala="boate"] .negname{color:#ffd6e8;text-shadow:0 0 12px var(--acc)}
+.negdoc[data-escala="boate"] .negstamp{mix-blend-mode:normal}
+/* estúdio: production script with punched holes */
+[data-escala="estudio"]{--pp:#ffffff;--ink:#111;--mut:#666;--acc:#d81b1b;--line:#d6d6d6;--hf:"Bungee","Courier Prime",sans-serif;--bf:"Courier Prime","Courier New",monospace}
+.negdoc[data-escala="estudio"]{padding-left:64px;background-image:radial-gradient(circle at 22px 70px,#ddd 7px,transparent 8px),radial-gradient(circle at 22px 50%,#ddd 7px,transparent 8px),radial-gradient(circle at 22px calc(100% - 70px),#ddd 7px,transparent 8px)}
+@media (max-width:640px){.negdoc[data-escala="estudio"]{padding-left:22px;background-image:none}}
+.negdoc[data-escala="estudio"] .negstamp{background:var(--acc);color:#fff;border:0;transform:none;border-radius:4px;mix-blend-mode:normal;letter-spacing:.2em}
+.negdoc[data-escala="estudio"] .negsec>h3{font-size:16px;text-transform:uppercase}
+/* culto: parchment with sigils */
+[data-escala="culto"]{--pp:#e8d9b8;--ink:#3b1d0e;--mut:#7a5232;--acc:#6b0f1a;--line:#bfa27a;--hf:"IM Fell English SC","IM Fell English",serif;--bf:"IM Fell English","EB Garamond",serif}
+.negdoc[data-escala="culto"]{background-image:radial-gradient(ellipse at 50% 50%,transparent 55%,rgba(90,50,10,.28)),radial-gradient(circle at 18% 22%,rgba(120,60,20,.10),transparent 30%)}
+.negdoc[data-escala="culto"]::after{content:"⛧";position:absolute;right:30px;bottom:12px;font-size:120px;line-height:1;color:var(--acc);opacity:.09;pointer-events:none}
+.negdoc[data-escala="culto"] .negmark{border-radius:50%;border-width:3px;border-style:double}
+/* loja: receipt / service note */
+[data-escala="loja"]{--pp:#fffdf2;--ink:#2a2a2a;--mut:#6a6a6a;--acc:#1f6f43;--line:#cfcfc4;--hf:"Courier Prime","Courier New",monospace;--bf:"Courier Prime","Courier New",monospace}
+.negdoc[data-escala="loja"]{max-width:760px;border-top:2px dashed var(--ink);border-bottom:0;-webkit-mask:linear-gradient(#000 0 0) top/100% calc(100% - 10px) no-repeat,conic-gradient(from -45deg at bottom,#0000,#000 1deg 89deg,#0000 90deg) bottom/20px 10px repeat-x;mask:linear-gradient(#000 0 0) top/100% calc(100% - 10px) no-repeat,conic-gradient(from -45deg at bottom,#0000,#000 1deg 89deg,#0000 90deg) bottom/20px 10px repeat-x;padding-bottom:36px}
+.negdoc[data-escala="loja"] .negname{font-weight:700;text-transform:uppercase}
+.negdoc[data-escala="loja"] .negsec>h3{font-size:16px;text-transform:uppercase;border-bottom:1px dashed var(--ink);font-weight:700}
+.negdoc[data-escala="loja"] .negstamp{border-radius:50%;padding:18px 10px;transform:rotate(-14deg)}
 .sheet.sins .check-line{display:flex;gap:8px;align-items:flex-start;cursor:pointer}
 .sheet.sins input[type=checkbox]{width:auto;flex:none;margin:4px 0 0;accent-color:var(--sa)}
 .sheet.etmos{--sbg:#e5e0f0;--sp:#eeeaf6;--sp2:#d9d2ea;--sf:#2b1830;--sm:#6b5875;--sa:#4a2350;--sab:#f4effa;--sl:#b6abc9;--sl2:#cdc4dc;--sh:#f7f4fc;
@@ -5229,6 +5346,7 @@ const dPath=(kind,camp,id)=>S.fb?'campanhas/'+camp+'/'+kind+'/'+id:kind+'/'+id;
 /* after joining a table (Firebase), listen again: the first listeners were refused before the membership existed */
 function resubscribe(){for(const k of Object.keys(unsub)){try{unsub[k]&&unsub[k]();}catch(e){}delete unsub[k];}subscribe();}
 function watchPlayer(pid){if(!pid||unsub['u'+pid])return;
+  if(S.mode==='cloud'&&(S.master||pid===S.uid))unsub['ng'+pid]=db.collection('pjs/'+pid+'/negocio').onSnapshot(s=>{const m={};for(const d of s.docs){const v=d.data();if(v)m[d.id]=v;}S_NEG[pid]=m;negConsolidate();onRemote();},()=>{});
   if(S.master)unsub['r'+pid]=db.collection('pjs/'+pid+'/rolagens').onSnapshot(s=>{const m={};for(const d of s.docs){const v=d.data();if(v)m[d.id]=Object.assign({id:d.id,pid},v);}S.rolls[pid]=m;onRemote();},()=>{});
   if(S.master&&pid!==S.uid)unsub['dc'+pid]=db.collection('pjs/'+pid+'/docs').onSnapshot(s=>{const m={};for(const d of s.docs){const v=d.data();if(v)m[d.id]=Object.assign({id:d.id,pid},v);}S.pdocs[pid]=m;onRemote();},()=>{});
   if(!S.fb&&S.mode==='cloud'&&pid===S.uid)unsub['jn'+pid]=db.collection('pjs/'+pid+'/campanhas').onSnapshot(s=>{S.joined={};for(const d of s.docs)S.joined[d.id]=d.data()||{};onRemote();},()=>{});
@@ -5260,7 +5378,7 @@ async function resolveNames(ids){if(!user||!ids.length)return;const need=ids.fil
 
 /* remote change while a sheet is open: re-render only when the viewer is not typing in it */
 let staleSheet=false;
-function onRemote(){notify();if(Mesa.view()!=='fichas')return;const root=$('#app');const a=R.activeElement;if(root&&a&&root.contains(a)&&/INPUT|TEXTAREA|SELECT/.test(a.tagName)&&a.type!=='checkbox'&&a.type!=='file'){staleSheet=true;return;}render();}
+function onRemote(){notify();if(S.master&&Object.keys(S_NEG).length)negConsolidate();if(Mesa.view()!=='fichas')return;const root=$('#app');const a=R.activeElement;if(root&&a&&root.contains(a)&&/INPUT|TEXTAREA|SELECT/.test(a.tagName)&&a.type!=='checkbox'&&a.type!=='file'){staleSheet=true;return;}render();}
 R.addEventListener('focusout',()=>{setTimeout(()=>{if(staleSheet){const a=R.activeElement;if(!a||!/INPUT|TEXTAREA|SELECT/.test(a.tagName)){staleSheet=false;render();}}},50);});
 
 /* ================= DICE ================= */
@@ -5401,13 +5519,14 @@ function viewCamp(app,c){lastCamp=c.id;try{sessionStorage.setItem('mesa.camp',c.
   resolveNames([...new Set(sheets.map(s=>s.owner).filter(o=>o&&o!==S.uid))]).then(()=>{if(!S.names.__done&&sheets.some(s=>s.owner&&s.owner!==S.uid)){S.names.__done=1;if(route().v==='camp')render();}});
   const nLog=S.master?campLogs(c.id).filter(l=>(l.fim||0)>seenLogs(c.id)).length+allSheets().filter(s=>s.camp===c.id&&s.owner).reduce((a,s)=>a+Object.keys(s.pendentes||{}).length,0):0;
   const nDoc=S.master?0:campDocs(c.id).filter(d=>(d.t||0)>num(store.get('mesa.docvisto.'+c.id))).length;
-  const tabs=S.master?[['grupo','Grupo'],['mapas','Mapas'],['npcs','NPCs'],['diario','Diário'],['documentos','Documentos'],...(c.sys==='etmos'?[['particulas','Partículas']]:[]),['convites','Convites'],['registro','Registro'+(nLog?` <span class="cnt">${nLog}</span>`:'')],['notas','Notas do mestre']]:[['grupo','Minhas fichas'],['diario','Diário'],['documentos','Documentos'+(nDoc?` <span class="cnt">${nDoc}</span>`:'')]];if(!tabs.some(t=>t[0]===ui.campTab))ui.campTab='grupo';
+  const tabs=S.master?[['grupo','Grupo'],['negocio','Negócio'],['mapas','Mapas'],['npcs','NPCs'],['diario','Diário'],['documentos','Documentos'],...(c.sys==='etmos'?[['particulas','Partículas']]:[]),['convites','Convites'],['registro','Registro'+(nLog?` <span class="cnt">${nLog}</span>`:'')],['notas','Notas do mestre']]:[['grupo','Minhas fichas'],...(c.negocio&&c.negocio.ativo?[['negocio','Negócio']]:[]),['diario','Diário'],['documentos','Documentos'+(nDoc?` <span class="cnt">${nDoc}</span>`:'')]];if(!tabs.some(t=>t[0]===ui.campTab))ui.campTab='grupo';
   const banner=S.readOnlyMsg?`<div class="banner">${esc(S.readOnlyMsg)}</div>`:'';
   let body='';
   if(ui.campTab==='grupo')body=S.master?`<div class="row" style="margin-bottom:12px"><button class="btn primary" id="newPc">Nova ficha (sua)</button><button class="btn" data-newinv="pc">Convidar um jogador</button></div>
       ${pcs.length?`<div class="grid-cards">${pcs.map(s=>pcCard(s,c)).join('')}</div>`:'<div class="empty">Nenhum personagem ainda. Gere um convite para cada jogador na aba Convites.</div>'}`
     :`<div class="row" style="margin-bottom:12px"><button class="btn primary" id="newPc">Nova ficha</button></div>${pcs.length?`<div class="grid-cards">${pcs.map(s=>pcCard(s,c)).join('')}</div>`:'<div class="empty">Você ainda não tem fichas nesta mesa. Comece em “Nova ficha”.</div>'}`;
   else if(ui.campTab==='npcs')body=`<div class="row" style="margin-bottom:12px"><button class="btn primary" id="newNpc">Novo NPC</button><button class="btn" id="genNpc">Gerar NPC</button><button class="btn" id="fromBest">Do bestiário</button><button class="btn" data-newinv="npc">Convite para criar um NPC</button><span class="note">NPCs que você cria só você vê; os criados por convite também ficam visíveis para quem os criou.</span></div>${npcs.length?`<div class="grid-cards">${npcs.map(s=>pcCard(s,c)).join('')}</div>`:'<div class="empty">Nenhum NPC ainda.</div>'}`;
+  else if(ui.campTab==='negocio')body=negView(c);
   else if(ui.campTab==='mapas'&&S.master)body=mapsView(c);
   else if(ui.campTab==='convites')body=invitesView(c);
   else if(ui.campTab==='particulas')body=partsView(c);
@@ -5425,7 +5544,7 @@ function viewCamp(app,c){lastCamp=c.id;try{sessionStorage.setItem('mesa.camp',c.
   const np=$('#newPc');if(np)np.onclick=()=>createSheet(c,'pc');const nn=$('#newNpc');if(nn)nn.onclick=()=>createSheet(c,'npc');
   for(const b of app.querySelectorAll('[data-newinv]'))b.onclick=()=>inviteForm(c,b.dataset.newinv);
   const gn=$('#genNpc');if(gn)gn.onclick=()=>npcGenerator(c);const fb=$('#fromBest');if(fb)fb.onclick=()=>bestPicker(c);
-  bindMaps(app,c);bindInvites(app,c);bindLogs(app,c);bindParts(app,c);bindDiary(app,c);bindDocs(app,c);
+  bindMaps(app,c);bindInvites(app,c);bindLogs(app,c);bindParts(app,c);bindDiary(app,c);bindDocs(app,c);bindNeg(app,c);
   const mn=$('#mNotes');if(mn)mn.oninput=()=>{setStatus('Alterações não salvas');saveNote(c.id,mn.value);};
   for(const b of app.querySelectorAll('[data-hp]'))b.onclick=()=>{const sh=findSheet(b.dataset.hp);if(!sh||!canEdit(sh))return;const [pv,mx]=hpOf(sh);setHpVal(sh,pv+num(b.dataset.d));queueSave(sh);render();};}
 /* master: own sheets and private NPCs. Player: only through an invite (inv = {id, tipo}). */
@@ -5441,6 +5560,148 @@ function openModal(html){$('#modalBox').innerHTML=html;$('#modal').hidden=false;
 function closeModal(){$('#modal').hidden=true;$('#modalBox').classList.remove('wide');}
 $('#modal').addEventListener('click',e=>{if(e.target.id==='modal')closeModal();});window.addEventListener('keydown',e=>{if(e.key==='Escape'&&Mesa.view()==='fichas')closeModal();});
 function confirmBox(msg,ok){openModal(`<h2>Tem certeza?</h2><p>${esc(msg)}</p><div class="row" style="justify-content:flex-end"><button class="btn" data-close>Cancelar</button><button class="btn primary" id="cfOk" style="background:var(--bad);border-color:var(--bad)">Apagar</button></div>`);$('#cfOk').onclick=()=>{closeModal();ok();};}
+
+/* ================= BUSINESS OF THE GROUP (campaign tab) =================
+   The structure lives in the campaign (only the master writes it). A player moves a resource by writing
+   a request in their own folder (pjs/<uid>/negocio); the master's page books it in the ledger and removes it. */
+const NEG_ESC={
+  empresa:{n:'Empresa',doc:'Memorando interno',grupo:'Departamento',grupos:'Departamentos',lider:'Presidente',cargos:['Presidente','Diretor(a)','Gerente','Contador(a)','Segurança','Estagiário(a)'],selo:'CONFIDENCIAL',bonus:'+1 na rolagem de lucro entre as sessões.',lucro:1},
+  agencia:{n:'Agência',doc:'Dossiê da agência',grupo:'Equipe',grupos:'Equipes',lider:'Diretor(a)',cargos:['Diretor(a)','Agente sênior','Agente','Atirador(a)','Infiltrador(a)','Motorista','Informante'],selo:'ULTRASSECRETO',bonus:'Contratos de serviço pagam +50%.'},
+  gangue:{n:'Gangue',doc:'Lista da gangue',grupo:'Bando',grupos:'Bandos',lider:'Chefão',cargos:['Chefão','Braço direito','Cobrador(a)','Soldado','Olheiro(a)','Novato(a)'],selo:'TERRITÓRIO NOSSO',bonus:'+2 capangas convocados por sessão.'},
+  familia:{n:'Família',doc:'Livro da Família',grupo:'Tropa',grupos:'Tropas',lider:'Don',cargos:['Don','Consigliere','Capo','Soldato','Associado(a)'],selo:'OMERTÀ',bonus:'Uma vez por sessão, a Família cobra um favor de alguém de fora.'},
+  hotel:{n:'Hotel',doc:'Registro do hotel',grupo:'Setor',grupos:'Setores',lider:'Dono(a)',cargos:['Dono(a)','Gerente','Recepção','Camareiro(a)','Bartender','Segurança','Hóspede fixo'],selo:'HOSPEDAGEM',bonus:'Descanso longo sempre seguro; ajudar um hóspede de verdade conta como ato de Redenção.'},
+  boate:{n:'Boate ou cabaré',doc:'Programa da casa',grupo:'Núcleo',grupos:'Núcleos',lider:'Dono(a) da casa',cargos:['Dono(a) da casa','Estrela','Dançarino(a)','Músico(a)','Bartender','Leão de chácara'],selo:'ESTREIA',bonus:'+2 em Lábia dentro do lugar; os rumores chegam primeiro.'},
+  estudio:{n:'Estúdio ou rádio',doc:'Roteiro de produção',grupo:'Programa',grupos:'Programas',lider:'Produtor(a)-chefe',cargos:['Produtor(a)-chefe','Apresentador(a)','Câmera','Editor(a)','Repórter','Técnico(a) de som'],selo:'NO AR',bonus:'+1 de Reputação por arco; as mensagens chegam ao anel inteiro.'},
+  culto:{n:'Culto',doc:'Códice da ordem',grupo:'Círculo',grupos:'Círculos',lider:'Sumo sacerdote',cargos:['Sumo sacerdote','Oráculo','Acólito(a)','Guardião(ã)','Iniciado(a)'],selo:'SELADO',bonus:'Uma vez por sessão, fiéis escondem, abrigam ou defendem vocês.'},
+  loja:{n:'Loja ou oficina',doc:'Nota de serviço',grupo:'Balcão',grupos:'Balcões',lider:'Proprietário(a)',cargos:['Proprietário(a)','Mestre de obras','Mecânico(a)','Vendedor(a)','Entregador(a)','Aprendiz'],selo:'PAGO',bonus:'Equipamento com 30% de desconto; conserta qualquer coisa.'}};
+const NEG_FUNC=[['Segurança',50,'Um capanga que defende o lugar (PV 12, ataque +4, 2d6).'],['Contador(a)',60,'+2 na rolagem de lucro.'],['Médico(a)',80,'Cura todos os PV entre as sessões, menos dano sagrado.'],['Informante',60,'Uma informação útil por sessão.'],['Faz-tudo',40,'O Calor desce 1 a mais por sessão tranquila.'],['Estrela da casa',100,'+1 de Reputação por arco.']];
+const NEG_MELH=[['Cofre',1000,'O caixa não pode ser roubado em ataques.'],['Arsenal',1500,'Armas comuns de graça para o grupo.'],['Enfermaria',1500,'Descanso curto cura o máximo do dado.'],['Sala secreta',2000,'Esconde pessoas e objetos; Furtividade com vantagem lá dentro.'],['Veículo da casa',3000,'Um carro ou van para o grupo.'],['Círculo de proteção',4000,'Exorcistas e invasores precisam de Vontade DT 16 para entrar.']];
+const S_NEG={};/* requests by player: S_NEG[pid][id] */
+const negNew=esc0=>({ativo:true,nome:'',escala:esc0||'agencia',lema:'',sede:'',numero:String(100+Math.floor(Math.random()*900)),nivel:1,reputacao:1,calor:0,cargos:[],grupos:[],
+  recursos:[{id:'caixa',nome:'Caixa',tipo:'dinheiro',valor:500,unidade:'$',grupo:'*'}],funcionarios:[],melhorias:[],livro:[],estatuto:''});
+const negE=n=>NEG_ESC[n.escala]||NEG_ESC.agencia;
+const money=(v,u)=>(u==='$'||!u?'$ ':'')+Math.round(num(v)).toLocaleString('pt-BR')+(u&&u!=='$'?' '+u:'');
+const negMine=(n,who)=>(n.cargos||[]).filter(x=>x.owner&&x.owner===(who||S.uid));
+function negCanMove(n,r,who,asMaster){if(asMaster===undefined?S.master:asMaster)return true;const mine=negMine(n,who);if(!mine.length)return false;if(mine.some(x=>x.lider))return true;
+  if(r.grupo==='*')return true;if(mine.some(x=>x.grupo&&x.grupo===r.grupo))return true;return (n.grupos||[]).some(g=>g.id===r.grupo&&mine.some(x=>x.id===g.chefe));}
+const negWho=(n,owner)=>{const l=(n.cargos||[]).filter(x=>x.owner===owner);return l.length?l.map(x=>x.nome).join(', '):'';};
+/* the master books a movement: money cannot go below zero */
+function negApply(c,{rec,delta,motivo,quem}){const n=c.negocio,r=(n.recursos||[]).find(x=>x.id===rec);if(!r)return 'Esse recurso não existe mais.';
+  if(num(delta)<0&&num(r.valor)+num(delta)<0)return `Saldo insuficiente em ${r.nome}.`;r.valor=num(r.valor)+num(delta);
+  n.livro=[{t:Date.now(),quem:quem||'Mestre',rec:r.nome,delta:num(delta),unidade:r.unidade||'',motivo:motivo||'',saldo:r.valor}].concat(n.livro||[]).slice(0,120);return '';}
+let negSaveT=null;function negSave(c,now){clearTimeout(negSaveT);if(now){saveCamp(c);return;}setStatus('Alterações não salvas');negSaveT=setTimeout(()=>saveCamp(c),600);}
+/* master's page: book every pending request from the players, once */
+const negSeen=new Set();
+async function negConsolidate(){if(!S.master||S.mode!=='cloud')return;const touched=new Set();
+  for(const [pid,m] of Object.entries(S_NEG))for(const [id,e] of Object.entries(m||{})){if(e.estado!=='pendente'||negSeen.has(pid+id))continue;const c=S.camps[e.camp];if(!c||!c.negocio)continue;negSeen.add(pid+id);
+    const n=c.negocio,r=(n.recursos||[]).find(x=>x.id===e.rec);let err='';
+    if(!r)err='Esse recurso não existe mais.';else if(!(n.cargos||[]).some(x=>x.owner===pid))err='Você não faz parte do negócio.';
+    else if(!negCanMove(n,r,pid,false))err='Você não controla esse recurso.';
+    if(!err)err=negApply(c,{rec:e.rec,delta:e.delta,motivo:e.motivo,quem:e.quem||negWho(n,pid)||S.names[pid]||'Jogador'});
+    try{if(err)await db.doc('pjs/'+pid+'/negocio/'+id).set(Object.assign({},e,{estado:'recusado',nota:err}));else{await db.doc('pjs/'+pid+'/negocio/'+id).delete();touched.add(c.id);}}catch(x){negSeen.delete(pid+id);}}
+  for(const cid of touched)await saveCamp(S.camps[cid]);if(touched.size&&route().v==='camp')render();}
+/* the document */
+function negView(c){const n=c.negocio;
+  if(!n||!n.ativo){if(!S.master)return '<div class="empty">O mestre ainda não fundou o negócio do grupo.</div>';
+    return `<div class="negfound"><h2>Fundar o negócio do grupo</h2><p class="note">Escolha a escala. Ela define o visual do documento, como se chamam os grupos internos, os cargos sugeridos e o bônus do negócio.</p>
+      <div class="negesc">${Object.entries(NEG_ESC).map(([k,e])=>`<button type="button" class="negcard" data-negfund="${k}" data-escala="${k}"><b>${esc(e.n)}</b><small>${esc(e.doc)} · ${esc(e.grupos)}</small><span>${esc(e.bonus)}</span></button>`).join('')}</div></div>`;}
+  const E=negE(n),M=S.master,mine=negMine(n);const lider=(n.cargos||[]).find(x=>x.lider);
+  const fld=(path,ph,cls,tag)=>M?(tag==='ta'?`<textarea class="ninp ${cls||''}" data-nk="${path}" rows="3" placeholder="${esc(ph||'')}">${esc(getP(n,path)||'')}</textarea>`:`<input class="ninp ${cls||''}" data-nk="${path}" value="${esc(getP(n,path)??'')}" placeholder="${esc(ph||'')}">`):`<span class="nval ${cls||''}">${esc(getP(n,path)||'—')}</span>`;
+  const gname=id=>id==='*'?'Todos os membros':id?((n.grupos||[]).find(g=>g.id===id)||{}).nome||E.grupo+' removido':'Só a liderança';
+  const member=x=>`<li class="negmem${x.lider?' lead':''}${x.owner===S.uid?' me':''}"><b>${esc(x.nome||'Sem nome')}</b><span>${esc(x.cargo||'—')}</span>${x.jogador?`<small>${esc(x.jogador)}</small>`:''}${x.owner===S.uid?'<em>você</em>':''}</li>`;
+  const pips=(k,mx,cur,cls)=>`<span class="negpips ${cls||''}">${Array.from({length:mx},(_,i)=>`<button type="button" class="${cur>=i+1?'on':''}" ${M?`data-npip="${k}" data-i="${i+1}"`:'disabled'} aria-label="${k} ${i+1}"></button>`).join('')}</span>`;
+  const groups=n.grupos||[],cargos=n.cargos||[];
+  const org=`<div class="negorg">${lider?`<div class="neglead"><span class="lbl">${esc(E.lider)}</span>${member(lider)}</div>`:'<p class="note">Ninguém lidera ainda.</p>'}
+    <div class="neggroups">${groups.map(g=>{const ch=cargos.find(x=>x.id===g.chefe);const ms=cargos.filter(x=>x.grupo===g.id&&!x.lider);return `<section class="neggrp"><h4>${esc(g.nome||E.grupo)}</h4>${ch?`<p class="negchefe">Chefe: <b>${esc(ch.nome)}</b></p>`:''}${g.desc?`<p class="note">${esc(g.desc)}</p>`:''}<ul>${ms.map(member).join('')||'<li class="note">Ninguém ainda.</li>'}</ul></section>`;}).join('')}
+      ${cargos.some(x=>!x.grupo&&!x.lider)?`<section class="neggrp loose"><h4>Sem ${esc(E.grupo.toLowerCase())}</h4><ul>${cargos.filter(x=>!x.grupo&&!x.lider).map(member).join('')}</ul></section>`:''}</div></div>`;
+  const myReq=Object.entries(S_NEG[S.uid]||{}).filter(([,e])=>e.camp===c.id);
+  const pend=rid=>myReq.filter(([,e])=>e.rec===rid&&e.estado==='pendente').reduce((a,[,e])=>a+num(e.delta),0);
+  const recs=`<table class="negtab"><thead><tr><th>Recurso</th><th>Controlado por</th><th class="r">Saldo</th><th></th></tr></thead><tbody>${(n.recursos||[]).map((r,i)=>{const p=pend(r.id);return `<tr>
+      <td>${M?`<input class="ninp" data-nk="recursos.${i}.nome" value="${esc(r.nome)}">`:`<b>${esc(r.nome)}</b>`}</td>
+      <td>${M?`<select class="ninp" data-nk="recursos.${i}.grupo" data-nre="1"><option value="*"${r.grupo==='*'?' selected':''}>Todos os membros</option><option value=""${!r.grupo?' selected':''}>Só a liderança</option>${groups.map(g=>`<option value="${esc(g.id)}"${r.grupo===g.id?' selected':''}>${esc(g.nome||E.grupo)}</option>`).join('')}</select>`:esc(gname(r.grupo))}</td>
+      <td class="r"><b>${esc(money(r.valor,r.unidade))}</b>${p?`<small class="negp"> ${p>0?'+':'−'}${esc(money(Math.abs(p),r.unidade))} aguardando</small>`:''}</td>
+      <td class="r">${negCanMove(n,r)?`<button type="button" class="btn small" data-nmov="${esc(r.id)}">Movimentar</button>`:''}${M&&r.id!=='caixa'?`<button type="button" class="x" data-ndel="recursos|${i}" aria-label="Remover recurso">×</button>`:''}</td></tr>`;}).join('')}</tbody></table>
+    ${M?`<div class="row"><button type="button" class="btn small" data-nadd="dinheiro">+ Cofre ou conta</button><button type="button" class="btn small" data-nadd="qtd">+ Estoque (armas, munição, mercadoria…)</button></div>`:''}
+    ${myReq.filter(([,e])=>e.estado==='recusado').map(([id,e])=>`<p class="negrec">Recusado: ${esc(e.motivo||'movimento')} (${esc(e.nota||'')}) <button type="button" class="btn small" data-ndis="${esc(id)}">Dispensar</button></p>`).join('')}`;
+  const livro=(n.livro||[]).slice(0,30);
+  const ledger=livro.length?`<table class="negtab ledger"><thead><tr><th>Quando</th><th>Quem</th><th>Recurso</th><th>Motivo</th><th class="r">Valor</th><th class="r">Saldo</th></tr></thead><tbody>${livro.map(l=>`<tr><td>${esc(new Date(l.t).toLocaleDateString('pt-BR'))}</td><td>${esc(l.quem)}</td><td>${esc(l.rec)}</td><td>${esc(l.motivo||'')}</td><td class="r ${l.delta<0?'neg':'pos'}">${l.delta<0?'−':'+'}${esc(money(Math.abs(l.delta),l.unidade))}</td><td class="r">${esc(money(l.saldo,l.unidade))}</td></tr>`).join('')}</tbody></table>`:'<p class="note">Nenhum movimento ainda.</p>';
+  const custo=(n.funcionarios||[]).reduce((a,f)=>a+num(f.custo),0)+num(n.nivel)*100;
+  const staff=`<ul class="neglist">${(n.funcionarios||[]).map((f,i)=>`<li><b>${M?`<input class="ninp" data-nk="funcionarios.${i}.nome" value="${esc(f.nome)}">`:esc(f.nome)}</b><span>${esc(f.funcao||'')}</span><em>${esc(money(f.custo))}/sessão</em>${M?`<button type="button" class="x" data-ndel="funcionarios|${i}" aria-label="Dispensar">×</button>`:''}</li>`).join('')||'<li class="note">Ninguém contratado.</li>'}</ul>
+    ${M?`<label class="negsel">Contratar <select id="nFunc"><option value="">Escolher…</option>${NEG_FUNC.map((f,i)=>`<option value="${i}">${esc(f[0])} ($ ${f[1]}/sessão)</option>`).join('')}</select></label>`:''}
+    <p class="note">Funcionários: até ${num(n.nivel)+1} (nível + 1). Manutenção por sessão: ${esc(money(custo))} (${num(n.nivel)} × $100 + salários).</p>`;
+  const upgrades=`<ul class="neglist">${(n.melhorias||[]).map((m,i)=>`<li><b>${esc(m.nome)}</b><span>${esc(m.efeito||'')}</span>${M?`<button type="button" class="x" data-ndel="melhorias|${i}" aria-label="Remover">×</button>`:''}</li>`).join('')||'<li class="note">Nenhuma melhoria.</li>'}</ul>
+    ${M?`<label class="negsel">Comprar com o caixa <select id="nMelh"><option value="">Escolher…</option>${NEG_MELH.filter(m=>!(n.melhorias||[]).some(x=>x.nome===m[0])).map(m=>`<option value="${esc(m[0])}">${esc(m[0])} ($ ${m[1].toLocaleString('pt-BR')})</option>`).join('')}</select></label>`:''}`;
+  const caixa=(n.recursos||[]).find(r=>r.id==='caixa')||{valor:0};const nextLvl=num(n.nivel)+1;
+  const tools=M?`<div class="negtools"><button type="button" class="btn small" id="nLucro">Rolar lucro da sessão</button><button type="button" class="btn small" id="nManut">Pagar manutenção (${esc(money(custo))})</button>${num(n.nivel)<5?`<button type="button" class="btn small" id="nUp" ${num(caixa.valor)>=nextLvl*2000&&num(n.reputacao)>=nextLvl*2?'':'disabled'} title="Precisa de $ ${(nextLvl*2000).toLocaleString('pt-BR')} e Reputação ${nextLvl*2}">Subir para o nível ${nextLvl}</button>`:''}</div>
+    <p class="note">Lucro: 1d20 + nível + metade da Reputação${E.lucro?` + ${E.lucro} (${esc(E.n)})`:''} + 2 por contador, contra 13. Sucesso: nível × $300; 20 natural: o dobro e +1 de Reputação; 1 natural: +2 de Calor.</p>`:'';
+  const roleLine=mine.length?`<p class="negyou">Você: ${mine.map(x=>`<b>${esc(x.nome)}</b>, ${esc(x.cargo||'membro')}${x.lider?' (lidera)':''}${x.grupo?' · '+esc(gname(x.grupo)):''}`).join('; ')}.</p>`:(!M?'<p class="negyou">Você ainda não tem cargo neste negócio. Peça ao mestre.</p>':'');
+  return `<article class="negdoc" data-escala="${esc(n.escala)}">
+    <div class="negstamp" aria-hidden="true">${esc(E.selo)}</div>
+    <header class="neghead"><div class="negmark" aria-hidden="true">${esc((n.nome||E.n).trim().charAt(0).toUpperCase())}</div>
+      <div class="negtitle"><span class="negkind">${esc(E.doc)} · nº ${esc(n.numero||'001')}</span>${fld('nome',`Nome da ${E.n.toLowerCase()}`,'negname')}${fld('lema','Lema ou slogan','neglema')}</div></header>
+    ${roleLine}
+    <section class="negsec"><h3>Ficha cadastral</h3><div class="negfacts">
+      <div><span class="lbl">Escala</span>${M?`<select class="ninp" data-nk="escala" data-nre="1">${Object.entries(NEG_ESC).map(([k,e])=>`<option value="${k}"${n.escala===k?' selected':''}>${esc(e.n)}</option>`).join('')}</select>`:`<span class="nval">${esc(E.n)}</span>`}</div>
+      <div><span class="lbl">Sede</span>${fld('sede','Endereço, anel, bairro')}</div>
+      <div><span class="lbl">Nível</span><span class="nval big">${num(n.nivel)}</span>${pips('nivel',5,num(n.nivel))}</div>
+      <div><span class="lbl">Reputação</span><span class="nval big">${num(n.reputacao)}</span>${pips('reputacao',10,num(n.reputacao))}</div>
+      <div><span class="lbl">Calor</span><span class="nval big${num(n.calor)>=6?' hot':''}">${num(n.calor)} / 6</span>${pips('calor',6,num(n.calor),'calor')}</div></div>
+      <p class="negbonus"><b>Bônus de ${esc(E.n.toLowerCase())}:</b> ${esc(E.bonus)}</p>${num(n.calor)>=6?'<p class="neghot">Calor 6: alguém ataca o negócio na próxima sessão. Depois, o Calor volta a 3.</p>':''}</section>
+    <section class="negsec"><h3>Quadro de pessoal</h3>${org}
+      ${M?`<details class="negedit"${(ui.negEdit!=null?ui.negEdit:!cargos.length)?' open':''}><summary>Editar membros e ${esc(E.grupos.toLowerCase())}</summary>
+        <datalist id="negCargos">${E.cargos.map(x=>`<option value="${esc(x)}">`).join('')}</datalist>
+        <table class="negtab"><thead><tr><th>Membro</th><th>Cargo</th><th>${esc(E.grupo)}</th><th>Lidera</th><th></th></tr></thead><tbody>${cargos.map((x,i)=>`<tr><td><b>${esc(x.nome)}</b>${x.jogador?` <small>${esc(x.jogador)}</small>`:''}</td><td><input class="ninp" list="negCargos" data-nk="cargos.${i}.cargo" value="${esc(x.cargo||'')}" placeholder="Cargo"></td>
+          <td><select class="ninp" data-nk="cargos.${i}.grupo" data-nre="1"><option value="">—</option>${groups.map(g=>`<option value="${esc(g.id)}"${x.grupo===g.id?' selected':''}>${esc(g.nome||E.grupo)}</option>`).join('')}</select></td>
+          <td><input type="radio" name="negLead" data-nlead="${i}" ${x.lider?'checked':''} aria-label="Lidera"></td><td><button type="button" class="x" data-ndel="cargos|${i}" aria-label="Tirar do negócio">×</button></td></tr>`).join('')}</tbody></table>
+        <div class="row"><label class="negsel">Adicionar membro <select id="nMem"><option value="">Escolher…</option>${allSheets().filter(s=>s.camp===c.id&&!cargos.some(x=>x.sheet===s.id)).map(s=>`<option value="${esc(s.id)}">${esc(s.nome||'Sem nome')}${s.kind==='npc'?' (NPC)':''}</option>`).join('')}<option value="__fora">Alguém de fora (só o nome)</option></select></label></div>
+        <h4>${esc(E.grupos)}</h4>${groups.map((g,i)=>`<div class="neggedit"><input class="ninp" data-nk="grupos.${i}.nome" value="${esc(g.nome)}" placeholder="Nome"><select class="ninp" data-nk="grupos.${i}.chefe" data-nre="1"><option value="">Chefe: ninguém</option>${cargos.map(x=>`<option value="${esc(x.id)}"${g.chefe===x.id?' selected':''}>Chefe: ${esc(x.nome)}</option>`).join('')}</select><input class="ninp" data-nk="grupos.${i}.desc" value="${esc(g.desc||'')}" placeholder="O que faz"><button type="button" class="x" data-ndel="grupos|${i}" aria-label="Apagar">×</button></div>`).join('')}
+        <button type="button" class="btn small" id="nGrp">+ ${esc(E.grupo)}</button></details>`:''}</section>
+    <section class="negsec"><h3>Recursos e cofres</h3>${recs}<p class="note">${M?'Clique no nome para renomear. "Controlado por" define quem pode movimentar.':'Você movimenta os recursos que o seu cargo controla. O mestre registra o pedido no livro-caixa quando a página dele estiver aberta.'}</p></section>
+    <section class="negsec"><h3>Livro-caixa</h3>${ledger}</section>
+    <div class="neg2"><section class="negsec"><h3>Funcionários contratados</h3>${staff}</section><section class="negsec"><h3>Melhorias</h3>${upgrades}</section></div>
+    ${M?`<section class="negsec"><h3>Entre as sessões</h3>${tools}</section>`:''}
+    <section class="negsec"><h3>Estatuto e regras da casa</h3>${fld('estatuto','Regras internas, acordos, quem não pode entrar…','',  'ta')}</section>
+    <footer class="negfoot"><span>${esc(E.doc)} · ${esc(c.nome)}</span>${M?'<button type="button" class="btn small danger" id="nClose">Encerrar o negócio</button>':''}</footer></article>`;}
+function negMovForm(c,rid){const n=c.negocio,r=(n.recursos||[]).find(x=>x.id===rid);if(!r)return;const mine=negMine(n);
+  openModal(`<h2>Movimentar ${esc(r.nome)}</h2><p class="note">Saldo: ${esc(money(r.valor,r.unidade))}</p>
+    <div class="seg" id="nmDir"><button type="button" data-d="-1" aria-pressed="true">Retirar</button><button type="button" data-d="1" aria-pressed="false">Depositar</button></div>
+    <label class="field"><span>Quantidade${r.unidade&&r.unidade!=='$'?' ('+esc(r.unidade)+')':' ($)'}</span><input id="nmVal" type="number" min="1" step="1"></label>
+    <label class="field"><span>Motivo</span><input id="nmMot" maxlength="120" placeholder="Suborno, munição, pagamento do serviço…"></label>
+    ${!S.master&&mine.length>1?`<label class="field"><span>Em nome de</span><select id="nmWho">${mine.map(x=>`<option>${esc(x.nome)}</option>`).join('')}</select></label>`:''}
+    <p class="err" id="nmErr" aria-live="polite"></p><div class="row" style="justify-content:flex-end"><button class="btn" data-close>Cancelar</button><button class="btn primary" id="nmOk">Registrar</button></div>`);
+  let dir=-1;for(const b of $('#nmDir').children)b.onclick=()=>{dir=num(b.dataset.d);for(const x of $('#nmDir').children)x.setAttribute('aria-pressed',String(x===b));};
+  $('#nmOk').onclick=async()=>{const v=Math.round(num($('#nmVal').value));if(v<=0){$('#nmErr').textContent='Escreva uma quantidade.';return;}const mot=$('#nmMot').value.trim().slice(0,120);
+    if(S.master||S.mode!=='cloud'){const err=negApply(c,{rec:r.id,delta:dir*v,motivo:mot,quem:'Mestre'});if(err){$('#nmErr').textContent=err;return;}closeModal();await saveCamp(c);render();return;}
+    if(dir<0&&num(r.valor)+pendingFor(c,r.id)-v<0){$('#nmErr').textContent='Saldo insuficiente.';return;}
+    const who=$('#nmWho')?$('#nmWho').value:(mine[0]||{}).nome||'';const id=uid();const e={camp:c.id,rec:r.id,delta:dir*v,motivo:mot,quem:who,t:Date.now(),estado:'pendente'};
+    try{await db.doc('pjs/'+S.uid+'/negocio/'+id).set(e);(S_NEG[S.uid]=S_NEG[S.uid]||{})[id]=e;closeModal();toast('Pedido registrado. Entra no livro-caixa quando o mestre abrir a mesa.');render();}catch(x){$('#nmErr').textContent='Não foi possível registrar agora.';}};}
+const pendingFor=(c,rid)=>Object.values(S_NEG[S.uid]||{}).filter(e=>e.camp===c.id&&e.rec===rid&&e.estado==='pendente').reduce((a,e)=>a+num(e.delta),0);
+function bindNeg(app,c){
+  for(const b of app.querySelectorAll('[data-negfund]'))b.onclick=async()=>{c.negocio=negNew(b.dataset.negfund);await saveCamp(c);render();};
+  const n=c.negocio;if(!n||!n.ativo)return;
+  const de=app.querySelector('.negedit');if(de)de.ontoggle=()=>{ui.negEdit=de.open;};
+  for(const el of app.querySelectorAll('[data-nk]'))el.addEventListener(el.tagName==='SELECT'?'change':'input',()=>{setP(n,el.dataset.nk,el.value);if(el.dataset.nre){negSave(c,true);render();}else negSave(c);});
+  for(const b of app.querySelectorAll('[data-npip]'))b.onclick=()=>{const k=b.dataset.npip,i=num(b.dataset.i);n[k]=num(n[k])===i?(k==='nivel'?1:i-1):i;negSave(c,true);render();};
+  for(const b of app.querySelectorAll('[data-nlead]'))b.onchange=()=>{(n.cargos||[]).forEach((x,i)=>x.lider=i===num(b.dataset.nlead));negSave(c,true);render();};
+  for(const b of app.querySelectorAll('[data-ndel]'))b.onclick=()=>{const [k,i]=b.dataset.ndel.split('|');const arr=n[k]||[];const it=arr[num(i)];
+    if(k==='grupos'&&it){for(const x of n.cargos||[])if(x.grupo===it.id)x.grupo='';for(const r of n.recursos||[])if(r.grupo===it.id)r.grupo='';}
+    if(k==='cargos'&&it)for(const g of n.grupos||[])if(g.chefe===it.id)g.chefe='';arr.splice(num(i),1);negSave(c,true);render();};
+  for(const b of app.querySelectorAll('[data-nadd]'))b.onclick=()=>{const q=b.dataset.nadd==='qtd';(n.recursos=n.recursos||[]).push({id:uid(),nome:q?'Munição':'Nova conta',tipo:q?'qtd':'dinheiro',valor:0,unidade:q?'un.':'$',grupo:''});negSave(c,true);render();};
+  for(const b of app.querySelectorAll('[data-nmov]'))b.onclick=()=>negMovForm(c,b.dataset.nmov);
+  for(const b of app.querySelectorAll('[data-ndis]'))b.onclick=async()=>{const id=b.dataset.ndis;try{await db.doc('pjs/'+S.uid+'/negocio/'+id).delete();}catch(e){}if(S_NEG[S.uid])delete S_NEG[S.uid][id];render();};
+  const gr=app.querySelector('#nGrp');if(gr)gr.onclick=()=>{(n.grupos=n.grupos||[]).push({id:uid(),nome:negE(n).grupo+' '+((n.grupos||[]).length+1),chefe:'',desc:''});negSave(c,true);render();};
+  const mm=app.querySelector('#nMem');if(mm)mm.onchange=()=>{const v=mm.value;if(!v)return;n.cargos=n.cargos||[];
+    if(v==='__fora'){const nome=prompt('Nome de quem entra no negócio:');if(!nome)return;n.cargos.push({id:uid(),sheet:'',owner:'',nome:nome.slice(0,60),jogador:'',cargo:'',grupo:'',lider:false});}
+    else{const s=findSheet(v);if(!s)return;n.cargos.push({id:uid(),sheet:s.id,owner:s.kind==='pc'&&s.owner?s.owner:'',nome:s.nome||'Sem nome',jogador:s.owner&&s.owner!==S.uid?S.names[s.owner]||'':'',cargo:'',grupo:'',lider:!n.cargos.length});}
+    negSave(c,true);render();};
+  const fu=app.querySelector('#nFunc');if(fu)fu.onchange=()=>{const f=NEG_FUNC[num(fu.value)];if(!fu.value||!f)return;if((n.funcionarios||[]).length>=num(n.nivel)+1){toast(`No nível ${num(n.nivel)}, o negócio comporta ${num(n.nivel)+1} funcionários.`);render();return;}(n.funcionarios=n.funcionarios||[]).push({nome:f[0],funcao:f[2],custo:f[1]});negSave(c,true);render();};
+  const me=app.querySelector('#nMelh');if(me)me.onchange=()=>{const m=NEG_MELH.find(x=>x[0]===me.value);if(!m)return;const err=negApply(c,{rec:'caixa',delta:-m[1],motivo:'Melhoria: '+m[0],quem:'Mestre'});if(err){toast(err);render();return;}(n.melhorias=n.melhorias||[]).push({nome:m[0],efeito:m[2]});negSave(c,true);render();};
+  const lu=app.querySelector('#nLucro');if(lu)lu.onclick=()=>{const E=negE(n),d=rnd(20),cont=(n.funcionarios||[]).filter(f=>/Contador/.test(f.nome)).length*2,b=num(n.nivel)+Math.floor(num(n.reputacao)/2)+num(E.lucro)+cont,t=d+b;let ganho=0,txt;
+    if(d===20){ganho=num(n.nivel)*600;n.reputacao=Math.min(10,num(n.reputacao)+1);txt='20 natural: lucro em dobro e +1 de Reputação';}else if(d===1){n.calor=Math.min(6,num(n.calor)+2);txt='1 natural: +2 de Calor e uma complicação grande';}else if(t>=13){ganho=num(n.nivel)*300;txt='Sucesso';}else txt='Falha: o mestre cria uma complicação pequena';
+    if(ganho)negApply(c,{rec:'caixa',delta:ganho,motivo:'Lucro da sessão',quem:'Negócio'});rollSheet=null;pushRoll({label:`${n.nome||E.n} · lucro da sessão`,total:t,detail:`d20: ${d} + ${b} contra 13 · ${txt}${ganho?' · +$ '+ganho.toLocaleString('pt-BR'):''}`,crit:d===20,fail:d===1});negSave(c,true);render();};
+  const ma=app.querySelector('#nManut');if(ma)ma.onclick=()=>{const custo=(n.funcionarios||[]).reduce((a,f)=>a+num(f.custo),0)+num(n.nivel)*100;const err=negApply(c,{rec:'caixa',delta:-custo,motivo:'Manutenção da sessão',quem:'Negócio'});if(err){n.calor=Math.min(6,num(n.calor)+1);toast('Sem dinheiro para a manutenção: +1 de Calor (dívidas).');}negSave(c,true);render();};
+  const up=app.querySelector('#nUp');if(up)up.onclick=()=>{const nx=num(n.nivel)+1;const err=negApply(c,{rec:'caixa',delta:-nx*2000,motivo:'Expansão para o nível '+nx,quem:'Negócio'});if(err){toast(err);return;}n.nivel=nx;negSave(c,true);render();};
+  const cl=app.querySelector('#nClose');if(cl)cl.onclick=()=>confirmBox('Encerrar o negócio? O documento, os cargos e o livro-caixa somem desta campanha.',async()=>{delete c.negocio;await saveCamp(c);render();});}
 
 /* ================= SESSION DIARY ================= */
 const ymd=t=>{const d=new Date(t);return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');};
